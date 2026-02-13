@@ -7,9 +7,18 @@ export function GachaScreen() {
   const [results, setResults] = useState<PullResult[]>([]);
   const chest = game.goldChest;
 
+  function addEquipmentToInventory(pullResults: PullResult[]) {
+    for (const r of pullResults) {
+      if (r.equipment) {
+        game.player.addToInventory(r.equipment);
+      }
+    }
+  }
+
   function doPull() {
     const result = game.pullGacha();
     if (!result) return;
+    addEquipmentToInventory([result]);
     setResults([result]);
     refresh();
   }
@@ -17,6 +26,7 @@ export function GachaScreen() {
   function doPull10() {
     const results = game.pullGacha10();
     if (!results) return;
+    addEquipmentToInventory(results);
     setResults(results);
     refresh();
   }

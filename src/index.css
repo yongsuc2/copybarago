@@ -173,6 +173,35 @@ body {
   margin: 6px 0;
 }
 
+.inv-filter-bar {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+.inv-filter-btn {
+  padding: 6px 12px;
+  background: #1a1a2e;
+  border: 1px solid #444;
+  border-radius: 16px;
+  color: #aaa;
+  font-size: 12px;
+  cursor: pointer;
+}
+.inv-filter-btn:hover { border-color: #888; color: #ddd; }
+.inv-filter-btn.active { background: #e94560; border-color: #e94560; color: #fff; }
+
+.inv-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1a1a2e;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 10px;
+  margin: 6px 0;
+}
+
 .battle-arena {
   background: #0d1b2a;
   border-radius: 10px;
