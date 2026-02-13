@@ -1,0 +1,165 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+
+#root {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #333;
+  border-right: 1px solid #333;
+  background: #16213e;
+}
+
+.resource-bar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #0f3460;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+.res-item { padding: 2px 6px; background: #1a1a2e; border-radius: 4px; }
+
+.nav-bar {
+  display: flex;
+  background: #0f3460;
+  border-top: 1px solid #333;
+  overflow-x: auto;
+}
+.nav-btn {
+  flex: 1;
+  padding: 10px 4px;
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 12px;
+  cursor: pointer;
+  min-width: 50px;
+}
+.nav-btn.active { color: #e94560; border-top: 2px solid #e94560; }
+.nav-btn:hover { color: #fff; }
+
+.screen {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.screen h2 { margin-bottom: 12px; color: #e94560; font-size: 18px; }
+.screen h3 { margin: 12px 0 8px; color: #ddd; font-size: 15px; }
+
+.stats-display { background: #1a1a2e; padding: 10px; border-radius: 6px; margin: 8px 0; }
+.stats-display h4 { margin-bottom: 6px; color: #e94560; }
+.stat-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 13px; }
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  margin: 4px;
+}
+.btn-primary { background: #e94560; color: #fff; }
+.btn-primary:hover { background: #c73a52; }
+.btn-primary:disabled { background: #555; cursor: not-allowed; }
+.btn-secondary { background: #333; color: #ddd; }
+.btn-secondary:hover { background: #444; }
+
+.card {
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 0;
+}
+
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+.progress-fill { height: 100%; background: #e94560; transition: width 0.3s; }
+
+.hp-bar { height: 12px; }
+.hp-fill { background: #4caf50; }
+
+.grade-common { color: #aaa; }
+.grade-uncommon { color: #4caf50; }
+.grade-rare { color: #2196f3; }
+.grade-epic { color: #9c27b0; }
+.grade-legendary { color: #ff9800; }
+.grade-mythic { color: #e94560; }
+.grade-s { color: #ffd700; font-weight: bold; }
+
+.encounter-options { display: flex; flex-direction: column; gap: 8px; }
+.encounter-option {
+  background: #1a1a2e;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+}
+.encounter-option:hover { border-color: #e94560; }
+
+.battle-log {
+  max-height: 200px;
+  overflow-y: auto;
+  background: #111;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: monospace;
+}
+.battle-log .log-entry { padding: 2px 0; border-bottom: 1px solid #222; }
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+.menu-card {
+  background: #1a1a2e;
+  border: 1px solid #444;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+}
+.menu-card:hover { border-color: #e94560; }
+.menu-card .title { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+.menu-card .sub { font-size: 11px; color: #888; }
+
+.talent-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1a1a2e;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin: 6px 0;
+}
+
+.equip-slot {
+  background: #1a1a2e;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 10px;
+  margin: 6px 0;
+}

@@ -1,0 +1,102 @@
+import { EquipmentGrade, SlotType } from '../enums';
+import { Stats } from '../value-objects/Stats';
+
+interface EquipmentBaseStats {
+  slot: SlotType;
+  grade: EquipmentGrade;
+  stats: Stats;
+}
+
+const BASE_STATS: EquipmentBaseStats[] = [
+  { slot: SlotType.WEAPON, grade: EquipmentGrade.COMMON, stats: Stats.create({ atk: 10 }) },
+  { slot: SlotType.WEAPON, grade: EquipmentGrade.UNCOMMON, stats: Stats.create({ atk: 25 }) },
+  { slot: SlotType.WEAPON, grade: EquipmentGrade.RARE, stats: Stats.create({ atk: 50 }) },
+  { slot: SlotType.WEAPON, grade: EquipmentGrade.EPIC, stats: Stats.create({ atk: 100 }) },
+  { slot: SlotType.WEAPON, grade: EquipmentGrade.LEGENDARY, stats: Stats.create({ atk: 200 }) },
+  { slot: SlotType.WEAPON, grade: EquipmentGrade.MYTHIC, stats: Stats.create({ atk: 400 }) },
+
+  { slot: SlotType.ARMOR, grade: EquipmentGrade.COMMON, stats: Stats.create({ maxHp: 50 }) },
+  { slot: SlotType.ARMOR, grade: EquipmentGrade.UNCOMMON, stats: Stats.create({ maxHp: 120 }) },
+  { slot: SlotType.ARMOR, grade: EquipmentGrade.RARE, stats: Stats.create({ maxHp: 250 }) },
+  { slot: SlotType.ARMOR, grade: EquipmentGrade.EPIC, stats: Stats.create({ maxHp: 500 }) },
+  { slot: SlotType.ARMOR, grade: EquipmentGrade.LEGENDARY, stats: Stats.create({ maxHp: 1000 }) },
+  { slot: SlotType.ARMOR, grade: EquipmentGrade.MYTHIC, stats: Stats.create({ maxHp: 2000 }) },
+
+  { slot: SlotType.RING, grade: EquipmentGrade.COMMON, stats: Stats.create({ atk: 5 }) },
+  { slot: SlotType.RING, grade: EquipmentGrade.UNCOMMON, stats: Stats.create({ atk: 12 }) },
+  { slot: SlotType.RING, grade: EquipmentGrade.RARE, stats: Stats.create({ atk: 25 }) },
+  { slot: SlotType.RING, grade: EquipmentGrade.EPIC, stats: Stats.create({ atk: 50 }) },
+  { slot: SlotType.RING, grade: EquipmentGrade.LEGENDARY, stats: Stats.create({ atk: 100 }) },
+  { slot: SlotType.RING, grade: EquipmentGrade.MYTHIC, stats: Stats.create({ atk: 200 }) },
+
+  { slot: SlotType.ACCESSORY, grade: EquipmentGrade.COMMON, stats: Stats.create({ maxHp: 30 }) },
+  { slot: SlotType.ACCESSORY, grade: EquipmentGrade.UNCOMMON, stats: Stats.create({ maxHp: 70 }) },
+  { slot: SlotType.ACCESSORY, grade: EquipmentGrade.RARE, stats: Stats.create({ maxHp: 150 }) },
+  { slot: SlotType.ACCESSORY, grade: EquipmentGrade.EPIC, stats: Stats.create({ maxHp: 300 }) },
+  { slot: SlotType.ACCESSORY, grade: EquipmentGrade.LEGENDARY, stats: Stats.create({ maxHp: 600 }) },
+  { slot: SlotType.ACCESSORY, grade: EquipmentGrade.MYTHIC, stats: Stats.create({ maxHp: 1200 }) },
+];
+
+const UPGRADE_MULTIPLIER_PER_LEVEL = 0.05;
+
+const MERGE_COUNT: Record<EquipmentGrade, number> = {
+  [EquipmentGrade.COMMON]: 3,
+  [EquipmentGrade.UNCOMMON]: 3,
+  [EquipmentGrade.RARE]: 3,
+  [EquipmentGrade.EPIC]: 2,
+  [EquipmentGrade.LEGENDARY]: 2,
+  [EquipmentGrade.MYTHIC]: 0,
+};
+
+const GRADE_ORDER: EquipmentGrade[] = [
+  EquipmentGrade.COMMON,
+  EquipmentGrade.UNCOMMON,
+  EquipmentGrade.RARE,
+  EquipmentGrade.EPIC,
+  EquipmentGrade.LEGENDARY,
+  EquipmentGrade.MYTHIC,
+];
+
+const PROMOTE_LEVELS = [10, 20, 30];
+
+export const EquipmentTable = {
+  getBaseStats(slot: SlotType, grade: EquipmentGrade): Stats {
+    const entry = BASE_STATS.find(e => e.slot === slot && e.grade === grade);
+    return entry?.stats ?? Stats.ZERO;
+  },
+
+  getUpgradeMultiplier(level: number): number {
+    return 1 + level * UPGRADE_MULTIPLIER_PER_LEVEL;
+  },
+
+  getMergeCount(grade: EquipmentGrade): number {
+    return MERGE_COUNT[grade];
+  },
+
+  getNextGrade(grade: EquipmentGrade): EquipmentGrade | null {
+    const idx = GRADE_ORDER.indexOf(grade);
+    if (idx >= GRADE_ORDER.length - 1) return null;
+    return GRADE_ORDER[idx + 1];
+  },
+
+  getGradeIndex(grade: EquipmentGrade): number {
+    return GRADE_ORDER.indexOf(grade);
+  },
+
+  getPromoteLevels(): number[] {
+    return PROMOTE_LEVELS;
+  },
+
+  canPromoteAtLevel(level: number): boolean {
+    return PROMOTE_LEVELS.includes(level);
+  },
+
+  getSlotMaxCount(slot: SlotType): number {
+    switch (slot) {
+      case SlotType.WEAPON: return 1;
+      case SlotType.ARMOR: return 1;
+      case SlotType.RING: return 2;
+      case SlotType.ACCESSORY: return 2;
+    }
+  },
+};
