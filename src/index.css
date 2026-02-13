@@ -172,3 +172,196 @@ body {
   padding: 10px;
   margin: 6px 0;
 }
+
+.battle-arena {
+  background: #0d1b2a;
+  border-radius: 10px;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #1b2838;
+}
+
+.ba-turn-counter {
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #ddd;
+}
+
+.ba-boss-badge {
+  background: #e94560;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  margin-right: 8px;
+}
+
+.ba-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  min-height: 140px;
+}
+
+.ba-character {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.ba-move-right {
+  transform: translateX(60px);
+}
+
+.ba-move-left {
+  transform: translateX(-60px);
+}
+
+.ba-hit {
+  animation: shake 0.3s ease-in-out;
+}
+
+.ba-vs {
+  font-size: 16px;
+  font-weight: bold;
+  color: #555;
+}
+
+.ba-hp-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  width: 100%;
+}
+
+.ba-hp-bar {
+  flex: 1;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 60px;
+}
+
+.ba-hp-fill {
+  height: 100%;
+  transition: width 0.4s ease;
+  border-radius: 4px;
+}
+.ba-hp-fill.player { background: #4caf50; }
+.ba-hp-fill.enemy { background: #e94560; }
+
+.ba-power {
+  font-size: 11px;
+  color: #aaa;
+  white-space: nowrap;
+}
+
+.ba-popup-area {
+  position: absolute;
+  top: -24px;
+  display: flex;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.ba-damage-popup {
+  font-weight: bold;
+  font-size: 16px;
+  animation: popupFloat 0.8s ease-out forwards;
+  white-space: nowrap;
+}
+.ba-damage-popup.damage { color: #ff5252; }
+.ba-damage-popup.heal { color: #69f0ae; }
+.ba-damage-popup.crit { color: #ffd740; font-size: 20px; }
+
+@keyframes popupFloat {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+
+.player-stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px;
+  background: #0f1923;
+  border-radius: 8px;
+  margin: 6px 0;
+  flex-wrap: wrap;
+}
+
+.psb-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  padding: 3px 8px;
+  background: #1a2636;
+  border-radius: 4px;
+}
+
+.psb-hp {
+  flex: 1;
+  min-width: 140px;
+}
+
+.psb-label {
+  color: #999;
+  font-size: 11px;
+}
+
+.psb-hp-percent {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.psb-hp-value {
+  color: #ddd;
+  font-size: 11px;
+}
+
+.psb-value {
+  color: #ddd;
+  font-weight: bold;
+}
+
+.ba-day-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 8px;
+  font-size: 13px;
+  color: #888;
+}
+.ba-day-divider::before,
+.ba-day-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #333;
+}
+
+.battle-result-banner {
+  text-align: center;
+  padding: 16px;
+  border-radius: 8px;
+  margin: 8px 0;
+  font-size: 16px;
+  font-weight: bold;
+}
+.battle-result-banner.victory {
+  background: rgba(76, 175, 80, 0.15);
+  color: #69f0ae;
+  border: 1px solid #4caf50;
+}
+.battle-result-banner.defeat {
+  background: rgba(233, 69, 96, 0.15);
+  color: #ff5252;
+  border: 1px solid #e94560;
+}
