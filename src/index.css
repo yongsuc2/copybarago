@@ -26,7 +26,7 @@ body {
   font-size: 13px;
   flex-wrap: wrap;
 }
-.res-item { padding: 2px 6px; background: #1a1a2e; border-radius: 4px; }
+.res-item { padding: 2px 6px; background: #1a1a2e; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; }
 
 .nav-bar {
   display: flex;
@@ -36,14 +36,19 @@ body {
 }
 .nav-btn {
   flex: 1;
-  padding: 10px 4px;
+  padding: 8px 4px 6px;
   background: none;
   border: none;
   color: #aaa;
-  font-size: 12px;
+  font-size: 10px;
   cursor: pointer;
   min-width: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
 }
+.nav-label { display: block; }
 .nav-btn.active { color: #e94560; border-top: 2px solid #e94560; }
 .nav-btn:hover { color: #fff; }
 
@@ -141,6 +146,10 @@ body {
   padding: 16px;
   text-align: center;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 }
 .menu-card:hover { border-color: #e94560; }
 .menu-card .title { font-size: 14px; font-weight: bold; margin-bottom: 4px; }

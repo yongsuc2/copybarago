@@ -1,4 +1,5 @@
 import { useGame } from '../GameContext';
+import { Coins, Gem, Zap, Medal, Ticket } from 'lucide-react';
 
 export function ResourceBar() {
   const { game } = useGame();
@@ -6,11 +7,11 @@ export function ResourceBar() {
 
   return (
     <div className="resource-bar">
-      <span className="res-item" title="Gold">G: {Math.floor(r.gold)}</span>
-      <span className="res-item" title="Gems">D: {Math.floor(r.gems)}</span>
-      <span className="res-item" title="Stamina">S: {Math.floor(r.stamina)}</span>
-      <span className="res-item" title="Challenge Tokens">T: {r.challengeTokens}</span>
-      <span className="res-item" title="Arena Tickets">A: {r.arenaTickets}</span>
+      <span className="res-item" title="골드"><Coins size={13} color="#ffd700" /> {Math.floor(r.gold)}</span>
+      <span className="res-item" title="보석"><Gem size={13} color="#e040fb" /> {Math.floor(r.gems)}</span>
+      <span className="res-item" title="스태미나"><Zap size={13} color="#4caf50" /> {Math.floor(r.stamina)}</span>
+      <span className="res-item" title="도전 토큰"><Medal size={13} color="#ff9800" /> {r.challengeTokens}</span>
+      <span className="res-item" title="아레나 티켓"><Ticket size={13} color="#2196f3" /> {r.arenaTickets}</span>
     </div>
   );
 }

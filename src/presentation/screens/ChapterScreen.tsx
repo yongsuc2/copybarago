@@ -34,7 +34,7 @@ export function ChapterScreen() {
 
     const enc = game.currentChapter.advanceDay();
     setEncounter(enc);
-    setLog(prev => [...prev, `Day ${game.currentChapter!.currentDay}: ${enc?.type ?? 'BOSS'}`]);
+    setLog(prev => [...prev, `${game.currentChapter!.currentDay}일차: ${enc?.type ?? '보스'}`]);
     refresh();
   }
 
@@ -50,10 +50,10 @@ export function ChapterScreen() {
     const result = game.currentChapter.resolveEncounter(index, stats.hp, stats.maxHp);
     if (result) {
       if (result.skillsGained.length > 0) {
-        setLog(prev => [...prev, `  Gained: ${result.skillsGained.map(s => s.name).join(', ')}`]);
+        setLog(prev => [...prev, `  획득: ${result.skillsGained.map(s => s.name).join(', ')}`]);
       }
       if (result.hpChange !== 0) {
-        setLog(prev => [...prev, `  HP change: ${result.hpChange > 0 ? '+' : ''}${result.hpChange}`]);
+        setLog(prev => [...prev, `  체력 변화: ${result.hpChange > 0 ? '+' : ''}${result.hpChange}`]);
       }
     }
 
@@ -73,7 +73,7 @@ export function ChapterScreen() {
     battle.runToCompletion();
     game.currentChapter.onBattleEnd(battle.state);
 
-    setLog(prev => [...prev, `  Battle: ${battle.state} in ${battle.turnCount} turns`]);
+    setLog(prev => [...prev, `  전투: ${battle.state} (${battle.turnCount}턴)`]);
     setBattleResult(battle.state);
 
     if (battle.state === BattleState.DEFEAT) {
@@ -99,11 +99,11 @@ export function ChapterScreen() {
       game.currentChapter.onBossDefeated();
       game.player.clearedChapterMax = Math.max(game.player.clearedChapterMax, game.currentChapter.id);
       game.travel.maxClearedChapter = game.player.clearedChapterMax;
-      setLog(prev => [...prev, `BOSS CLEAR! Chapter ${game.currentChapter!.id} completed!`]);
+      setLog(prev => [...prev, `보스 클리어! 챕터 ${game.currentChapter!.id} 완료!`]);
       game.player.resources.add('GOLD' as any, 500);
     } else {
       game.currentChapter.onBattleEnd(battle.state);
-      setLog(prev => [...prev, `Boss defeated you...`]);
+      setLog(prev => [...prev, `보스에게 패배했습니다...`]);
     }
 
     setBattleResult(battle.state);
@@ -113,17 +113,17 @@ export function ChapterScreen() {
 
   return (
     <div className="screen">
-      <h2>Adventure</h2>
+      <h2>모험</h2>
 
       {!chapter && (
         <div>
           <div className="card">
             <div className="stat-row">
-              <span>Next Chapter</span>
+              <span>다음 챕터</span>
               <span>{game.player.clearedChapterMax + 1}</span>
             </div>
             <div className="stat-row">
-              <span>Stamina Cost</span>
+              <span>스태미나 소모</span>
               <span>5</span>
             </div>
           </div>
@@ -132,11 +132,11 @@ export function ChapterScreen() {
             disabled={game.player.resources.stamina < 5}
             onClick={startChapter}
           >
-            Start Chapter {game.player.clearedChapterMax + 1}
+            챕터 {game.player.clearedChapterMax + 1} 시작
           </button>
           {battleResult && (
             <div className="card" style={{ marginTop: 8 }}>
-              <strong>{battleResult === BattleState.VICTORY ? 'Chapter Cleared!' : 'Chapter Failed'}</strong>
+              <strong>{battleResult === BattleState.VICTORY ? '챕터 클리어!' : '챕터 실패'}</strong>
             </div>
           )}
         </div>
@@ -146,14 +146,14 @@ export function ChapterScreen() {
         <div>
           <div className="card">
             <div className="stat-row">
-              <span>Chapter {chapter.id}</span>
-              <span>Day {chapter.currentDay}/{chapter.totalDays}</span>
+              <span>챕터 {chapter.id}</span>
+              <span>{chapter.currentDay}일 / {chapter.totalDays}일</span>
             </div>
             <div className="progress-bar">
               <div className="progress-fill" style={{ width: `${chapter.getProgress() * 100}%` }} />
             </div>
             <div className="stat-row">
-              <span>Skills</span>
+              <span>스킬</span>
               <span>{chapter.sessionSkills.length}</span>
             </div>
           </div>

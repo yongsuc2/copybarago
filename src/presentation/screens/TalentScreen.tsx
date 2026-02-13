@@ -19,30 +19,30 @@ export function TalentScreen() {
   }
 
   const rows = [
-    { stat: StatType.ATK, label: 'ATK', level: talent.atkLevel },
-    { stat: StatType.HP, label: 'HP', level: talent.hpLevel },
-    { stat: StatType.DEF, label: 'DEF', level: talent.defLevel },
+    { stat: StatType.ATK, label: '공격력', level: talent.atkLevel },
+    { stat: StatType.HP, label: '체력', level: talent.hpLevel },
+    { stat: StatType.DEF, label: '방어력', level: talent.defLevel },
   ];
 
   const nextThreshold = talent.getNextGradeThreshold();
 
   return (
     <div className="screen">
-      <h2>Talent</h2>
+      <h2>재능</h2>
 
       <div className="card">
         <div className="stat-row">
-          <span>Grade</span>
+          <span>등급</span>
           <span>{talent.grade}</span>
         </div>
         <div className="stat-row">
-          <span>Total Level</span>
+          <span>총 레벨</span>
           <span>{talent.getTotalLevel()}</span>
         </div>
         {nextThreshold && (
           <>
             <div className="stat-row">
-              <span>Next Grade</span>
+              <span>다음 등급</span>
               <span>{talent.getTotalLevel()} / {nextThreshold}</span>
             </div>
             <div className="progress-bar">
@@ -67,23 +67,23 @@ export function TalentScreen() {
               disabled={!canAfford}
               onClick={() => upgradeStat(row.stat)}
             >
-              Upgrade ({cost}g)
+              강화 ({cost}골드)
             </button>
           </div>
         );
       })}
 
-      <StatsDisplay stats={stats} label="Total Stats" />
+      <StatsDisplay stats={stats} label="종합 스탯" />
 
       {game.player.isHeritageUnlocked() && (
         <div className="card" style={{ marginTop: 12 }}>
-          <h3>Heritage</h3>
+          <h3>유산</h3>
           <div className="stat-row">
-            <span>Route</span>
+            <span>경로</span>
             <span>{game.player.heritage.route}</span>
           </div>
           <div className="stat-row">
-            <span>Level</span>
+            <span>레벨</span>
             <span>{game.player.heritage.level}</span>
           </div>
         </div>

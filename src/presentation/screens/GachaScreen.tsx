@@ -23,31 +23,31 @@ export function GachaScreen() {
 
   return (
     <div className="screen">
-      <h2>Gacha</h2>
+      <h2>뽑기</h2>
 
       <div className="card">
-        <div className="stat-row"><span>Gems</span><span>{Math.floor(game.player.resources.gems)}</span></div>
-        <div className="stat-row"><span>Pity</span><span>{chest.pityCount} / {chest.getPityThreshold()}</span></div>
+        <div className="stat-row"><span>보석</span><span>{Math.floor(game.player.resources.gems)}</span></div>
+        <div className="stat-row"><span>천장</span><span>{chest.pityCount} / {chest.getPityThreshold()}</span></div>
         <div className="progress-bar">
           <div className="progress-fill" style={{ width: `${chest.getPityProgress() * 100}%` }} />
         </div>
-        <div className="stat-row"><span>To Pity</span><span>{chest.getRemainingToPity()} pulls</span></div>
+        <div className="stat-row"><span>천장까지</span><span>{chest.getRemainingToPity()}회</span></div>
       </div>
 
       <div style={{ display: 'flex', gap: 8, margin: '12px 0' }}>
         <button className="btn btn-primary" onClick={doPull}
           disabled={game.player.resources.gems < chest.getCostPerPull()}>
-          Pull x1 ({chest.getCostPerPull()} gems)
+          1회 뽑기 ({chest.getCostPerPull()} 보석)
         </button>
         <button className="btn btn-primary" onClick={doPull10}
           disabled={game.player.resources.gems < chest.getPull10Cost()}>
-          Pull x10 ({chest.getPull10Cost()} gems)
+          10회 뽑기 ({chest.getPull10Cost()} 보석)
         </button>
       </div>
 
       {results.length > 0 && (
         <>
-          <h3>Results</h3>
+          <h3>결과</h3>
           {results.map((r, i) => (
             <div className="card" key={i} style={{ padding: 8, margin: '4px 0', borderColor: r.isPity ? '#ffd700' : '#333' }}>
               {r.equipment ? (
@@ -57,7 +57,7 @@ export function GachaScreen() {
                     {r.equipment.grade}
                   </span>
                   <span style={{ marginLeft: 8, fontSize: 12 }}>{r.equipment.slot}</span>
-                  {r.isPity && <span style={{ marginLeft: 8, color: '#ffd700', fontSize: 12 }}>PITY!</span>}
+                  {r.isPity && <span style={{ marginLeft: 8, color: '#ffd700', fontSize: 12 }}>천장!</span>}
                 </div>
               ) : (
                 <div style={{ fontSize: 12, color: '#888' }}>

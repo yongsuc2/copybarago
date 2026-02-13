@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useGame } from '../GameContext';
 import { DungeonType, ResourceType, BattleState } from '../../domain/enums';
 import { BattleUnit } from '../../domain/battle/BattleUnit';
+import { Building2, Skull, Swords, Map, Pickaxe, ArrowLeft } from 'lucide-react';
 
 type ContentTab = 'menu' | 'tower' | 'dungeon' | 'arena' | 'travel' | 'mine';
 
@@ -31,9 +32,9 @@ export function ContentScreen() {
       for (const r of outcome.reward.resources) {
         game.player.resources.add(r.type, r.amount);
       }
-      showMsg(`Victory! Floor ${game.tower.currentFloor}-${game.tower.currentStage}`);
+      showMsg(`승리! ${game.tower.currentFloor}층-${game.tower.currentStage}`);
     } else {
-      showMsg('Defeat! Token not consumed.');
+      showMsg('패배! 토큰이 소모되지 않았습니다.');
       game.player.resources.add(ResourceType.CHALLENGE_TOKEN, 1);
     }
     refresh();
@@ -42,7 +43,7 @@ export function ContentScreen() {
   function enterDungeon(type: DungeonType) {
     const result = game.enterDungeon(type);
     if (result.isFail()) { showMsg(result.message); return; }
-    showMsg('Dungeon cleared! Rewards collected.');
+    showMsg('던전 클리어! 보상을 획득했습니다.');
     refresh();
   }
 
@@ -55,14 +56,14 @@ export function ContentScreen() {
     const wins = result.data!.results.filter(r => r === BattleState.VICTORY).length;
     const reward = game.arena.getReward();
     for (const r of reward.resources) game.player.resources.add(r.type, r.amount);
-    showMsg(`Arena: ${wins}/4 wins! Tier: ${game.arena.tier}`);
+    showMsg(`아레나: ${wins}/4 승! 티어: ${game.arena.tier}`);
     refresh();
   }
 
   function runTravel() {
     const result = game.travelRun(10);
     if (result.isFail()) { showMsg(result.message); return; }
-    showMsg(`Travel complete! +${result.data!.reward.resources[0]?.amount ?? 0} gold`);
+    showMsg(`여행 완료! +${result.data!.reward.resources[0]?.amount ?? 0} 골드`);
     refresh();
   }
 
@@ -76,10 +77,10 @@ export function ContentScreen() {
       const cartResult = game.goblinMiner.useCart(game.rng);
       if (cartResult.isOk()) {
         for (const r of cartResult.data!.reward.resources) game.player.resources.add(r.type, r.amount);
-        showMsg('Cart reward collected!');
+        showMsg('수레 보상을 획득했습니다!');
       }
     } else {
-      showMsg(`Mined! Ore: ${game.goblinMiner.oreCount}/30`);
+      showMsg(`채굴 완료! 광석: ${game.goblinMiner.oreCount}/30`);
     }
     refresh();
   }
@@ -87,28 +88,33 @@ export function ContentScreen() {
   if (tab === 'menu') {
     return (
       <div className="screen">
-        <h2>Content</h2>
+        <h2>콘텐츠</h2>
         {message && <div className="card" style={{ color: '#4caf50' }}>{message}</div>}
         <div className="menu-grid">
           <div className="menu-card" onClick={() => setTab('tower')}>
-            <div className="title">Tower</div>
-            <div className="sub">F{game.tower.currentFloor}-{game.tower.currentStage}</div>
+            <Building2 size={28} color="#9c27b0" />
+            <div className="title">탑</div>
+            <div className="sub">{game.tower.currentFloor}층-{game.tower.currentStage}</div>
           </div>
           <div className="menu-card" onClick={() => setTab('dungeon')}>
-            <div className="title">Dungeon</div>
-            <div className="sub">{game.dungeonManager.getTotalRemainingCount()} remaining</div>
+            <Skull size={28} color="#e94560" />
+            <div className="title">던전</div>
+            <div className="sub">{game.dungeonManager.getTotalRemainingCount()}회 남음</div>
           </div>
           <div className="menu-card" onClick={() => setTab('arena')}>
-            <div className="title">Arena</div>
-            <div className="sub">{game.arena.tier} | {game.arena.getRemainingEntries()} entries</div>
+            <Swords size={28} color="#ff9800" />
+            <div className="title">아레나</div>
+            <div className="sub">{game.arena.tier} | {game.arena.getRemainingEntries()}회 남음</div>
           </div>
           <div className="menu-card" onClick={() => setTab('travel')}>
-            <div className="title">Travel</div>
+            <Map size={28} color="#4caf50" />
+            <div className="title">여행</div>
             <div className="sub">x{game.travel.multiplier}</div>
           </div>
           <div className="menu-card" onClick={() => setTab('mine')}>
-            <div className="title">Mine</div>
-            <div className="sub">{game.goblinMiner.oreCount}/30 ore</div>
+            <Pickaxe size={28} color="#ffd700" />
+            <div className="title">광산</div>
+            <div className="sub">광석 {game.goblinMiner.oreCount}/30</div>
           </div>
         </div>
       </div>
@@ -117,27 +123,27 @@ export function ContentScreen() {
 
   return (
     <div className="screen">
-      <button className="btn btn-secondary" onClick={() => setTab('menu')}>Back</button>
+      <button className="btn btn-secondary" onClick={() => setTab('menu')}><ArrowLeft size={14} style={{ verticalAlign: -2 }} /> 뒤로</button>
       {message && <div className="card" style={{ color: '#4caf50' }}>{message}</div>}
 
       {tab === 'tower' && (
         <>
-          <h2>Tower</h2>
+          <h2>탑</h2>
           <div className="card">
-            <div className="stat-row"><span>Floor</span><span>{game.tower.currentFloor}</span></div>
-            <div className="stat-row"><span>Stage</span><span>{game.tower.currentStage}/10</span></div>
-            <div className="stat-row"><span>Tokens</span><span>{game.player.resources.challengeTokens}</span></div>
+            <div className="stat-row"><span>층</span><span>{game.tower.currentFloor}</span></div>
+            <div className="stat-row"><span>스테이지</span><span>{game.tower.currentStage}/10</span></div>
+            <div className="stat-row"><span>토큰</span><span>{game.player.resources.challengeTokens}</span></div>
           </div>
           <button className="btn btn-primary" onClick={challengeTower}
             disabled={game.player.resources.challengeTokens < 1}>
-            Challenge
+            도전
           </button>
         </>
       )}
 
       {tab === 'dungeon' && (
         <>
-          <h2>Daily Dungeons</h2>
+          <h2>일일 던전</h2>
           {[DungeonType.DRAGON_NEST, DungeonType.CELESTIAL_TREE, DungeonType.SKY_ISLAND].map(type => {
             const d = game.dungeonManager.getDungeon(type);
             return (
@@ -148,7 +154,7 @@ export function ContentScreen() {
                 </div>
                 <button className="btn btn-primary" onClick={() => enterDungeon(type)}
                   disabled={!d.isAvailable()}>
-                  Enter
+                  입장
                 </button>
               </div>
             );
@@ -158,47 +164,47 @@ export function ContentScreen() {
 
       {tab === 'arena' && (
         <>
-          <h2>Arena</h2>
+          <h2>아레나</h2>
           <div className="card">
-            <div className="stat-row"><span>Tier</span><span>{game.arena.tier}</span></div>
-            <div className="stat-row"><span>Points</span><span>{game.arena.points}</span></div>
-            <div className="stat-row"><span>Entries</span><span>{game.arena.getRemainingEntries()}/5</span></div>
+            <div className="stat-row"><span>티어</span><span>{game.arena.tier}</span></div>
+            <div className="stat-row"><span>점수</span><span>{game.arena.points}</span></div>
+            <div className="stat-row"><span>남은 횟수</span><span>{game.arena.getRemainingEntries()}/5</span></div>
           </div>
           <button className="btn btn-primary" onClick={fightArena}
             disabled={!game.arena.isAvailable() || game.player.resources.arenaTickets < 1}>
-            Fight
+            전투
           </button>
         </>
       )}
 
       {tab === 'travel' && (
         <>
-          <h2>Travel</h2>
+          <h2>여행</h2>
           <div className="card">
-            <div className="stat-row"><span>Max Chapter</span><span>{game.travel.maxClearedChapter}</span></div>
-            <div className="stat-row"><span>Multiplier</span><span>x{game.travel.multiplier}</span></div>
-            <div className="stat-row"><span>Preview (10 sta)</span><span>{game.travel.getGoldPreview(10)} gold</span></div>
+            <div className="stat-row"><span>최대 클리어 챕터</span><span>{game.travel.maxClearedChapter}</span></div>
+            <div className="stat-row"><span>배율</span><span>x{game.travel.multiplier}</span></div>
+            <div className="stat-row"><span>예상 수익 (10 스태미나)</span><span>{game.travel.getGoldPreview(10)} 골드</span></div>
           </div>
           <button className="btn btn-primary" onClick={runTravel}
             disabled={game.player.resources.stamina < 10}>
-            Travel (10 stamina)
+            여행 (10 스태미나)
           </button>
         </>
       )}
 
       {tab === 'mine' && (
         <>
-          <h2>Goblin Mine</h2>
+          <h2>고블린 광산</h2>
           <div className="card">
-            <div className="stat-row"><span>Ore</span><span>{game.goblinMiner.oreCount}/30</span></div>
-            <div className="stat-row"><span>Pickaxes</span><span>{game.player.resources.pickaxes}</span></div>
+            <div className="stat-row"><span>광석</span><span>{game.goblinMiner.oreCount}/30</span></div>
+            <div className="stat-row"><span>곡괭이</span><span>{game.player.resources.pickaxes}</span></div>
             <div className="progress-bar">
               <div className="progress-fill" style={{ width: `${game.goblinMiner.getProgress() * 100}%` }} />
             </div>
           </div>
           <button className="btn btn-primary" onClick={doMine}
             disabled={game.player.resources.pickaxes < 1}>
-            Mine
+            채굴
           </button>
         </>
       )}

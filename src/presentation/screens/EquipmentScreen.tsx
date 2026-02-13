@@ -2,10 +2,10 @@ import { useGame } from '../GameContext';
 import { SlotType, ResourceType } from '../../domain/enums';
 
 const SLOT_LABELS: Record<SlotType, string> = {
-  [SlotType.WEAPON]: 'Weapon',
-  [SlotType.ARMOR]: 'Armor',
-  [SlotType.RING]: 'Ring',
-  [SlotType.ACCESSORY]: 'Accessory',
+  [SlotType.WEAPON]: '무기',
+  [SlotType.ARMOR]: '방어구',
+  [SlotType.RING]: '반지',
+  [SlotType.ACCESSORY]: '장신구',
 };
 
 export function EquipmentScreen() {
@@ -27,15 +27,15 @@ export function EquipmentScreen() {
 
   return (
     <div className="screen">
-      <h2>Equipment</h2>
+      <h2>장비</h2>
 
       <div className="card">
         <div className="stat-row">
-          <span>Equipment Stones</span>
+          <span>장비 강화석</span>
           <span>{game.player.resources.equipmentStones}</span>
         </div>
         <div className="stat-row">
-          <span>Power Stones</span>
+          <span>파워 스톤</span>
           <span>{game.player.resources.powerStones}</span>
         </div>
       </div>
@@ -69,7 +69,7 @@ export function EquipmentScreen() {
                     </div>
                   </>
                 ) : (
-                  <span style={{ color: '#555' }}>Empty Slot</span>
+                  <span style={{ color: '#555' }}>빈 슬롯</span>
                 )}
               </div>
             ))}

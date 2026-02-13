@@ -1,13 +1,15 @@
 import { useGame } from '../GameContext';
+import { Home, Swords, TrendingUp, Shield, PawPrint, LayoutGrid, Gift } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
-const NAV_ITEMS = [
-  { screen: 'main', label: 'Home' },
-  { screen: 'chapter', label: 'Chapter' },
-  { screen: 'talent', label: 'Talent' },
-  { screen: 'equipment', label: 'Equip' },
-  { screen: 'pet', label: 'Pet' },
-  { screen: 'content', label: 'Content' },
-  { screen: 'gacha', label: 'Gacha' },
+const NAV_ITEMS: { screen: string; label: string; icon: LucideIcon }[] = [
+  { screen: 'main', label: '홈', icon: Home },
+  { screen: 'chapter', label: '모험', icon: Swords },
+  { screen: 'talent', label: '재능', icon: TrendingUp },
+  { screen: 'equipment', label: '장비', icon: Shield },
+  { screen: 'pet', label: '펫', icon: PawPrint },
+  { screen: 'content', label: '콘텐츠', icon: LayoutGrid },
+  { screen: 'gacha', label: '뽑기', icon: Gift },
 ];
 
 export function NavBar() {
@@ -15,15 +17,19 @@ export function NavBar() {
 
   return (
     <nav className="nav-bar">
-      {NAV_ITEMS.map(item => (
-        <button
-          key={item.screen}
-          className={`nav-btn ${screen === item.screen ? 'active' : ''}`}
-          onClick={() => setScreen(item.screen)}
-        >
-          {item.label}
-        </button>
-      ))}
+      {NAV_ITEMS.map(item => {
+        const Icon = item.icon;
+        return (
+          <button
+            key={item.screen}
+            className={`nav-btn ${screen === item.screen ? 'active' : ''}`}
+            onClick={() => setScreen(item.screen)}
+          >
+            <Icon size={18} />
+            <span className="nav-label">{item.label}</span>
+          </button>
+        );
+      })}
     </nav>
   );
 }

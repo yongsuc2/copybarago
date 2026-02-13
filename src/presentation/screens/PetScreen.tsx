@@ -33,15 +33,15 @@ export function PetScreen() {
 
   return (
     <div className="screen">
-      <h2>Pets</h2>
+      <h2>펫</h2>
 
       <div className="card">
         <div className="stat-row">
-          <span>Pet Eggs</span>
+          <span>펫 알</span>
           <span>{game.player.resources.get(ResourceType.PET_EGG)}</span>
         </div>
         <div className="stat-row">
-          <span>Pet Food</span>
+          <span>펫 먹이</span>
           <span>{game.player.resources.get(ResourceType.PET_FOOD)}</span>
         </div>
         <button
@@ -50,12 +50,12 @@ export function PetScreen() {
           onClick={hatchEgg}
           style={{ marginTop: 8 }}
         >
-          Hatch Egg
+          알 부화
         </button>
       </div>
 
       {pets.length === 0 && (
-        <div className="card"><span style={{ color: '#888' }}>No pets yet</span></div>
+        <div className="card"><span style={{ color: '#888' }}>보유한 펫이 없습니다</span></div>
       )}
 
       {pets.map((pet, i) => (
@@ -75,14 +75,14 @@ export function PetScreen() {
           </div>
           <div style={{ marginTop: 8, display: 'flex', gap: 4 }}>
             {pet !== activePet && (
-              <button className="btn btn-primary" onClick={() => setActive(i)}>Set Active</button>
+              <button className="btn btn-primary" onClick={() => setActive(i)}>출전</button>
             )}
             <button
               className="btn btn-secondary"
               onClick={() => feedPet(i)}
               disabled={!game.player.resources.canAfford(ResourceType.PET_FOOD, 1)}
             >
-              Feed
+              먹이주기
             </button>
           </div>
         </div>
