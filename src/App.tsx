@@ -26,11 +26,13 @@ function ScreenRouter() {
 
 function AppLayout() {
   const { game, screen } = useGame();
-  const inChapter = screen === 'chapter' && game.currentChapter !== null;
+  const hideResourceBar = screen === 'chapter' && game.currentChapter !== null;
 
   return (
     <>
-      {!inChapter && <ResourceBar />}
+      <div style={hideResourceBar ? { display: 'none' } : undefined}>
+        <ResourceBar />
+      </div>
       <ScreenRouter />
       <NavBar />
     </>
