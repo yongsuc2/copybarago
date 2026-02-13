@@ -79,7 +79,7 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
   return (
     <div className="battle-arena">
       <div className="ba-turn-counter">
-        {isBoss && <span className="ba-boss-badge">BOSS</span>}
+        {isBoss && <span className="ba-boss-badge">보스</span>}
         <span>턴 {turnCount}/{maxTurns}</span>
       </div>
 
@@ -104,7 +104,7 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
           </div>
         </div>
 
-        <div className="ba-vs">VS</div>
+        <div className="ba-vs">대</div>
 
         <div className={`ba-character ${isEnemyApproach ? 'ba-move-left' : ''} ${isEnemyHit ? 'ba-hit' : ''}`}>
           <div className="ba-popup-area">

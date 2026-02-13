@@ -67,11 +67,11 @@ export function PetScreen() {
                 [{pet.tier}] {pet.grade}
               </span>
             </div>
-            <span style={{ fontSize: 12 }}>Lv.{pet.level}</span>
+            <span style={{ fontSize: 12 }}>{pet.level}레벨</span>
           </div>
           <div className="stat-row">
-            <span>ATK +{pet.getGlobalBonus().atk}</span>
-            <span>HP +{pet.getGlobalBonus().maxHp}</span>
+            <span>공격력 +{pet.getGlobalBonus().atk}</span>
+            <span>체력 +{pet.getGlobalBonus().maxHp}</span>
           </div>
           <div style={{ marginTop: 8, display: 'flex', gap: 4 }}>
             {pet !== activePet && (

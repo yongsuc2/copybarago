@@ -60,7 +60,7 @@ export function TalentScreen() {
           <div className="talent-row" key={row.stat}>
             <div>
               <div style={{ fontWeight: 'bold' }}>{row.label}</div>
-              <div style={{ fontSize: 12, color: '#888' }}>Lv.{row.level}</div>
+              <div style={{ fontSize: 12, color: '#888' }}>{row.level}레벨</div>
             </div>
             <button
               className="btn btn-primary"

@@ -22,7 +22,7 @@ export function PlayerStatsBar({ hp, maxHp, atk, def }: PlayerStatsBarProps) {
     <div className="player-stats-bar">
       <div className="psb-item psb-hp">
         <Heart size={14} color="#e94560" fill="#e94560" />
-        <span className="psb-label">HP</span>
+        <span className="psb-label">체력</span>
         <span className="psb-hp-percent">{hpPercent}%</span>
         <span className="psb-hp-value">{formatNumber(hp)}/{formatNumber(maxHp)}</span>
       </div>

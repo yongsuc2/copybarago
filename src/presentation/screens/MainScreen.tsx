@@ -8,7 +8,7 @@ export function MainScreen() {
 
   return (
     <div className="screen">
-      <h2>Capybara Go!</h2>
+      <h2>카피바라 고!</h2>
       <StatsDisplay stats={stats} label="플레이어 스탯" />
 
       <div className="card">

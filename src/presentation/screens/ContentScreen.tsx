@@ -6,6 +6,12 @@ import { Building2, Skull, Swords, Map, Pickaxe, ArrowLeft } from 'lucide-react'
 
 type ContentTab = 'menu' | 'tower' | 'dungeon' | 'arena' | 'travel' | 'mine';
 
+const DUNGEON_LABELS: Record<DungeonType, string> = {
+  [DungeonType.DRAGON_NEST]: '용의 둥지',
+  [DungeonType.CELESTIAL_TREE]: '세계수',
+  [DungeonType.SKY_ISLAND]: '하늘섬',
+};
+
 export function ContentScreen() {
   const { game, refresh } = useGame();
   const [tab, setTab] = useState<ContentTab>('menu');
@@ -149,7 +155,7 @@ export function ContentScreen() {
             return (
               <div className="card" key={type}>
                 <div className="card-header">
-                  <span style={{ fontWeight: 'bold' }}>{type}</span>
+                  <span style={{ fontWeight: 'bold' }}>{DUNGEON_LABELS[type]}</span>
                   <span style={{ fontSize: 12 }}>{d.getRemainingCount()}/{d.dailyLimit}</span>
                 </div>
                 <button className="btn btn-primary" onClick={() => enterDungeon(type)}

@@ -56,7 +56,7 @@ export function EquipmentScreen() {
                           {eq.name}
                         </span>
                         <div style={{ fontSize: 12, color: '#888' }}>
-                          {eq.grade} Lv.{eq.level} | ATK +{eq.getStats().atk} HP +{eq.getStats().maxHp}
+                          {eq.grade} {eq.level}레벨 | 공격력 +{eq.getStats().atk} 체력 +{eq.getStats().maxHp}
                         </div>
                       </div>
                       <button
@@ -64,7 +64,7 @@ export function EquipmentScreen() {
                         onClick={() => upgradeEquipment(slotType, i)}
                         disabled={game.player.resources.equipmentStones < 1}
                       >
-                        +1
+                        강화
                       </button>
                     </div>
                   </>
