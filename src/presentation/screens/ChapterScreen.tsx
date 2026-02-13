@@ -116,8 +116,41 @@ export function ChapterScreen() {
     refresh();
   }, [game, refresh]);
 
+  function computeMidTurnHp(
+    playerHpBefore: number,
+    enemyHpBefore: number,
+    entries: BattleLogEntry[],
+    playerName: string,
+    playerMaxHp: number,
+    enemyMaxHp: number,
+  ) {
+    let playerHp = playerHpBefore;
+    let enemyHp = enemyHpBefore;
+
+    for (const entry of entries) {
+      const isHeal = entry.type === BattleLogType.LIFESTEAL
+        || entry.type === BattleLogType.HOT_HEAL
+        || entry.type === BattleLogType.REVIVE;
+      if (isHeal) {
+        if (entry.target === playerName) playerHp += entry.value;
+        else enemyHp += entry.value;
+      } else {
+        if (entry.target === playerName) playerHp -= entry.value;
+        else enemyHp -= entry.value;
+      }
+    }
+
+    return {
+      playerHp: Math.max(0, Math.min(playerHp, playerMaxHp)),
+      enemyHp: Math.max(0, Math.min(enemyHp, enemyMaxHp)),
+    };
+  }
+
   async function animateTurn(b: Battle, playerName: string) {
     if (cancelledRef.current) return;
+
+    const playerHpBefore = b.player.currentHp;
+    const enemyHpBefore = b.enemy.currentHp;
 
     const result = b.executeTurn();
     setTurnCount(result.turnNumber);
@@ -134,14 +167,24 @@ export function ChapterScreen() {
       }
     }
 
+    const midHp = computeMidTurnHp(
+      playerHpBefore, enemyHpBefore,
+      playerEntries, playerName,
+      b.player.maxHp, b.enemy.maxHp,
+    );
+
     if (playerEntries.length > 0 && !cancelledRef.current) {
       setAttackPhase('player-approach');
       await delay(PHASE_DURATION.approach);
       if (cancelledRef.current) return;
 
       setDamageEntries(playerEntries);
-      setPlayerUnit(cloneUnit(b.player));
-      setEnemyUnit(cloneUnit(b.enemy));
+      const midPlayer = cloneUnit(b.player);
+      midPlayer.currentHp = midHp.playerHp;
+      const midEnemy = cloneUnit(b.enemy);
+      midEnemy.currentHp = midHp.enemyHp;
+      setPlayerUnit(midPlayer);
+      setEnemyUnit(midEnemy);
       setAttackPhase('player-hit');
       await delay(PHASE_DURATION.hit);
       if (cancelledRef.current) return;
