@@ -350,6 +350,17 @@ export function ChapterScreen() {
 
       {isBattling && playerUnit && enemyUnit && (
         <div>
+          {chapter && (
+            <div className="card" style={{ marginBottom: 8 }}>
+              <div className="stat-row">
+                <span>챕터 {chapter.id}</span>
+                <span>{chapter.currentDay}일 / {chapter.totalDays}일</span>
+              </div>
+              <div className="progress-bar">
+                <div className="progress-fill" style={{ width: `${chapter.getProgress() * 100}%` }} />
+              </div>
+            </div>
+          )}
           <BattleArena
             playerUnit={playerUnit}
             enemyUnit={enemyUnit}
@@ -365,11 +376,6 @@ export function ChapterScreen() {
             atk={playerUnit.getEffectiveAtk()}
             def={playerUnit.getEffectiveDef()}
           />
-          {chapter && (
-            <div className="progress-bar" style={{ margin: '8px 0' }}>
-              <div className="progress-fill" style={{ width: `${chapter.getProgress() * 100}%` }} />
-            </div>
-          )}
         </div>
       )}
 

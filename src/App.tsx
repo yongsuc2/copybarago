@@ -24,12 +24,23 @@ function ScreenRouter() {
   }
 }
 
+function AppLayout() {
+  const { game, screen } = useGame();
+  const inChapter = screen === 'chapter' && game.currentChapter !== null;
+
+  return (
+    <>
+      {!inChapter && <ResourceBar />}
+      <ScreenRouter />
+      <NavBar />
+    </>
+  );
+}
+
 function App() {
   return (
     <GameProvider>
-      <ResourceBar />
-      <ScreenRouter />
-      <NavBar />
+      <AppLayout />
     </GameProvider>
   );
 }
