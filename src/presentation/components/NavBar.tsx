@@ -1,5 +1,5 @@
 import { useGame } from '../GameContext';
-import { Home, Swords, TrendingUp, Shield, PawPrint, LayoutGrid, Gift } from 'lucide-react';
+import { Home, Swords, TrendingUp, Shield, PawPrint, LayoutGrid, Gift, ListTodo } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 const NAV_ITEMS: { screen: string; label: string; icon: LucideIcon }[] = [
@@ -10,6 +10,7 @@ const NAV_ITEMS: { screen: string; label: string; icon: LucideIcon }[] = [
   { screen: 'pet', label: '펫', icon: PawPrint },
   { screen: 'content', label: '콘텐츠', icon: LayoutGrid },
   { screen: 'gacha', label: '뽑기', icon: Gift },
+  { screen: 'quest', label: '퀘스트', icon: ListTodo },
 ];
 
 export function NavBar() {

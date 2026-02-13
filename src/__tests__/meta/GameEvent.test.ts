@@ -19,7 +19,7 @@ describe('GameEvent', () => {
   it('tracks mission progress', () => {
     const now = Date.now();
     const event = new GameEvent('e1', 'Test', EventType.MISSION, now, now + 10000, [
-      { id: 'm1', description: 'Do something', target: 5, current: 0, reward: Reward.fromResources({ type: ResourceType.GOLD, amount: 100 }) },
+      { id: 'm1', description: 'Do something', target: 5, current: 0, reward: Reward.fromResources({ type: ResourceType.GOLD, amount: 100 }), claimed: false },
     ]);
 
     event.updateMissionProgress('m1', 3);
@@ -32,7 +32,7 @@ describe('GameEvent', () => {
   it('claims mission reward only when completed', () => {
     const now = Date.now();
     const event = new GameEvent('e1', 'Test', EventType.MISSION, now, now + 10000, [
-      { id: 'm1', description: 'Do something', target: 3, current: 0, reward: Reward.fromResources({ type: ResourceType.GOLD, amount: 100 }) },
+      { id: 'm1', description: 'Do something', target: 3, current: 0, reward: Reward.fromResources({ type: ResourceType.GOLD, amount: 100 }), claimed: false },
     ]);
 
     expect(event.claimMissionReward('m1')).toBeNull();
@@ -46,8 +46,8 @@ describe('GameEvent', () => {
   it('reports progress correctly', () => {
     const now = Date.now();
     const event = new GameEvent('e1', 'Test', EventType.MISSION, now, now + 10000, [
-      { id: 'm1', description: 'A', target: 1, current: 1, reward: Reward.empty() },
-      { id: 'm2', description: 'B', target: 1, current: 0, reward: Reward.empty() },
+      { id: 'm1', description: 'A', target: 1, current: 1, reward: Reward.empty(), claimed: false },
+      { id: 'm2', description: 'B', target: 1, current: 0, reward: Reward.empty(), claimed: false },
     ]);
 
     expect(event.getProgress()).toBeCloseTo(0.5);

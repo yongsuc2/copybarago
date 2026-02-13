@@ -13,6 +13,7 @@ export interface EventMission {
   target: number;
   current: number;
   reward: Reward;
+  claimed: boolean;
 }
 
 export class GameEvent {
@@ -58,7 +59,8 @@ export class GameEvent {
 
   claimMissionReward(missionId: string): Reward | null {
     const mission = this.missions.find(m => m.id === missionId);
-    if (!mission || mission.current < mission.target) return null;
+    if (!mission || mission.current < mission.target || mission.claimed) return null;
+    mission.claimed = true;
     return mission.reward;
   }
 
@@ -71,6 +73,13 @@ export class GameEvent {
   getCompletedMissionCount(): number {
     return this.missions.filter(m => m.current >= m.target).length;
   }
+}
+
+function makeMission(id: string, description: string, target: number, type: ResourceType, amount: number): EventMission {
+  return {
+    id, description, target, current: 0, claimed: false,
+    reward: Reward.fromResources({ type, amount }),
+  };
 }
 
 export class EventManager {
@@ -107,35 +116,49 @@ export class EventManager {
 
     const event = new GameEvent(
       `daily_${now}`,
-      'Daily Quests',
+      '일일 퀘스트',
       EventType.MISSION,
       now,
       endOfDay.getTime(),
       [
-        {
-          id: 'daily_chapter', description: 'Clear 3 chapters', target: 3, current: 0,
-          reward: Reward.fromResources({ type: ResourceType.GEMS, amount: 30 }),
-        },
-        {
-          id: 'daily_dungeon', description: 'Complete 3 dungeons', target: 3, current: 0,
-          reward: Reward.fromResources({ type: ResourceType.GOLD, amount: 500 }),
-        },
-        {
-          id: 'daily_tower', description: 'Challenge tower 2 times', target: 2, current: 0,
-          reward: Reward.fromResources({ type: ResourceType.EQUIPMENT_STONE, amount: 3 }),
-        },
-        {
-          id: 'daily_arena', description: 'Fight in arena 1 time', target: 1, current: 0,
-          reward: Reward.fromResources({ type: ResourceType.GEMS, amount: 20 }),
-        },
-        {
-          id: 'daily_travel', description: 'Travel 5 times', target: 5, current: 0,
-          reward: Reward.fromResources({ type: ResourceType.GOLD, amount: 300 }),
-        },
+        makeMission('daily_chapter', '챕터 3회 클리어', 3, ResourceType.GEMS, 30),
+        makeMission('daily_dungeon', '던전 3회 완료', 3, ResourceType.GOLD, 500),
+        makeMission('daily_tower', '탑 2회 도전', 2, ResourceType.EQUIPMENT_STONE, 3),
+        makeMission('daily_arena', '아레나 1회 전투', 1, ResourceType.GEMS, 20),
+        makeMission('daily_travel', '여행 5회', 5, ResourceType.GOLD, 300),
       ],
     );
 
     this.addEvent(event);
     return event;
+  }
+
+  createWeeklyQuests(): GameEvent {
+    const now = Date.now();
+    const endOfWeek = new Date();
+    const daysUntilSunday = 7 - endOfWeek.getDay();
+    endOfWeek.setDate(endOfWeek.getDate() + (daysUntilSunday === 0 ? 7 : daysUntilSunday));
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    const event = new GameEvent(
+      `weekly_${now}`,
+      '주간 퀘스트',
+      EventType.MISSION,
+      now,
+      endOfWeek.getTime(),
+      [
+        makeMission('weekly_chapter', '챕터 15회 클리어', 15, ResourceType.GEMS, 150),
+        makeMission('weekly_gacha', '장비 뽑기 20회', 20, ResourceType.EQUIPMENT_STONE, 10),
+        makeMission('weekly_sell', '장비 판매 10회', 10, ResourceType.GOLD, 2000),
+        makeMission('weekly_tower', '탑 10회 도전', 10, ResourceType.POWER_STONE, 3),
+      ],
+    );
+
+    this.addEvent(event);
+    return event;
+  }
+
+  hasActiveWeeklyQuest(): boolean {
+    return this.events.some(e => e.id.startsWith('weekly_') && e.isActive());
   }
 }

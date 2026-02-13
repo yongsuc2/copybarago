@@ -34,6 +34,8 @@ export function ContentScreen() {
     battle.runToCompletion();
 
     const outcome = game.tower.onBattleResult(battle.state);
+    game.updateQuestProgress('daily_tower');
+    game.updateQuestProgress('weekly_tower');
     if (outcome.advanced) {
       for (const r of outcome.reward.resources) {
         game.player.resources.add(r.type, r.amount);
@@ -49,6 +51,7 @@ export function ContentScreen() {
   function enterDungeon(type: DungeonType) {
     const result = game.enterDungeon(type);
     if (result.isFail()) { showMsg(result.message); return; }
+    game.updateQuestProgress('daily_dungeon');
     showMsg('던전 클리어! 보상을 획득했습니다.');
     refresh();
   }
@@ -59,6 +62,7 @@ export function ContentScreen() {
     const result = game.arena.fight(playerUnit, game.player.resources.arenaTickets, game.rng);
     if (result.isFail()) { showMsg(result.message); return; }
     game.player.resources.spend(ResourceType.ARENA_TICKET, 1);
+    game.updateQuestProgress('daily_arena');
     const wins = result.data!.results.filter(r => r === BattleState.VICTORY).length;
     const reward = game.arena.getReward();
     for (const r of reward.resources) game.player.resources.add(r.type, r.amount);
@@ -69,6 +73,7 @@ export function ContentScreen() {
   function runTravel() {
     const result = game.travelRun(10);
     if (result.isFail()) { showMsg(result.message); return; }
+    game.updateQuestProgress('daily_travel');
     showMsg(`여행 완료! +${result.data!.reward.resources[0]?.amount ?? 0} 골드`);
     refresh();
   }

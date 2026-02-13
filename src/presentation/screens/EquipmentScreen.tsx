@@ -53,7 +53,10 @@ export function EquipmentScreen() {
   }
 
   function sell(id: string) {
-    game.player.sellEquipment(id);
+    const price = game.player.sellEquipment(id);
+    if (price > 0) {
+      game.updateQuestProgress('weekly_sell');
+    }
     refresh();
   }
 

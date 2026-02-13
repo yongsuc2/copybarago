@@ -8,6 +8,7 @@ import { EquipmentScreen } from './presentation/screens/EquipmentScreen';
 import { PetScreen } from './presentation/screens/PetScreen';
 import { ContentScreen } from './presentation/screens/ContentScreen';
 import { GachaScreen } from './presentation/screens/GachaScreen';
+import { QuestScreen } from './presentation/screens/QuestScreen';
 
 function ScreenRouter() {
   const { screen } = useGame();
@@ -20,6 +21,7 @@ function ScreenRouter() {
     case 'pet': return <PetScreen />;
     case 'content': return <ContentScreen />;
     case 'gacha': return <GachaScreen />;
+    case 'quest': return <QuestScreen />;
     default: return <MainScreen />;
   }
 }

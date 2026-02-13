@@ -84,6 +84,7 @@ export class GameManager {
     this.player.resources.setAmount(ResourceType.STAMINA, 100);
     this.player.resources.dailyReset();
     this.eventManager.createDailyQuests();
+    this.eventManager.createWeeklyQuests();
   }
 
   startChapter(chapterId: number, type: ChapterType): void {
@@ -133,11 +134,20 @@ export class GameManager {
     return result;
   }
 
+  updateQuestProgress(missionId: string, amount: number = 1): void {
+    for (const event of this.eventManager.getActiveEvents()) {
+      event.updateMissionProgress(missionId, amount);
+    }
+  }
+
   checkDailyReset(): void {
     if (this.dailyReset.needsReset()) {
       this.dailyReset.performReset(this.player.resources, this.dungeonManager, this.arena);
       this.eventManager.cleanupExpired();
       this.eventManager.createDailyQuests();
+      if (!this.eventManager.hasActiveWeeklyQuest()) {
+        this.eventManager.createWeeklyQuests();
+      }
     }
   }
 }

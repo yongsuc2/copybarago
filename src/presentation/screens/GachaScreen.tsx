@@ -19,6 +19,7 @@ export function GachaScreen() {
     const result = game.pullGacha();
     if (!result) return;
     addEquipmentToInventory([result]);
+    game.updateQuestProgress('weekly_gacha');
     setResults([result]);
     refresh();
   }
@@ -27,6 +28,7 @@ export function GachaScreen() {
     const results = game.pullGacha10();
     if (!results) return;
     addEquipmentToInventory(results);
+    game.updateQuestProgress('weekly_gacha', 10);
     setResults(results);
     refresh();
   }
