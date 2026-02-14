@@ -38,17 +38,20 @@ export function EquipmentScreen() {
     const result = eq.upgrade(game.player.resources.equipmentStones);
     if (result.isOk()) {
       game.player.resources.spend(ResourceType.EQUIPMENT_STONE, 1);
+      game.saveGame();
     }
     refresh();
   }
 
   function unequip(slotType: SlotType, index: number) {
     game.player.unequipToInventory(slotType, index);
+    game.saveGame();
     refresh();
   }
 
   function equipFromInventory(id: string) {
     game.player.equipFromInventory(id);
+    game.saveGame();
     refresh();
   }
 
@@ -56,6 +59,7 @@ export function EquipmentScreen() {
     const price = game.player.sellEquipment(id);
     if (price > 0) {
       game.updateQuestProgress('weekly_sell');
+      game.saveGame();
     }
     refresh();
   }

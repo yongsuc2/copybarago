@@ -45,6 +45,7 @@ export function ContentScreen() {
       showMsg('패배! 토큰이 소모되지 않았습니다.');
       game.player.resources.add(ResourceType.CHALLENGE_TOKEN, 1);
     }
+    game.saveGame();
     refresh();
   }
 
@@ -52,6 +53,7 @@ export function ContentScreen() {
     const result = game.enterDungeon(type);
     if (result.isFail()) { showMsg(result.message); return; }
     game.updateQuestProgress('daily_dungeon');
+    game.saveGame();
     showMsg('던전 클리어! 보상을 획득했습니다.');
     refresh();
   }
@@ -67,6 +69,7 @@ export function ContentScreen() {
     const reward = game.arena.getReward();
     for (const r of reward.resources) game.player.resources.add(r.type, r.amount);
     showMsg(`아레나: ${wins}/4 승! 티어: ${game.arena.tier}`);
+    game.saveGame();
     refresh();
   }
 
@@ -75,6 +78,7 @@ export function ContentScreen() {
     if (result.isFail()) { showMsg(result.message); return; }
     game.updateQuestProgress('daily_travel');
     showMsg(`여행 완료! +${result.data!.reward.resources[0]?.amount ?? 0} 골드`);
+    game.saveGame();
     refresh();
   }
 
@@ -93,6 +97,7 @@ export function ContentScreen() {
     } else {
       showMsg(`채굴 완료! 광석: ${game.goblinMiner.oreCount}/30`);
     }
+    game.saveGame();
     refresh();
   }
 

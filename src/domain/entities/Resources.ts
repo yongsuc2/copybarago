@@ -94,4 +94,20 @@ export class Resources {
   setAmount(type: ResourceType, amount: number): void {
     this.amounts.set(type, amount);
   }
+
+  toJSON(): Record<string, number> {
+    const obj: Record<string, number> = {};
+    for (const [key, val] of this.amounts.entries()) {
+      obj[key] = val;
+    }
+    return obj;
+  }
+
+  static fromJSON(data: Record<string, number>): Resources {
+    const res = new Resources();
+    for (const [key, val] of Object.entries(data)) {
+      res.setAmount(key as ResourceType, val);
+    }
+    return res;
+  }
 }

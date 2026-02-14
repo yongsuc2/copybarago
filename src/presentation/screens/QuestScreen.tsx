@@ -29,6 +29,7 @@ export function QuestScreen() {
     for (const r of reward.resources) {
       game.player.resources.add(r.type, r.amount);
     }
+    game.saveGame();
     refresh();
   }
 
@@ -44,6 +45,7 @@ export function QuestScreen() {
         }
       }
     }
+    game.saveGame();
     refresh();
   }
 

@@ -41,10 +41,10 @@ function isDamageOrHeal(type: BattleLogType): boolean {
 export function ChapterScreen() {
   const { game, refresh, setScreen } = useGame();
   const [encounter, setEncounter] = useState<Encounter | null>(null);
-  const [battleResult, setBattleResult] = useState<string | null>(null);
+  const [, setBattleResult] = useState<string | null>(null);
   const [log, setLog] = useState<string[]>([]);
 
-  const [battle, setBattle] = useState<Battle | null>(null);
+  const [, setBattle] = useState<Battle | null>(null);
   const [playerUnit, setPlayerUnit] = useState<BattleUnit | null>(null);
   const [enemyUnit, setEnemyUnit] = useState<BattleUnit | null>(null);
   const [attackPhase, setAttackPhase] = useState<AttackPhase>('idle');
@@ -94,6 +94,7 @@ export function ChapterScreen() {
 
       setTimeout(() => {
         clearBattleState();
+        game.saveGame();
         setChapterResult({
           type: b.state === BattleState.VICTORY ? 'victory' : 'defeat',
           chapterId: chId,
@@ -119,6 +120,7 @@ export function ChapterScreen() {
 
         setTimeout(() => {
           clearBattleState();
+          game.saveGame();
           setChapterResult({
             type: 'defeat',
             chapterId: chId,

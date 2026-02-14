@@ -14,6 +14,7 @@ export function PetScreen() {
     if (!game.player.activePet) {
       game.player.setActivePet(pet);
     }
+    game.saveGame();
     refresh();
   }
 
@@ -23,11 +24,13 @@ export function PetScreen() {
     if (!game.player.resources.canAfford(ResourceType.PET_FOOD, 1)) return;
     game.player.resources.spend(ResourceType.PET_FOOD, 1);
     pet.feed(1);
+    game.saveGame();
     refresh();
   }
 
   function setActive(petIndex: number) {
     game.player.setActivePet(pets[petIndex]);
+    game.saveGame();
     refresh();
   }
 

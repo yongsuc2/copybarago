@@ -10,6 +10,7 @@ import { ContentScreen } from './presentation/screens/ContentScreen';
 import { GachaScreen } from './presentation/screens/GachaScreen';
 import { QuestScreen } from './presentation/screens/QuestScreen';
 import { ChapterTreasureScreen } from './presentation/screens/ChapterTreasureScreen';
+import { SettingsScreen } from './presentation/screens/SettingsScreen';
 
 function ScreenRouter() {
   const { screen } = useGame();
@@ -24,6 +25,7 @@ function ScreenRouter() {
     case 'gacha': return <GachaScreen />;
     case 'quest': return <QuestScreen />;
     case 'chapter-treasure': return <ChapterTreasureScreen />;
+    case 'settings': return <SettingsScreen />;
     default: return <MainScreen />;
   }
 }

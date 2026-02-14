@@ -592,3 +592,76 @@ body {
   color: #d4a843;
   margin: 8px 0;
 }
+
+.settings-section {
+  background: #1e2d4a;
+  border: 1px solid #2a3f5f;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 0;
+}
+.settings-btn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.settings-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 8px 12px;
+  border: 1px solid #3a5a8a;
+  border-radius: 6px;
+  background: #2a3f5f;
+  color: #e0e0e0;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+.settings-btn:hover:not(:disabled) { background: #3a5a8a; }
+.settings-btn:disabled { opacity: 0.4; cursor: default; }
+.settings-btn.danger { border-color: #e94560; color: #ff5252; }
+.settings-btn.danger:hover:not(:disabled) { background: rgba(233, 69, 96, 0.2); }
+
+.debug-panel {
+  border: 1px solid #f5a623;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px 0;
+  background: rgba(245, 166, 35, 0.05);
+}
+.debug-section { margin-bottom: 10px; }
+.debug-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.debug-btn {
+  padding: 6px 10px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background: #2a2a2a;
+  color: #e0e0e0;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+.debug-btn:hover { background: #444; }
+
+.toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  z-index: 1000;
+  animation: toastIn 0.3s ease;
+}
+.toast-success { background: #2e7d32; color: #fff; }
+.toast-error { background: #c62828; color: #fff; }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}

@@ -14,6 +14,7 @@ export function TalentScreen() {
     const result = talent.upgrade(stat, game.player.resources.gold);
     if (result.isOk() && result.data) {
       game.player.resources.spend(ResourceType.GOLD, result.data.cost);
+      game.saveGame();
     }
     refresh();
   }

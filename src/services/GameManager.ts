@@ -23,6 +23,8 @@ import { Result } from '../domain/value-objects/Result';
 import { EventBus } from '../infrastructure/EventBus';
 import { SeededRandom } from '../infrastructure/SeededRandom';
 import { ChapterType, ChestType, DungeonType, ResourceType } from '../domain/enums';
+import { SaveManager } from '../domain/meta/SaveManager';
+import { SaveSerializer } from './SaveSerializer';
 
 export class GameManager {
   player: Player;
@@ -51,6 +53,7 @@ export class GameManager {
 
   eventBus: EventBus;
   rng: SeededRandom;
+  saveManager: SaveManager;
 
   constructor() {
     this.player = new Player();
@@ -79,8 +82,13 @@ export class GameManager {
 
     this.eventBus = new EventBus();
     this.rng = new SeededRandom(Date.now());
+    this.saveManager = new SaveManager();
 
-    this.initNewGame();
+    if (this.saveManager.hasSave()) {
+      this.loadGame();
+    } else {
+      this.initNewGame();
+    }
   }
 
   private initNewGame(): void {
@@ -160,5 +168,51 @@ export class GameManager {
         this.eventManager.createWeeklyQuests();
       }
     }
+  }
+
+  saveGame(): boolean {
+    const state = SaveSerializer.serialize(this);
+    const result = this.saveManager.save(state as unknown as Record<string, unknown>);
+    return result.isOk();
+  }
+
+  loadGame(): boolean {
+    const result = this.saveManager.load();
+    if (result.isFail() || !result.data) return false;
+    try {
+      SaveSerializer.deserialize(result.data.playerData as unknown as ReturnType<typeof SaveSerializer.serialize>, this);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  deleteSave(): boolean {
+    return this.saveManager.deleteSave().isOk();
+  }
+
+  hasSave(): boolean {
+    return this.saveManager.hasSave();
+  }
+
+  exportSave(): string {
+    const state = SaveSerializer.serialize(this);
+    const json = JSON.stringify(state);
+    return btoa(encodeURIComponent(json));
+  }
+
+  importSave(encoded: string): boolean {
+    try {
+      const json = decodeURIComponent(atob(encoded));
+      const state = JSON.parse(json);
+      SaveSerializer.deserialize(state, this);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  getLastSaveTime(): number | null {
+    return this.saveManager.getLastSaveTime();
   }
 }
