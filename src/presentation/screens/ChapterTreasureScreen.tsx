@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { useGame } from '../GameContext';
 import { ChapterTreasureTable } from '../../domain/data/ChapterTreasureTable';
-import { ArrowLeft, Check, Lock, Gift } from 'lucide-react';
+import type { ChapterMilestone } from '../../domain/data/ChapterTreasureTable';
+import { ArrowLeft } from 'lucide-react';
 import { ResourceType } from '../../domain/enums';
 
 const RESOURCE_LABELS: Partial<Record<ResourceType, string>> = {
@@ -18,46 +18,54 @@ const RESOURCE_COLORS: Partial<Record<ResourceType, string>> = {
   [ResourceType.POWER_STONE]: '#ff7043',
 };
 
+function getAllMilestonesLinear(clearedChapterMax: number): ChapterMilestone[] {
+  const chapterIds = ChapterTreasureTable.getAvailableChapterIds(clearedChapterMax);
+  const all: ChapterMilestone[] = [];
+  for (const id of chapterIds) {
+    all.push(...ChapterTreasureTable.getMilestonesForChapter(id));
+  }
+  return all;
+}
+
 export function ChapterTreasureScreen() {
   const { game, refresh, setScreen } = useGame();
-  const chapterIds = ChapterTreasureTable.getAvailableChapterIds(game.player.clearedChapterMax);
-  const [selectedChapterId, setSelectedChapterId] = useState(
-    () => Math.max(1, game.player.clearedChapterMax + 1),
-  );
-  const [selectedMilestoneIdx, setSelectedMilestoneIdx] = useState(0);
 
-  const milestones = ChapterTreasureTable.getMilestonesForChapter(selectedChapterId);
-  const currentMilestone = milestones[selectedMilestoneIdx];
+  const allMilestones = getAllMilestonesLinear(game.player.clearedChapterMax);
+  const claimedCount = allMilestones.filter(m => game.player.claimedMilestones.has(m.id)).length;
+
+  const currentMilestone = allMilestones.find(
+    m => game.chapterTreasure.getMilestoneStatus(m, game.player) !== 'claimed',
+  ) ?? null;
 
   const status = currentMilestone
     ? game.chapterTreasure.getMilestoneStatus(currentMilestone, game.player)
-    : 'locked';
+    : null;
 
-  const bestDay = game.player.bestSurvivalDays.get(selectedChapterId) ?? 0;
-  const clearSentinel = ChapterTreasureTable.getClearSentinelDay(selectedChapterId);
+  const bestDay = currentMilestone
+    ? (game.player.bestSurvivalDays.get(currentMilestone.chapterId) ?? 0)
+    : 0;
+  const clearSentinel = currentMilestone
+    ? ChapterTreasureTable.getClearSentinelDay(currentMilestone.chapterId)
+    : 0;
   const isCleared = bestDay >= clearSentinel;
 
   function handleClaim() {
     if (!currentMilestone || status !== 'claimable') return;
     game.claimChapterTreasure(currentMilestone.id);
+    game.saveGame();
     refresh();
   }
 
-  function handleSelectChapter(id: number) {
-    setSelectedChapterId(id);
-    setSelectedMilestoneIdx(0);
-  }
-
   function getConditionText(): string {
-    if (!currentMilestone) return '';
-    if (status === 'claimed') return '수령 완료';
+    if (!currentMilestone || !status) return '';
     if (currentMilestone.type === 'CLEAR') {
-      return `챕터${selectedChapterId} 클리어 후 수령 가능`;
+      return `챕터 ${currentMilestone.chapterId} 클리어 후 수령 가능`;
     }
-    return `챕터${selectedChapterId}에서 ${currentMilestone.requiredDay}일 생존 후 수령 가능`;
+    return `챕터 ${currentMilestone.chapterId}에서 ${currentMilestone.requiredDay}일 생존 후 수령 가능`;
   }
 
   function getBestDayDisplay(): string {
+    if (!currentMilestone) return '';
     if (isCleared) return '클리어';
     if (bestDay === 0) return '기록 없음';
     return `${bestDay}일`;
@@ -69,79 +77,67 @@ export function ChapterTreasureScreen() {
         <span>챕터 보물상자</span>
       </div>
 
-      <div className="treasure-best-day">
-        최고 기록: {getBestDayDisplay()}
-      </div>
-
-      <div className="treasure-chapter-selector">
-        {chapterIds.map(id => (
-          <button
-            key={id}
-            className={`treasure-chapter-pill ${id === selectedChapterId ? 'active' : ''}`}
-            onClick={() => handleSelectChapter(id)}
-          >
-            Ch.{id}
-          </button>
-        ))}
-      </div>
-
-      <div className="treasure-banner-scroll">
-        {milestones.map((m, i) => {
-          const mStatus = game.chapterTreasure.getMilestoneStatus(m, game.player);
-          return (
-            <div
-              key={m.id}
-              className={`treasure-banner ${mStatus} ${i === selectedMilestoneIdx ? 'selected' : ''}`}
-              onClick={() => setSelectedMilestoneIdx(i)}
-            >
-              <div className="treasure-banner-icon">
-                {mStatus === 'claimed' && <Check size={20} />}
-                {mStatus === 'locked' && <Lock size={20} />}
-                {mStatus === 'claimable' && <Gift size={20} />}
-              </div>
-              <div className="treasure-banner-label">{m.label}</div>
-              <div className="treasure-banner-chapter">챕터{m.chapterId}</div>
-            </div>
-          );
-        })}
-      </div>
-
-      {currentMilestone && (
-        <div className="treasure-reward-card">
-          <div className="treasure-reward-title">보상</div>
-          <div className="treasure-reward-grid">
-            {currentMilestone.reward.resources.map((r, i) => (
-              <div key={i} className="treasure-reward-item">
-                <div
-                  className="treasure-reward-icon"
-                  style={{ background: RESOURCE_COLORS[r.type] ?? '#888' }}
-                />
-                <div className="treasure-reward-info">
-                  <div className="treasure-reward-amount">{r.amount.toLocaleString()}</div>
-                  <div className="treasure-reward-name">{RESOURCE_LABELS[r.type] ?? r.type}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+      <div style={{ textAlign: 'center', margin: '12px 0 8px' }}>
+        <div style={{ fontSize: 13, color: '#aaa', marginBottom: 4 }}>
+          보상 진행도
         </div>
-      )}
+        <div className="progress-bar" style={{ height: 10 }}>
+          <div
+            className="progress-fill"
+            style={{ width: `${allMilestones.length > 0 ? (claimedCount / allMilestones.length) * 100 : 0}%` }}
+          />
+        </div>
+        <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>
+          {claimedCount} / {allMilestones.length}
+        </div>
+      </div>
 
-      <div className="treasure-condition">{getConditionText()}</div>
+      {currentMilestone && status ? (
+        <>
+          <div className="card" style={{ textAlign: 'center', marginTop: 12 }}>
+            <div style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 4 }}>
+              챕터 {currentMilestone.chapterId} — {currentMilestone.label}
+            </div>
+            <div style={{ fontSize: 12, color: '#888' }}>
+              최고 기록: {getBestDayDisplay()}
+            </div>
+          </div>
 
-      {currentMilestone && status === 'claimable' && (
-        <button className="btn btn-primary" style={{ width: '100%', marginTop: 8 }} onClick={handleClaim}>
-          수령
-        </button>
-      )}
-      {currentMilestone && status === 'claimed' && (
-        <button className="btn btn-secondary" style={{ width: '100%', marginTop: 8 }} disabled>
-          수령 완료
-        </button>
-      )}
-      {currentMilestone && status === 'locked' && (
-        <button className="btn btn-secondary" style={{ width: '100%', marginTop: 8 }} disabled>
-          조건 미달성
-        </button>
+          <div className="treasure-reward-card">
+            <div className="treasure-reward-title">보상</div>
+            <div className="treasure-reward-grid">
+              {currentMilestone.reward.resources.map((r, i) => (
+                <div key={i} className="treasure-reward-item">
+                  <div
+                    className="treasure-reward-icon"
+                    style={{ background: RESOURCE_COLORS[r.type] ?? '#888' }}
+                  />
+                  <div className="treasure-reward-info">
+                    <div className="treasure-reward-amount">{r.amount.toLocaleString()}</div>
+                    <div className="treasure-reward-name">{RESOURCE_LABELS[r.type] ?? r.type}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="treasure-condition">{getConditionText()}</div>
+
+          {status === 'claimable' && (
+            <button className="btn btn-primary" style={{ width: '100%', marginTop: 8 }} onClick={handleClaim}>
+              수령
+            </button>
+          )}
+          {status === 'locked' && (
+            <button className="btn btn-secondary" style={{ width: '100%', marginTop: 8 }} disabled>
+              조건 미달성
+            </button>
+          )}
+        </>
+      ) : (
+        <div style={{ textAlign: 'center', padding: '40px 0', color: '#888' }}>
+          모든 보상을 수령했습니다
+        </div>
       )}
 
       <button
