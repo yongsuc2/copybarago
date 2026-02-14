@@ -90,6 +90,8 @@ export function ChapterScreen() {
           game.travel.maxClearedChapter = game.player.clearedChapterMax;
           game.player.resources.add('GOLD' as any, 500);
         }
+        game.updateQuestProgress('daily_chapter');
+        game.updateQuestProgress('weekly_chapter');
       } else {
         game.currentChapter?.onBattleEnd(b.state);
       }
