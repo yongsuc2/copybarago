@@ -335,6 +335,24 @@ export function ChapterScreen() {
     advanceDay();
   }
 
+  function abandonChapter() {
+    const chId = game.currentChapter?.id ?? 0;
+    cancelledRef.current = true;
+    if (game.currentChapter) {
+      game.player.updateBestSurvivalDay(
+        game.currentChapter.id,
+        game.currentChapter.currentDay,
+        false,
+      );
+    }
+    game.currentChapter = null;
+    clearBattleState();
+    setEncounter(null);
+    game.saveGame();
+    setChapterResult({ type: 'defeat', chapterId: chId, gold: 0 });
+    refresh();
+  }
+
   function selectOption(index: number) {
     if (!game.currentChapter || !encounter) return;
 
@@ -486,6 +504,13 @@ export function ChapterScreen() {
             atk={playerUnit.getEffectiveAtk()}
             def={playerUnit.getEffectiveDef()}
           />
+          <button
+            className="btn btn-secondary"
+            style={{ width: '100%', marginTop: 8, color: '#ff5252' }}
+            onClick={abandonChapter}
+          >
+            포기하기
+          </button>
         </div>
       )}
 
@@ -523,6 +548,13 @@ export function ChapterScreen() {
               </div>
             ))}
           </div>
+          <button
+            className="btn btn-secondary"
+            style={{ width: '100%', marginTop: 12, color: '#ff5252' }}
+            onClick={abandonChapter}
+          >
+            포기하기
+          </button>
         </div>
       )}
 
