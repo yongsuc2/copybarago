@@ -180,7 +180,7 @@ export class EncounterGenerator {
       case 0:
         options.push({
           label: '상자 열기',
-          description: '보물 상자를 발견했다!',
+          description: '골드 획득',
           hpCostPercent: 0,
           goldCost: 0,
           successRate: 1.0,
@@ -190,7 +190,7 @@ export class EncounterGenerator {
       case 1:
         options.push({
           label: '치유의 샘',
-          description: '마법의 샘',
+          description: '최대 체력의 50% 회복',
           hpCostPercent: 0,
           goldCost: 0,
           successRate: 1.0,
@@ -200,7 +200,7 @@ export class EncounterGenerator {
       case 2:
         options.push({
           label: '축복',
-          description: '신성한 축복을 받다',
+          description: '골드 200 획득',
           hpCostPercent: 0,
           goldCost: 0,
           successRate: 1.0,
