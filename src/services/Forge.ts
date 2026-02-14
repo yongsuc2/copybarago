@@ -70,10 +70,14 @@ export class Forge {
 
   findMergeCandidates(inventory: Equipment[]): Equipment[][] {
     const groups = new Map<string, Equipment[]>();
+    const epicIndex = EquipmentTable.getGradeIndex(EquipmentGrade.EPIC);
 
     for (const eq of inventory) {
       if (eq.isS) continue;
-      const key = `${eq.slot}_${eq.grade}`;
+      const isEpicPlus = EquipmentTable.getGradeIndex(eq.grade) >= epicIndex;
+      const key = isEpicPlus
+        ? `${eq.slot}_${eq.grade}_${eq.upgradeCount}`
+        : `${eq.slot}_${eq.grade}`;
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key)!.push(eq);
     }
@@ -81,8 +85,9 @@ export class Forge {
     const result: Equipment[][] = [];
     for (const [, group] of groups) {
       const required = EquipmentTable.getMergeCount(group[0].grade);
-      if (required > 0 && group.length >= required) {
-        result.push(group.slice(0, required));
+      if (required <= 0) continue;
+      for (let i = 0; i + required <= group.length; i += required) {
+        result.push(group.slice(i, i + required));
       }
     }
 
