@@ -19,76 +19,100 @@ function makeEffect(
 
 const ALL_SKILLS: Skill[] = [
   new Skill('lightning', 'Lightning', '⚡', SkillGrade.NORMAL, SkillCategory.ATTACK,
-    [HeritageRoute.GHOST], makeEffect(EffectType.DAMAGE, 15), TriggerCondition.ON_ATTACK),
+    [HeritageRoute.GHOST], makeEffect(EffectType.DAMAGE, 15), TriggerCondition.ON_ATTACK,
+    '공격 시 번개를 내려 15의 추가 피해'),
 
   new Skill('lance', 'Lance', '🔱', SkillGrade.NORMAL, SkillCategory.ATTACK,
-    [HeritageRoute.KNIGHT], makeEffect(EffectType.DAMAGE, 12), TriggerCondition.TURN_START),
+    [HeritageRoute.KNIGHT], makeEffect(EffectType.DAMAGE, 12), TriggerCondition.TURN_START,
+    '턴 시작 시 창으로 12의 선제 피해'),
 
   new Skill('shuriken', 'Shuriken', '🌀', SkillGrade.NORMAL, SkillCategory.ATTACK,
-    [HeritageRoute.RANGER], makeEffect(EffectType.DAMAGE, 10), TriggerCondition.ON_ATTACK),
+    [HeritageRoute.RANGER], makeEffect(EffectType.DAMAGE, 10), TriggerCondition.ON_ATTACK,
+    '공격 시 수리검으로 10의 추가 피해'),
 
   new Skill('sword_aura', 'Sword Aura', '⚔️', SkillGrade.NORMAL, SkillCategory.ATTACK,
-    [HeritageRoute.SKULL], makeEffect(EffectType.DAMAGE, 12), TriggerCondition.ON_ATTACK),
+    [HeritageRoute.SKULL], makeEffect(EffectType.DAMAGE, 12), TriggerCondition.ON_ATTACK,
+    '공격 시 검기로 12의 추가 피해'),
 
   new Skill('poison_weapon', 'Poison Weapon', '🧪', SkillGrade.NORMAL, SkillCategory.DEBUFF,
-    [], makeEffect(EffectType.DOT, 8, 3, StatusEffectType.POISON), TriggerCondition.ON_ATTACK),
+    [], makeEffect(EffectType.DOT, 8, 3, StatusEffectType.POISON), TriggerCondition.ON_ATTACK,
+    '공격 시 독을 부여하여 3턴간 매턴 8 피해'),
 
   new Skill('lifesteal', 'Lifesteal', '🩸', SkillGrade.NORMAL, SkillCategory.SURVIVAL,
-    [], makeEffect(EffectType.LIFESTEAL, 0.15), TriggerCondition.PASSIVE),
+    [], makeEffect(EffectType.LIFESTEAL, 0.15), TriggerCondition.PASSIVE,
+    '가한 피해의 15%만큼 체력 회복'),
 
   new Skill('regen', 'Regeneration', '💚', SkillGrade.NORMAL, SkillCategory.SURVIVAL,
-    [], makeEffect(EffectType.HOT, 10, 99, StatusEffectType.REGEN), TriggerCondition.PASSIVE),
+    [], makeEffect(EffectType.HOT, 10, 99, StatusEffectType.REGEN), TriggerCondition.PASSIVE,
+    '매 턴 체력 10 회복'),
 
   new Skill('counter', 'Counter Attack', '🛡️', SkillGrade.NORMAL, SkillCategory.ATTACK,
-    [HeritageRoute.KNIGHT], makeEffect(EffectType.COUNTER, 0.5), TriggerCondition.ON_HIT),
+    [HeritageRoute.KNIGHT], makeEffect(EffectType.COUNTER, 0.5), TriggerCondition.ON_HIT,
+    '피격 시 받은 피해의 50%를 반격'),
 
   new Skill('multi_hit_mastery', 'Multi-Hit Mastery', '💫', SkillGrade.LEGENDARY, SkillCategory.MASTERY,
-    [HeritageRoute.SKULL], makeEffect(EffectType.MULTI_HIT, 3), TriggerCondition.PASSIVE),
+    [HeritageRoute.SKULL], makeEffect(EffectType.MULTI_HIT, 3), TriggerCondition.PASSIVE,
+    '공격 횟수 3회로 증가'),
 
   new Skill('crit_mastery', 'Critical Mastery', '🎯', SkillGrade.LEGENDARY, SkillCategory.MASTERY,
-    [HeritageRoute.RANGER], makeEffect(EffectType.BUFF, 0.15, 99, StatusEffectType.CRIT_UP), TriggerCondition.PASSIVE),
+    [HeritageRoute.RANGER], makeEffect(EffectType.BUFF, 0.15, 99, StatusEffectType.CRIT_UP), TriggerCondition.PASSIVE,
+    '치명타 확률 15% 증가'),
 
   new Skill('rage_mastery', 'Rage Mastery', '💢', SkillGrade.LEGENDARY, SkillCategory.MASTERY,
-    [HeritageRoute.SKULL, HeritageRoute.KNIGHT], makeEffect(EffectType.BUFF, 0.2, 99, StatusEffectType.ATK_UP), TriggerCondition.PASSIVE),
+    [HeritageRoute.SKULL, HeritageRoute.KNIGHT], makeEffect(EffectType.BUFF, 0.2, 99, StatusEffectType.ATK_UP), TriggerCondition.PASSIVE,
+    '공격력 20% 증가'),
 
   new Skill('shrink_magic', 'Shrink Magic', '🔮', SkillGrade.LEGENDARY, SkillCategory.DEBUFF,
-    [], makeEffect(EffectType.DEBUFF, 0.2, 3, StatusEffectType.ATK_DOWN), TriggerCondition.TURN_START),
+    [], makeEffect(EffectType.DEBUFF, 0.2, 3, StatusEffectType.ATK_DOWN), TriggerCondition.TURN_START,
+    '턴 시작 시 적 공격력 20% 감소 (3턴)'),
 
   new Skill('hp_proficiency', 'HP Proficiency', '❤️', SkillGrade.LEGENDARY, SkillCategory.PROFICIENCY,
-    [], makeEffect(EffectType.BUFF, 0.1, 99, StatusEffectType.DEF_UP), TriggerCondition.PASSIVE),
+    [], makeEffect(EffectType.BUFF, 0.1, 99, StatusEffectType.DEF_UP), TriggerCondition.PASSIVE,
+    '방어력 10% 증가'),
 
   new Skill('atk_proficiency', 'ATK Proficiency', '🗡️', SkillGrade.LEGENDARY, SkillCategory.PROFICIENCY,
-    [], makeEffect(EffectType.BUFF, 0.1, 99, StatusEffectType.ATK_UP), TriggerCondition.PASSIVE),
+    [], makeEffect(EffectType.BUFF, 0.1, 99, StatusEffectType.ATK_UP), TriggerCondition.PASSIVE,
+    '공격력 10% 증가'),
 
   new Skill('def_proficiency', 'DEF Proficiency', '🏛️', SkillGrade.LEGENDARY, SkillCategory.PROFICIENCY,
-    [], makeEffect(EffectType.BUFF, 0.1, 99, StatusEffectType.DEF_UP), TriggerCondition.PASSIVE),
+    [], makeEffect(EffectType.BUFF, 0.1, 99, StatusEffectType.DEF_UP), TriggerCondition.PASSIVE,
+    '방어력 10% 증가'),
 
   new Skill('crit_proficiency', 'CRIT Proficiency', '👁️', SkillGrade.LEGENDARY, SkillCategory.PROFICIENCY,
-    [], makeEffect(EffectType.BUFF, 0.1, 99, StatusEffectType.CRIT_UP), TriggerCondition.PASSIVE),
+    [], makeEffect(EffectType.BUFF, 0.1, 99, StatusEffectType.CRIT_UP), TriggerCondition.PASSIVE,
+    '치명타 확률 10% 증가'),
 
   new Skill('defense_ultimate', 'Defense Ultimate', '🏰', SkillGrade.MYTHIC, SkillCategory.SURVIVAL,
-    [], makeEffect(EffectType.BUFF, 0.5, 99, StatusEffectType.DEF_UP), TriggerCondition.PASSIVE),
+    [], makeEffect(EffectType.BUFF, 0.5, 99, StatusEffectType.DEF_UP), TriggerCondition.PASSIVE,
+    '방어력 50% 증가'),
 
   new Skill('valor_ultimate', 'Valor Ultimate', '👑', SkillGrade.MYTHIC, SkillCategory.BUFF,
-    [], makeEffect(EffectType.BUFF, 0.5, 99, StatusEffectType.ATK_UP), TriggerCondition.PASSIVE),
+    [], makeEffect(EffectType.BUFF, 0.5, 99, StatusEffectType.ATK_UP), TriggerCondition.PASSIVE,
+    '공격력 50% 증가'),
 
   new Skill('revive', 'Revive', '✨', SkillGrade.MYTHIC, SkillCategory.SURVIVAL,
-    [], makeEffect(EffectType.REVIVE, 0.3), TriggerCondition.ON_DEATH),
+    [], makeEffect(EffectType.REVIVE, 0.3), TriggerCondition.ON_DEATH,
+    '사망 시 최대 체력의 30%로 부활 (1회)'),
 
   new Skill('super_atk', 'Super ATK', '💥', SkillGrade.MYTHIC, SkillCategory.BUFF,
-    [], makeEffect(EffectType.BUFF, 0.8, 99, StatusEffectType.ATK_UP), TriggerCondition.PASSIVE),
+    [], makeEffect(EffectType.BUFF, 0.8, 99, StatusEffectType.ATK_UP), TriggerCondition.PASSIVE,
+    '공격력 80% 증가'),
 
   new Skill('thunderstorm', 'Thunderstorm', '⛈️', SkillGrade.MYTHIC, SkillCategory.ATTACK,
-    [HeritageRoute.GHOST], makeEffect(EffectType.DAMAGE, 40), TriggerCondition.TURN_START),
+    [HeritageRoute.GHOST], makeEffect(EffectType.DAMAGE, 40), TriggerCondition.TURN_START,
+    '턴 시작 시 뇌우로 40의 피해'),
 
   new Skill('tyrant', 'Tyrant', '👹', SkillGrade.MYTHIC, SkillCategory.ATTACK,
-    [HeritageRoute.SKULL], makeEffect(EffectType.DAMAGE, 35), TriggerCondition.ON_ATTACK),
+    [HeritageRoute.SKULL], makeEffect(EffectType.DAMAGE, 35), TriggerCondition.ON_ATTACK,
+    '공격 시 폭군의 일격으로 35의 추가 피해'),
 
   new Skill('angel_power', 'Angel Power', '😇', SkillGrade.IMMORTAL, SkillCategory.BUFF,
-    [], makeEffect(EffectType.BUFF, 1.0, 99, StatusEffectType.ATK_UP), TriggerCondition.PASSIVE),
+    [], makeEffect(EffectType.BUFF, 1.0, 99, StatusEffectType.ATK_UP), TriggerCondition.PASSIVE,
+    '공격력 100% 증가'),
 
   new Skill('demon_power', 'Demon Power', '😈', SkillGrade.IMMORTAL, SkillCategory.ATTACK,
-    [], makeEffect(EffectType.DAMAGE, 60), TriggerCondition.ON_ATTACK),
+    [], makeEffect(EffectType.DAMAGE, 60), TriggerCondition.ON_ATTACK,
+    '공격 시 마왕의 힘으로 60의 추가 피해'),
 ];
 
 const SYNERGY_MAP: Record<HeritageRoute, string[]> = {

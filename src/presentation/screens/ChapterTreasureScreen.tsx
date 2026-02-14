@@ -1,22 +1,9 @@
 import { useGame } from '../GameContext';
 import { ChapterTreasureTable } from '../../domain/data/ChapterTreasureTable';
 import type { ChapterMilestone } from '../../domain/data/ChapterTreasureTable';
+import { ResourceDataTable } from '../../domain/data/ResourceDataTable';
 import { ArrowLeft } from 'lucide-react';
 import { ResourceType } from '../../domain/enums';
-
-const RESOURCE_LABELS: Partial<Record<ResourceType, string>> = {
-  [ResourceType.GOLD]: 'G',
-  [ResourceType.GEMS]: '보석',
-  [ResourceType.EQUIPMENT_STONE]: '장비석',
-  [ResourceType.POWER_STONE]: '파워스톤',
-};
-
-const RESOURCE_COLORS: Partial<Record<ResourceType, string>> = {
-  [ResourceType.GOLD]: '#ffd700',
-  [ResourceType.GEMS]: '#e040fb',
-  [ResourceType.EQUIPMENT_STONE]: '#4fc3f7',
-  [ResourceType.POWER_STONE]: '#ff7043',
-};
 
 function getAllMilestonesLinear(clearedChapterMax: number): ChapterMilestone[] {
   const chapterIds = ChapterTreasureTable.getAvailableChapterIds(clearedChapterMax);
@@ -110,11 +97,11 @@ export function ChapterTreasureScreen() {
                 <div key={i} className="treasure-reward-item">
                   <div
                     className="treasure-reward-icon"
-                    style={{ background: RESOURCE_COLORS[r.type] ?? '#888' }}
+                    style={{ background: ResourceDataTable.getColor(r.type) }}
                   />
                   <div className="treasure-reward-info">
                     <div className="treasure-reward-amount">{r.amount.toLocaleString()}</div>
-                    <div className="treasure-reward-name">{RESOURCE_LABELS[r.type] ?? r.type}</div>
+                    <div className="treasure-reward-name">{ResourceDataTable.getShortLabel(r.type)}</div>
                   </div>
                 </div>
               ))}

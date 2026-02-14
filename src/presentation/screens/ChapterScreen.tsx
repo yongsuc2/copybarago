@@ -9,27 +9,8 @@ import { BattleLogType } from '../../domain/battle/BattleLog';
 import type { AttackPhase } from '../components/BattleArena';
 import { AdventureStage } from '../components/AdventureStage';
 import { PlayerStatsBar } from '../components/PlayerStatsBar';
+import { EncounterDataTable } from '../../domain/data/EncounterDataTable';
 import { Package, Home, Swords } from 'lucide-react';
-
-const ENCOUNTER_TYPE_LABEL: Record<EncounterType, string> = {
-  [EncounterType.ANGEL]: '천사',
-  [EncounterType.DEMON]: '악마',
-  [EncounterType.CHANCE]: '우연',
-  [EncounterType.COMBAT]: '전투',
-  [EncounterType.MERCHANT]: '상인',
-  [EncounterType.ROULETTE]: '룰렛',
-  [EncounterType.LUCKY_MACHINE]: '행운머신',
-};
-
-const ENCOUNTER_DESCRIPTION: Record<EncounterType, string> = {
-  [EncounterType.ANGEL]: '천사가 나타나 스킬이나 회복을 제공합니다.',
-  [EncounterType.DEMON]: '악마가 체력을 대가로 강력한 스킬을 제안합니다.',
-  [EncounterType.CHANCE]: '행운의 이벤트가 발생했습니다!',
-  [EncounterType.COMBAT]: '적과 조우했습니다.',
-  [EncounterType.MERCHANT]: '떠돌이 상인이 스킬을 판매합니다.',
-  [EncounterType.ROULETTE]: '신비한 룰렛이 나타났습니다. 운을 시험해 보세요!',
-  [EncounterType.LUCKY_MACHINE]: '행운의 머신이 나타났습니다. 위험할수록 보상이 큽니다!',
-};
 
 const MAX_BATTLE_TURNS = 15;
 
@@ -495,9 +476,9 @@ export function ChapterScreen() {
           {encounter && !isBattling && (
             <>
               <div className="ba-day-divider">{chapter!.currentDay}일차</div>
-              <h3>{ENCOUNTER_TYPE_LABEL[encounter.type]}</h3>
+              <h3>{EncounterDataTable.getLabel(encounter.type)}</h3>
               <div style={{ fontSize: 12, color: '#aaa', marginBottom: 8 }}>
-                {ENCOUNTER_DESCRIPTION[encounter.type]}
+                {EncounterDataTable.getDescription(encounter.type)}
               </div>
               <div className="encounter-options">
                 {encounter.options.map((opt, i) => (

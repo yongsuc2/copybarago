@@ -87,3 +87,42 @@ docs/화면기획문서/모험화면_기획서.md (상시 스테이지 반영)
 ### 누적 현황
 - 테스트: 19개 파일, 142개 테스트 전부 통과
 - tsc 타입 체크 통과
+
+---
+
+## 2026-02-15 (Day 4)
+
+### 완료 작업
+- **데이터 테이블 분리 리팩토링**
+  - 하드코딩된 게임 데이터를 중앙화된 데이터 테이블로 분리
+  - EncounterDataTable: 인카운터 타입 라벨/설명, 출현 가중치, 수치/옵션 템플릿
+  - EquipmentDataTable: 장비 등급/슬롯 라벨, 판매가
+  - ResourceDataTable: 재화 라벨(전체/약어), 색상, 던전 라벨
+  - Skill 엔티티 description 필드 추가 + SkillTable 24종 스킬 설명 부여
+  - 소비자 파일 6개 업데이트 (EncounterGenerator, ChapterScreen, EquipmentScreen, DebugPanel, ChapterTreasureScreen, QuestScreen, ContentScreen)
+
+### 생성된 파일
+```
+src/domain/data/EncounterDataTable.ts
+src/domain/data/EquipmentDataTable.ts
+src/domain/data/ResourceDataTable.ts
+```
+
+### 수정된 파일
+```
+src/domain/entities/Skill.ts (description 필드 추가)
+src/domain/data/SkillTable.ts (24종 스킬 설명 추가)
+src/domain/chapter/EncounterGenerator.ts (EncounterDataTable 참조)
+src/presentation/screens/ChapterScreen.tsx (EncounterDataTable 참조)
+src/presentation/screens/EquipmentScreen.tsx (EquipmentDataTable 참조)
+src/presentation/screens/DebugPanel.tsx (EquipmentDataTable 참조)
+src/presentation/screens/ChapterTreasureScreen.tsx (ResourceDataTable 참조)
+src/presentation/screens/QuestScreen.tsx (ResourceDataTable 참조)
+src/presentation/screens/ContentScreen.tsx (ResourceDataTable 참조)
+docs/12_모험시스템.md (인카운터 데이터 파일 경로 추가)
+```
+
+### 누적 현황
+- 테스트: 19개 파일, 142개 테스트 전부 통과
+- tsc 타입 체크 통과
+- 데이터 테이블 3개 신규, 하드코딩 제거 완료

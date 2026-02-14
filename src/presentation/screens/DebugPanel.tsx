@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useGame } from '../GameContext';
 import { EquipmentGrade, ResourceType, SlotType } from '../../domain/enums';
 import { Equipment } from '../../domain/entities/Equipment';
+import { EquipmentDataTable } from '../../domain/data/EquipmentDataTable';
 
 const GRADES = [
   EquipmentGrade.COMMON,
@@ -12,14 +13,7 @@ const GRADES = [
   EquipmentGrade.MYTHIC,
 ];
 
-const GRADE_LABELS: Record<EquipmentGrade, string> = {
-  [EquipmentGrade.COMMON]: '일반',
-  [EquipmentGrade.UNCOMMON]: '우수',
-  [EquipmentGrade.RARE]: '희귀',
-  [EquipmentGrade.EPIC]: '에픽',
-  [EquipmentGrade.LEGENDARY]: '전설',
-  [EquipmentGrade.MYTHIC]: '신화',
-};
+const GRADE_LABELS = EquipmentDataTable.gradeLabels;
 
 const SLOTS = [SlotType.WEAPON, SlotType.ARMOR, SlotType.RING, SlotType.ACCESSORY];
 

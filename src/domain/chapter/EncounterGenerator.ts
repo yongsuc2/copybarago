@@ -4,36 +4,8 @@ import type { EncounterOption, EncounterReward } from './Encounter';
 import { Reward } from '../value-objects/Reward';
 import { Skill } from '../entities/Skill';
 import { SkillTable } from '../data/SkillTable';
+import { EncounterDataTable } from '../data/EncounterDataTable';
 import { SeededRandom } from '../../infrastructure/SeededRandom';
-
-interface EncounterWeight {
-  type: EncounterType;
-  weight: number;
-}
-
-const ENCOUNTER_WEIGHTS: Record<ChapterType, EncounterWeight[]> = {
-  [ChapterType.SIXTY_DAY]: [
-    { type: EncounterType.COMBAT, weight: 35 },
-    { type: EncounterType.ANGEL, weight: 20 },
-    { type: EncounterType.DEMON, weight: 10 },
-    { type: EncounterType.CHANCE, weight: 15 },
-    { type: EncounterType.MERCHANT, weight: 10 },
-    { type: EncounterType.ROULETTE, weight: 10 },
-  ],
-  [ChapterType.THIRTY_DAY]: [
-    { type: EncounterType.COMBAT, weight: 35 },
-    { type: EncounterType.ANGEL, weight: 20 },
-    { type: EncounterType.DEMON, weight: 10 },
-    { type: EncounterType.CHANCE, weight: 15 },
-    { type: EncounterType.MERCHANT, weight: 10 },
-    { type: EncounterType.LUCKY_MACHINE, weight: 10 },
-  ],
-  [ChapterType.FIVE_DAY]: [
-    { type: EncounterType.COMBAT, weight: 70 },
-    { type: EncounterType.ANGEL, weight: 20 },
-    { type: EncounterType.CHANCE, weight: 10 },
-  ],
-};
 
 function emptyReward(): EncounterReward {
   return { skills: [], healPercent: 0, reward: Reward.empty() };
@@ -59,7 +31,7 @@ export class EncounterGenerator {
   }
 
   generate(chapterType: ChapterType, _day: number, existingSkillIds: string[]): Encounter {
-    const weights = ENCOUNTER_WEIGHTS[chapterType];
+    const weights = EncounterDataTable.getWeights(chapterType);
     const type = this.rng.weightedPick(
       weights.map(w => ({ item: w.type, weight: w.weight }))
     );
@@ -92,13 +64,14 @@ export class EncounterGenerator {
 
   private createAngelEncounter(existingSkillIds: string[]): Encounter {
     const skills = this.getRandomSkills(2, existingSkillIds);
+    const d = EncounterDataTable.angel;
 
     const options: EncounterOption[] = [];
 
     for (const skill of skills) {
       options.push({
-        label: `획득: ${skill.icon} ${skill.name}`,
-        description: `${skill.icon} ${skill.name} 스킬 획득`,
+        label: d.skillLabel(skill.icon, skill.name),
+        description: d.skillDescription(skill.icon, skill.name),
         hpCostPercent: 0,
         goldCost: 0,
         successRate: 1.0,
@@ -107,12 +80,12 @@ export class EncounterGenerator {
     }
 
     options.push({
-      label: '체력 30% 회복',
-      description: '최대 체력의 30% 회복',
+      label: d.healLabel,
+      description: d.healDescription,
       hpCostPercent: 0,
       goldCost: 0,
       successRate: 1.0,
-      reward: healReward(0.3),
+      reward: healReward(d.healPercent),
     });
 
     return new Encounter(EncounterType.ANGEL, options);
@@ -123,14 +96,15 @@ export class EncounterGenerator {
     const skill = allSkills.length > 0
       ? allSkills[this.rng.nextInt(0, allSkills.length - 1)]
       : null;
+    const d = EncounterDataTable.demon;
 
     const options: EncounterOption[] = [];
 
     if (skill) {
       options.push({
-        label: `희생: ${skill.icon} ${skill.name}`,
-        description: `최대 체력 20% 소모, ${skill.icon} ${skill.name} 획득`,
-        hpCostPercent: 0.2,
+        label: d.skillLabel(skill.icon, skill.name),
+        description: d.skillDescription(skill.icon, skill.name),
+        hpCostPercent: d.hpCostPercent,
         goldCost: 0,
         successRate: 1.0,
         reward: skillReward([skill]),
@@ -138,8 +112,8 @@ export class EncounterGenerator {
     }
 
     options.push({
-      label: '거절',
-      description: '안전하게 떠나기',
+      label: d.rejectLabel,
+      description: d.rejectDescription,
       hpCostPercent: 0,
       goldCost: 0,
       successRate: 1.0,
@@ -150,18 +124,19 @@ export class EncounterGenerator {
   }
 
   private createCombatEncounter(): Encounter {
+    const d = EncounterDataTable.combat;
     const options: EncounterOption[] = [
       {
-        label: '전투',
-        description: '전투에 돌입',
+        label: d.fightLabel,
+        description: d.fightDescription,
         hpCostPercent: 0,
         goldCost: 0,
         successRate: 1.0,
         reward: emptyReward(),
       },
       {
-        label: '회피',
-        description: '이번 전투 건너뛰기',
+        label: d.avoidLabel,
+        description: d.avoidDescription,
         hpCostPercent: 0,
         goldCost: 0,
         successRate: 1.0,
@@ -174,37 +149,40 @@ export class EncounterGenerator {
 
   private createChanceEncounter(): Encounter {
     const roll = this.rng.nextInt(0, 2);
+    const d = EncounterDataTable.chance;
     const options: EncounterOption[] = [];
 
     switch (roll) {
-      case 0:
+      case 0: {
+        const goldAmount = d.boxGoldMin + this.rng.nextInt(0, d.boxGoldMax - d.boxGoldMin);
         options.push({
-          label: '상자 열기',
-          description: '골드 획득',
+          label: d.boxLabel,
+          description: d.boxDescription,
           hpCostPercent: 0,
           goldCost: 0,
           successRate: 1.0,
-          reward: resourceReward(ResourceType.GOLD, 100 + this.rng.nextInt(0, 200)),
+          reward: resourceReward(ResourceType.GOLD, goldAmount),
         });
         break;
+      }
       case 1:
         options.push({
-          label: '치유의 샘',
-          description: '최대 체력의 50% 회복',
+          label: d.springLabel,
+          description: d.springDescription,
           hpCostPercent: 0,
           goldCost: 0,
           successRate: 1.0,
-          reward: healReward(0.5),
+          reward: healReward(d.springHealPercent),
         });
         break;
       case 2:
         options.push({
-          label: '축복',
-          description: '골드 200 획득',
+          label: d.blessingLabel,
+          description: d.blessingDescription,
           hpCostPercent: 0,
           goldCost: 0,
           successRate: 1.0,
-          reward: resourceReward(ResourceType.GOLD, 200),
+          reward: resourceReward(ResourceType.GOLD, d.blessingGold),
         });
         break;
     }
@@ -214,13 +192,14 @@ export class EncounterGenerator {
 
   private createMerchantEncounter(existingSkillIds: string[]): Encounter {
     const skills = this.getRandomSkills(3, existingSkillIds);
+    const d = EncounterDataTable.merchant;
     const options: EncounterOption[] = [];
 
     for (const skill of skills) {
-      const price = skill.grade === SkillGrade.LEGENDARY ? 300 : 150;
+      const price = d.getPrice(skill.grade);
       options.push({
-        label: `구매: ${skill.icon} ${skill.name} (${price}g)`,
-        description: `${skill.icon} ${skill.name}을(를) ${price} 골드에 구매`,
+        label: d.buyLabel(skill.icon, skill.name, price),
+        description: d.buyDescription(skill.icon, skill.name, price),
         hpCostPercent: 0,
         goldCost: price,
         successRate: 1.0,
@@ -229,8 +208,8 @@ export class EncounterGenerator {
     }
 
     options.push({
-      label: '떠나기',
-      description: '상인을 떠나기',
+      label: d.leaveLabel,
+      description: d.leaveDescription,
       hpCostPercent: 0,
       goldCost: 0,
       successRate: 1.0,
@@ -243,27 +222,28 @@ export class EncounterGenerator {
   private createRouletteEncounter(): Encounter {
     const mythicSkills = SkillTable.getSkillsByGrade(SkillGrade.MYTHIC);
     const immortalSkills = SkillTable.getSkillsByGrade(SkillGrade.IMMORTAL);
+    const d = EncounterDataTable.roulette;
 
     const options: EncounterOption[] = [
       {
-        label: '일반 돌리기',
-        description: '80% 확률로 신화 스킬 획득',
+        label: d.normalLabel,
+        description: d.normalDescription,
         hpCostPercent: 0,
         goldCost: 0,
-        successRate: 0.8,
+        successRate: d.normalRate,
         reward: skillReward(mythicSkills.length > 0 ? [this.rng.pick(mythicSkills)] : []),
       },
       {
-        label: '대박 돌리기',
-        description: '30% 확률로 불멸 스킬 획득',
+        label: d.jackpotLabel,
+        description: d.jackpotDescription,
         hpCostPercent: 0,
         goldCost: 0,
-        successRate: 0.3,
+        successRate: d.jackpotRate,
         reward: skillReward(immortalSkills.length > 0 ? [this.rng.pick(immortalSkills)] : []),
       },
       {
-        label: '건너뛰기',
-        description: '그냥 지나가기',
+        label: d.skipLabel,
+        description: d.skipDescription,
         hpCostPercent: 0,
         goldCost: 0,
         successRate: 1.0,
@@ -275,31 +255,35 @@ export class EncounterGenerator {
   }
 
   private createLuckyMachineEncounter(): Encounter {
-    const goldReward = 500;
+    const d = EncounterDataTable.luckyMachine;
+    const baseGold = d.baseGold;
+    const safeGold = Math.floor(baseGold * d.safeMultiplier);
+    const riskyGold = baseGold * d.riskyMultiplier;
+
     const options: EncounterOption[] = [
       {
-        label: '안전 머신 (100%)',
-        description: `100% 확률, ${Math.floor(goldReward * 0.5)}골드 획득`,
+        label: d.safeLabel(safeGold),
+        description: d.safeDescription(safeGold),
         hpCostPercent: 0,
         goldCost: 0,
-        successRate: 1.0,
-        reward: resourceReward(ResourceType.GOLD, Math.floor(goldReward * 0.5)),
+        successRate: d.safeRate,
+        reward: resourceReward(ResourceType.GOLD, safeGold),
       },
       {
-        label: '일반 머신 (70%)',
-        description: `70% 확률, ${goldReward}골드 획득`,
+        label: d.normalLabel(baseGold),
+        description: d.normalDescription(baseGold),
         hpCostPercent: 0,
         goldCost: 0,
-        successRate: 0.7,
-        reward: resourceReward(ResourceType.GOLD, goldReward),
+        successRate: d.normalRate,
+        reward: resourceReward(ResourceType.GOLD, baseGold),
       },
       {
-        label: '위험 머신 (40%)',
-        description: `40% 확률, ${goldReward * 2}골드 획득`,
+        label: d.riskyLabel(riskyGold),
+        description: d.riskyDescription(riskyGold),
         hpCostPercent: 0,
         goldCost: 0,
-        successRate: 0.4,
-        reward: resourceReward(ResourceType.GOLD, goldReward * 2),
+        successRate: d.riskyRate,
+        reward: resourceReward(ResourceType.GOLD, riskyGold),
       },
     ];
 

@@ -1,19 +1,10 @@
 import { useState } from 'react';
 import { useGame } from '../GameContext';
 import { ResourceType } from '../../domain/enums';
+import { ResourceDataTable } from '../../domain/data/ResourceDataTable';
 import type { GameEvent, EventMission } from '../../domain/meta/GameEvent';
 
 type QuestTab = 'daily' | 'weekly';
-
-const RESOURCE_LABELS: Record<string, string> = {
-  [ResourceType.GOLD]: '골드',
-  [ResourceType.GEMS]: '보석',
-  [ResourceType.EQUIPMENT_STONE]: '장비석',
-  [ResourceType.POWER_STONE]: '파워스톤',
-  [ResourceType.STAMINA]: '스태미나',
-  [ResourceType.PET_EGG]: '펫 알',
-  [ResourceType.PET_FOOD]: '사료',
-};
 
 export function QuestScreen() {
   const { game, refresh } = useGame();
@@ -58,7 +49,7 @@ export function QuestScreen() {
     const completed = mission.current >= mission.target;
     const progress = Math.min(mission.current / mission.target, 1);
     const rewardText = mission.reward.resources
-      .map(r => `${RESOURCE_LABELS[r.type] ?? r.type} ${r.amount}`)
+      .map(r => `${ResourceDataTable.getLabel(r.type)} ${r.amount}`)
       .join(', ');
 
     return (

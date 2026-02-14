@@ -2,32 +2,12 @@ import { useState } from 'react';
 import { useGame } from '../GameContext';
 import { SlotType, ResourceType, EquipmentGrade } from '../../domain/enums';
 import { EquipmentTable } from '../../domain/data/EquipmentTable';
+import { EquipmentDataTable } from '../../domain/data/EquipmentDataTable';
 import type { Equipment } from '../../domain/entities/Equipment';
 
-const SLOT_LABELS: Record<SlotType, string> = {
-  [SlotType.WEAPON]: '무기',
-  [SlotType.ARMOR]: '방어구',
-  [SlotType.RING]: '반지',
-  [SlotType.ACCESSORY]: '장신구',
-};
-
-const GRADE_LABELS: Record<EquipmentGrade, string> = {
-  [EquipmentGrade.COMMON]: '일반',
-  [EquipmentGrade.UNCOMMON]: '우수',
-  [EquipmentGrade.RARE]: '희귀',
-  [EquipmentGrade.EPIC]: '에픽',
-  [EquipmentGrade.LEGENDARY]: '전설',
-  [EquipmentGrade.MYTHIC]: '신화',
-};
-
-const SELL_PRICES: Record<EquipmentGrade, number> = {
-  [EquipmentGrade.COMMON]: 10,
-  [EquipmentGrade.UNCOMMON]: 30,
-  [EquipmentGrade.RARE]: 100,
-  [EquipmentGrade.EPIC]: 300,
-  [EquipmentGrade.LEGENDARY]: 1000,
-  [EquipmentGrade.MYTHIC]: 3000,
-};
+const SLOT_LABELS = EquipmentDataTable.slotLabels;
+const GRADE_LABELS = EquipmentDataTable.gradeLabels;
+const SELL_PRICES = EquipmentDataTable.sellPrices;
 
 type Tab = 'equipped' | 'inventory' | 'forge';
 type SlotFilter = 'all' | SlotType;

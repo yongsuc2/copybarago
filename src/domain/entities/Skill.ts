@@ -26,6 +26,7 @@ export class Skill {
     public readonly heritageSynergy: HeritageRoute[],
     public readonly effect: SkillEffect,
     public readonly triggerCondition: TriggerCondition,
+    public readonly description: string = '',
   ) {}
 
   isSynergyWith(route: HeritageRoute): boolean {

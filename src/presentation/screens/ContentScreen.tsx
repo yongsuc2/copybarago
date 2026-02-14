@@ -2,15 +2,12 @@ import { useState } from 'react';
 import { useGame } from '../GameContext';
 import { DungeonType, ResourceType, BattleState } from '../../domain/enums';
 import { BattleUnit } from '../../domain/battle/BattleUnit';
+import { ResourceDataTable } from '../../domain/data/ResourceDataTable';
 import { Building2, Skull, Swords, Map, Pickaxe, ArrowLeft } from 'lucide-react';
 
 type ContentTab = 'menu' | 'tower' | 'dungeon' | 'arena' | 'travel' | 'mine';
 
-const DUNGEON_LABELS: Record<DungeonType, string> = {
-  [DungeonType.DRAGON_NEST]: '용의 둥지',
-  [DungeonType.CELESTIAL_TREE]: '세계수',
-  [DungeonType.SKY_ISLAND]: '하늘섬',
-};
+const DUNGEON_LABELS = ResourceDataTable.dungeonLabels;
 
 export function ContentScreen() {
   const { game, refresh } = useGame();
