@@ -10,6 +10,16 @@ import { BattleArena, type AttackPhase } from '../components/BattleArena';
 import { PlayerStatsBar } from '../components/PlayerStatsBar';
 import { Package, Home, Swords } from 'lucide-react';
 
+const ENCOUNTER_TYPE_LABEL: Record<EncounterType, string> = {
+  [EncounterType.ANGEL]: '천사',
+  [EncounterType.DEMON]: '악마',
+  [EncounterType.CHANCE]: '우연',
+  [EncounterType.COMBAT]: '전투',
+  [EncounterType.MERCHANT]: '상인',
+  [EncounterType.ROULETTE]: '룰렛',
+  [EncounterType.LUCKY_MACHINE]: '행운머신',
+};
+
 const MAX_BATTLE_TURNS = 15;
 
 const PHASE_DURATION = {
@@ -502,7 +512,7 @@ export function ChapterScreen() {
 
           <div className="ba-day-divider">{chapter.currentDay}일차</div>
 
-          <h3>{encounter.type}</h3>
+          <h3>{ENCOUNTER_TYPE_LABEL[encounter.type]}</h3>
           <div className="encounter-options">
             {encounter.options.map((opt, i) => (
               <div key={i} className="encounter-option" onClick={() => selectOption(i)}>
