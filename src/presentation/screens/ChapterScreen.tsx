@@ -167,8 +167,20 @@ export function ChapterScreen() {
       return;
     }
 
-    setEncounter(enc);
     setLog(prev => [...prev, `${game.currentChapter!.currentDay}일차: ${enc?.type ?? '???'}`]);
+
+    if (enc?.type === EncounterType.COMBAT) {
+      const stats = game.player.computeStats();
+      const pu = new BattleUnit('Capybara', stats, [...game.currentChapter.sessionSkills], true);
+      const b = game.currentChapter.createCombatBattle(pu);
+      if (b) {
+        startBattle(b, false);
+      }
+      refresh();
+      return;
+    }
+
+    setEncounter(enc);
     refresh();
   }, [game, refresh]);
 
@@ -356,15 +368,6 @@ export function ChapterScreen() {
 
   function selectOption(index: number) {
     if (!game.currentChapter || !encounter) return;
-
-    if (encounter.type === EncounterType.COMBAT && index === 0) {
-      const stats = game.player.computeStats();
-      const pu = new BattleUnit('Capybara', stats, [...game.currentChapter.sessionSkills], true);
-      const b = game.currentChapter.createCombatBattle(pu);
-      if (!b) return;
-      startBattle(b, false);
-      return;
-    }
 
     const stats = game.player.computeStats();
     const result = game.currentChapter.resolveEncounter(index, stats.hp, stats.maxHp);
