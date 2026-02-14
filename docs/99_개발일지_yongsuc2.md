@@ -57,3 +57,33 @@
 - **챕터 보물상자 시스템 구현** (Phase 9)
 - **챕터 결과 오버레이 추가**
 - **작업 목록/개발일지 2인 분할 관리 구조 도입**
+- **인카운터 UI 한글화** (선택지 라벨/설명 한글 변환, ENCOUNTER_TYPE_LABEL 매핑)
+- **스킬 아이콘 추가** (24종 스킬에 이모지 아이콘 부여, Skill.icon 필드)
+- **퀘스트 테스트 코드 확장** (21개 테스트: 미션 ID 일관성, 통합 테스트, 엣지 케이스)
+- **AdventureStage 상시 스테이지 구현**
+  - AdventureStage.tsx 신규: 전투/인카운터/대기 모드 통합
+  - 인카운터 이모지 비주얼 매핑 (7종 + CHANCE 세분화)
+  - CSS: adventure-stage, stage-encounter-visual, @keyframes shake 추가
+  - ChapterScreen.tsx JSX 구조 재배치 (4분기 → 3분기 통합)
+  - 모험화면_기획서.md 업데이트
+
+### 생성된 파일
+```
+src/presentation/components/AdventureStage.tsx
+```
+
+### 수정된 파일
+```
+src/domain/entities/Skill.ts (icon 필드 추가)
+src/domain/data/SkillTable.ts (24종 아이콘 할당)
+src/domain/chapter/EncounterGenerator.ts (한글 라벨, 스킬 아이콘 포함)
+src/presentation/screens/ChapterScreen.tsx (AdventureStage 통합, 구조 재배치)
+src/index.css (adventure-stage 스타일, shake 키프레임)
+src/__tests__/domain/Battle.test.ts (Skill icon 파라미터 추가)
+src/__tests__/meta/GameEvent.test.ts (21개 테스트 확장)
+docs/화면기획문서/모험화면_기획서.md (상시 스테이지 반영)
+```
+
+### 누적 현황
+- 테스트: 19개 파일, 142개 테스트 전부 통과
+- tsc 타입 체크 통과

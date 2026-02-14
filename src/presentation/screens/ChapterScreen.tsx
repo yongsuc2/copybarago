@@ -6,7 +6,8 @@ import { BattleUnit } from '../../domain/battle/BattleUnit';
 import { Battle } from '../../domain/battle/Battle';
 import type { BattleLogEntry } from '../../domain/battle/BattleLog';
 import { BattleLogType } from '../../domain/battle/BattleLog';
-import { BattleArena, type AttackPhase } from '../components/BattleArena';
+import type { AttackPhase } from '../components/BattleArena';
+import { AdventureStage } from '../components/AdventureStage';
 import { PlayerStatsBar } from '../components/PlayerStatsBar';
 import { Package, Home, Swords } from 'lucide-react';
 
@@ -396,53 +397,6 @@ export function ChapterScreen() {
     <div className="screen">
       <h2>모험</h2>
 
-      {chapterResult && !isBattling && (
-        <div className="chapter-result-overlay">
-          <div className={`chapter-result-icon ${chapterResult.type}`}>
-            {chapterResult.type === 'victory' ? '🎉' : '💀'}
-          </div>
-          <div className={`chapter-result-title ${chapterResult.type}`}>
-            {chapterResult.type === 'victory' ? '챕터 클리어!' : '챕터 실패'}
-          </div>
-          <div className="chapter-result-sub">
-            챕터 {chapterResult.chapterId}
-          </div>
-          {chapterResult.gold > 0 && (
-            <div className="chapter-result-reward">
-              <span style={{ color: '#ffd700' }}>+{chapterResult.gold} G</span>
-            </div>
-          )}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16, width: '100%' }}>
-            <button
-              className="btn btn-primary"
-              style={{ width: '100%', padding: '12px 16px', fontSize: 15 }}
-              onClick={() => { setChapterResult(null); setScreen('main'); }}
-            >
-              <Home size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-              메인으로
-            </button>
-            {chapterResult.type === 'victory' && game.player.resources.stamina >= 5 && (
-              <button
-                className="btn btn-secondary"
-                style={{ width: '100%', padding: '12px 16px', fontSize: 15 }}
-                onClick={() => { setChapterResult(null); startChapter(); }}
-              >
-                <Swords size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-                다음 챕터 시작
-              </button>
-            )}
-            <button
-              className="btn btn-secondary"
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}
-              onClick={() => { setChapterResult(null); setScreen('chapter-treasure'); }}
-            >
-              <Package size={16} />
-              보물상자 확인
-            </button>
-          </div>
-        </div>
-      )}
-
       {!chapter && !isBattling && !chapterResult && (
         <div>
           <div className="card">
@@ -476,7 +430,7 @@ export function ChapterScreen() {
         </div>
       )}
 
-      {isBattling && playerUnit && enemyUnit && (
+      {(chapter || isBattling) && !chapterResult && (
         <div>
           {chapter && (
             <div className="card" style={{ marginBottom: 8 }}>
@@ -487,9 +441,17 @@ export function ChapterScreen() {
               <div className="progress-bar">
                 <div className="progress-fill" style={{ width: `${chapter.getProgress() * 100}%` }} />
               </div>
+              {!isBattling && (
+                <div className="stat-row">
+                  <span>스킬</span>
+                  <span>{chapter.sessionSkills.length}</span>
+                </div>
+              )}
             </div>
           )}
-          <BattleArena
+
+          <AdventureStage
+            isBattling={isBattling}
             playerUnit={playerUnit}
             enemyUnit={enemyUnit}
             attackPhase={attackPhase}
@@ -497,57 +459,41 @@ export function ChapterScreen() {
             turnCount={turnCount}
             maxTurns={MAX_BATTLE_TURNS}
             isBoss={isBossFight}
-          />
-          <PlayerStatsBar
-            hp={playerUnit.currentHp}
-            maxHp={playerUnit.maxHp}
-            atk={playerUnit.getEffectiveAtk()}
-            def={playerUnit.getEffectiveDef()}
-          />
-          <button
-            className="btn btn-secondary"
-            style={{ width: '100%', marginTop: 8, color: '#ff5252' }}
-            onClick={abandonChapter}
-          >
-            포기하기
-          </button>
-        </div>
-      )}
-
-      {chapter && encounter && !isBattling && (
-        <div>
-          <div className="card">
-            <div className="stat-row">
-              <span>챕터 {chapter.id}</span>
-              <span>{chapter.currentDay}일 / {chapter.totalDays}일</span>
-            </div>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: `${chapter.getProgress() * 100}%` }} />
-            </div>
-            <div className="stat-row">
-              <span>스킬</span>
-              <span>{chapter.sessionSkills.length}</span>
-            </div>
-          </div>
-
-          <PlayerStatsBar
-            hp={playerStats.hp}
-            maxHp={playerStats.maxHp}
-            atk={playerStats.atk}
-            def={playerStats.def}
+            encounterType={encounter?.type}
+            encounterOptionLabel={encounter?.options[0]?.label}
           />
 
-          <div className="ba-day-divider">{chapter.currentDay}일차</div>
+          {isBattling && playerUnit ? (
+            <PlayerStatsBar
+              hp={playerUnit.currentHp}
+              maxHp={playerUnit.maxHp}
+              atk={playerUnit.getEffectiveAtk()}
+              def={playerUnit.getEffectiveDef()}
+            />
+          ) : (
+            <PlayerStatsBar
+              hp={playerStats.hp}
+              maxHp={playerStats.maxHp}
+              atk={playerStats.atk}
+              def={playerStats.def}
+            />
+          )}
 
-          <h3>{ENCOUNTER_TYPE_LABEL[encounter.type]}</h3>
-          <div className="encounter-options">
-            {encounter.options.map((opt, i) => (
-              <div key={i} className="encounter-option" onClick={() => selectOption(i)}>
-                <div style={{ fontWeight: 'bold' }}>{opt.label}</div>
-                <div style={{ fontSize: 12, color: '#999' }}>{opt.description}</div>
+          {encounter && !isBattling && (
+            <>
+              <div className="ba-day-divider">{chapter!.currentDay}일차</div>
+              <h3>{ENCOUNTER_TYPE_LABEL[encounter.type]}</h3>
+              <div className="encounter-options">
+                {encounter.options.map((opt, i) => (
+                  <div key={i} className="encounter-option" onClick={() => selectOption(i)}>
+                    <div style={{ fontWeight: 'bold' }}>{opt.label}</div>
+                    <div style={{ fontSize: 12, color: '#999' }}>{opt.description}</div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
+
           <button
             className="btn btn-secondary"
             style={{ width: '100%', marginTop: 12, color: '#ff5252' }}
@@ -555,6 +501,56 @@ export function ChapterScreen() {
           >
             포기하기
           </button>
+        </div>
+      )}
+
+      {chapterResult && !isBattling && (
+        <div>
+          <AdventureStage isBattling={false} />
+          <div className="chapter-result-overlay">
+            <div className={`chapter-result-icon ${chapterResult.type}`}>
+              {chapterResult.type === 'victory' ? '🎉' : '💀'}
+            </div>
+            <div className={`chapter-result-title ${chapterResult.type}`}>
+              {chapterResult.type === 'victory' ? '챕터 클리어!' : '챕터 실패'}
+            </div>
+            <div className="chapter-result-sub">
+              챕터 {chapterResult.chapterId}
+            </div>
+            {chapterResult.gold > 0 && (
+              <div className="chapter-result-reward">
+                <span style={{ color: '#ffd700' }}>+{chapterResult.gold} G</span>
+              </div>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16, width: '100%' }}>
+              <button
+                className="btn btn-primary"
+                style={{ width: '100%', padding: '12px 16px', fontSize: 15 }}
+                onClick={() => { setChapterResult(null); setScreen('main'); }}
+              >
+                <Home size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+                메인으로
+              </button>
+              {chapterResult.type === 'victory' && game.player.resources.stamina >= 5 && (
+                <button
+                  className="btn btn-secondary"
+                  style={{ width: '100%', padding: '12px 16px', fontSize: 15 }}
+                  onClick={() => { setChapterResult(null); startChapter(); }}
+                >
+                  <Swords size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+                  다음 챕터 시작
+                </button>
+              )}
+              <button
+                className="btn btn-secondary"
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}
+                onClick={() => { setChapterResult(null); setScreen('chapter-treasure'); }}
+              >
+                <Package size={16} />
+                보물상자 확인
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

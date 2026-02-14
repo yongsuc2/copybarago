@@ -326,6 +326,39 @@ body {
   100% { opacity: 0; transform: translateY(-20px); }
 }
 
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.adventure-stage {
+  min-height: 170px;
+  background: #0d1b2a;
+  border-radius: 10px;
+  margin: 8px 0;
+  border: 1px solid #1b2838;
+}
+
+.adventure-stage .battle-arena {
+  background: none;
+  border: none;
+  border-radius: 0;
+  margin: 0;
+}
+
+.stage-encounter-visual {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stage-encounter-emoji {
+  font-size: 48px;
+}
+
 .player-stats-bar {
   display: flex;
   align-items: center;
