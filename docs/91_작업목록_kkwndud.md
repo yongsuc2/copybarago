@@ -1,0 +1,50 @@
+# kkwndud 작업 목록
+
+## 작업 분배 원칙
+- 기존 패턴을 따르는 UI 화면 + 게임 시스템 구현
+- 비교적 쉬운 난이도의 시스템 개선/신규 구현
+- 공유 파일 수정 시 yongsuc2에게 알림
+
+---
+
+## 작업 목록
+
+| ID | 작업 | 난이도 | 상태 | 상세 | 참고 패턴 |
+|----|------|--------|------|------|----------|
+| K-1 | 전승 화면 + 연동 | 중 | 대기 | HeritageScreen: 4개 계승 루트 탭, 레벨/패시브 표시, 강화. NavBar/App.tsx 추가 | TalentScreen 참고 |
+| K-2 | 장비 합성 화면 + 연동 | 중 | 대기 | ForgeScreen: 인벤토리에서 재료 선택, 미리보기, 합성 실행. GameManager 메서드 추가 | EquipmentScreen 보관함 탭 참고 |
+| K-3 | 소장품 도감 시스템 | 하 | 대기 | CollectionScreen: 도감 목록, 보너스 표시, 수령. Collection 도메인 이미 구현됨 | PetScreen 참고 |
+| K-4 | 이벤트 화면 | 하 | 대기 | EventScreen: 진행 중 이벤트, 미션 진행도, 보상 수령 | QuestScreen 참고 |
+| K-5 | 지하감옥 개선 | 중 | 대기 | CatacombDungeon 연속 전투 UI. 기존 전투 로직 활용하여 5연전+보스 구현 | ChapterScreen 전투 참고 |
+| K-6 | 화면 기획서 작성 | 하 | 대기 | 미작성 화면별 상세 기획서 (docs/화면기획문서/) | 모험화면_기획서.md 참고 |
+| K-7 | UI 비주얼 개선 | 하 | 대기 | CSS 스타일 통일, 반응형, 색상/간격/폰트 다듬기 | index.css 참고 |
+| K-8 | 밸런스 데이터 시트 | 하 | 대기 | 챕터별 적 스탯, 비용 곡선, 보상 수치 정리 문서 | 기존 데이터 테이블 참고 |
+
+---
+
+## 의존성
+
+- K-1, K-3, K-4는 독립적으로 바로 시작 가능 (도메인 서비스 이미 존재)
+- K-2는 Forge 서비스 확인 후 진행
+- K-5는 전투 시스템 이해 후 진행 (K-1이나 K-3 먼저 해보면 좋음)
+- K-6, K-7, K-8은 언제든 진행 가능
+
+---
+
+## 작업 시 참고 사항
+
+### 새 화면 생성 패턴
+```
+1. src/presentation/screens/[Name]Screen.tsx 생성
+2. src/App.tsx에 import + case 추가
+3. src/index.css에 스타일 추가
+4. (필요시) src/presentation/components/NavBar.tsx에 탭 추가
+```
+
+### 핵심 훅
+```typescript
+const { game, refresh, setScreen } = useGame();
+```
+- `game`: GameManager 인스턴스 (모든 게임 데이터 접근)
+- `refresh()`: UI 갱신 (게임 상태 변경 후 반드시 호출)
+- `setScreen('name')`: 화면 전환
