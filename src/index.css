@@ -406,3 +406,155 @@ body {
   color: #ff5252;
   border: 1px solid #e94560;
 }
+
+.treasure-title-banner {
+  text-align: center;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #5c3d8f, #3d2066);
+  border: 2px solid #d4a843;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.treasure-best-day {
+  text-align: center;
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 10px;
+}
+
+.treasure-chapter-selector {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 0 10px;
+  scrollbar-width: thin;
+}
+
+.treasure-chapter-pill {
+  padding: 5px 12px;
+  background: #1a1a2e;
+  border: 1px solid #444;
+  border-radius: 16px;
+  color: #aaa;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.treasure-chapter-pill:hover { border-color: #888; color: #ddd; }
+.treasure-chapter-pill.active { background: #5c3d8f; border-color: #d4a843; color: #fff; }
+
+.treasure-banner-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 12px 0;
+  scrollbar-width: thin;
+  justify-content: center;
+}
+
+.treasure-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 14px 10px;
+  min-width: 90px;
+  background: #2a2045;
+  border: 2px solid #444;
+  border-radius: 8px 8px 4px 4px;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+  padding-bottom: 22px;
+}
+.treasure-banner:hover { border-color: #888; }
+.treasure-banner.selected { border-color: #d4a843; background: #3d2066; }
+.treasure-banner.locked { opacity: 0.5; }
+.treasure-banner.claimable { border-color: #ffd700; box-shadow: 0 0 8px rgba(255, 215, 0, 0.3); }
+.treasure-banner.claimed { border-color: #4caf50; background: #1a3020; }
+
+.treasure-banner-icon { font-size: 20px; margin-bottom: 2px; }
+.treasure-banner.claimable .treasure-banner-icon { color: #ffd700; }
+.treasure-banner.claimed .treasure-banner-icon { color: #4caf50; }
+.treasure-banner.locked .treasure-banner-icon { color: #666; }
+
+.treasure-banner-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.treasure-banner-chapter {
+  font-size: 10px;
+  color: #999;
+  background: #1a1a2e;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.treasure-reward-card {
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 0;
+}
+
+.treasure-reward-title {
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #ddd;
+}
+
+.treasure-reward-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.treasure-reward-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #222;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.treasure-reward-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.treasure-reward-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.treasure-reward-amount {
+  font-weight: bold;
+  font-size: 14px;
+  color: #fff;
+}
+
+.treasure-reward-name {
+  font-size: 11px;
+  color: #888;
+}
+
+.treasure-condition {
+  text-align: center;
+  font-size: 12px;
+  color: #d4a843;
+  margin: 8px 0;
+}

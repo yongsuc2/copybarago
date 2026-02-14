@@ -9,6 +9,7 @@ import { PetScreen } from './presentation/screens/PetScreen';
 import { ContentScreen } from './presentation/screens/ContentScreen';
 import { GachaScreen } from './presentation/screens/GachaScreen';
 import { QuestScreen } from './presentation/screens/QuestScreen';
+import { ChapterTreasureScreen } from './presentation/screens/ChapterTreasureScreen';
 
 function ScreenRouter() {
   const { screen } = useGame();
@@ -22,21 +23,24 @@ function ScreenRouter() {
     case 'content': return <ContentScreen />;
     case 'gacha': return <GachaScreen />;
     case 'quest': return <QuestScreen />;
+    case 'chapter-treasure': return <ChapterTreasureScreen />;
     default: return <MainScreen />;
   }
 }
 
 function AppLayout() {
   const { game, screen } = useGame();
-  const hideResourceBar = screen === 'chapter' && game.currentChapter !== null;
+  const hideChapterUI = screen === 'chapter' && game.currentChapter !== null;
 
   return (
     <>
-      <div style={hideResourceBar ? { display: 'none' } : undefined}>
+      <div style={hideChapterUI ? { display: 'none' } : undefined}>
         <ResourceBar />
       </div>
       <ScreenRouter />
-      <NavBar />
+      <div style={hideChapterUI ? { display: 'none' } : undefined}>
+        <NavBar />
+      </div>
     </>
   );
 }

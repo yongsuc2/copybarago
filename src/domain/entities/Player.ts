@@ -6,6 +6,7 @@ import { Equipment } from './Equipment';
 import { EquipmentSlot } from './EquipmentSlot';
 import { Pet } from './Pet';
 import { Resources } from './Resources';
+import { ChapterTreasureTable } from '../data/ChapterTreasureTable';
 
 const SELL_PRICES: Record<EquipmentGrade, number> = {
   [EquipmentGrade.COMMON]: 10,
@@ -27,6 +28,8 @@ export class Player {
   ownedPets: Pet[];
   resources: Resources;
   clearedChapterMax: number;
+  bestSurvivalDays: Map<number, number>;
+  claimedMilestones: Set<string>;
 
   constructor() {
     this.talent = new Talent();
@@ -42,6 +45,8 @@ export class Player {
     this.ownedPets = [];
     this.resources = new Resources();
     this.clearedChapterMax = 0;
+    this.bestSurvivalDays = new Map();
+    this.claimedMilestones = new Set();
   }
 
   computeStats(): Stats {
@@ -150,5 +155,15 @@ export class Player {
 
   getTalentGrade(): TalentGrade {
     return this.talent.grade;
+  }
+
+  updateBestSurvivalDay(chapterId: number, day: number, cleared: boolean): void {
+    const effectiveDay = cleared
+      ? ChapterTreasureTable.getClearSentinelDay(chapterId)
+      : day;
+    const current = this.bestSurvivalDays.get(chapterId) ?? 0;
+    if (effectiveDay > current) {
+      this.bestSurvivalDays.set(chapterId, effectiveDay);
+    }
   }
 }

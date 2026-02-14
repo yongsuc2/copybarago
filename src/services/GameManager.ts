@@ -17,6 +17,9 @@ import { Forge } from './Forge';
 import { EquipmentManager } from './EquipmentManager';
 import { PetManager } from './PetManager';
 import { ResourceAllocator } from './ResourceAllocator';
+import { ChapterTreasure } from '../domain/economy/ChapterTreasure';
+import { ChapterTreasureTable } from '../domain/data/ChapterTreasureTable';
+import { Result } from '../domain/value-objects/Result';
 import { EventBus } from '../infrastructure/EventBus';
 import { SeededRandom } from '../infrastructure/SeededRandom';
 import { ChapterType, ChestType, DungeonType, ResourceType } from '../domain/enums';
@@ -39,6 +42,7 @@ export class GameManager {
   routineScheduler: DailyRoutineScheduler;
   offlineCalc: OfflineRewardCalculator;
 
+  chapterTreasure: ChapterTreasure;
   battleManager: BattleManager;
   forge: Forge;
   equipmentManager: EquipmentManager;
@@ -66,6 +70,7 @@ export class GameManager {
     this.routineScheduler = new DailyRoutineScheduler();
     this.offlineCalc = new OfflineRewardCalculator();
 
+    this.chapterTreasure = new ChapterTreasure();
     this.battleManager = new BattleManager();
     this.forge = new Forge();
     this.equipmentManager = new EquipmentManager();
@@ -79,7 +84,7 @@ export class GameManager {
   }
 
   private initNewGame(): void {
-    this.player.resources.setAmount(ResourceType.GOLD, 1000);
+    this.player.resources.setAmount(ResourceType.GOLD, 2000);
     this.player.resources.setAmount(ResourceType.GEMS, 500);
     this.player.resources.setAmount(ResourceType.STAMINA, 100);
     this.player.resources.dailyReset();
@@ -138,6 +143,12 @@ export class GameManager {
     for (const event of this.eventManager.getActiveEvents()) {
       event.updateMissionProgress(missionId, amount);
     }
+  }
+
+  claimChapterTreasure(milestoneId: string) {
+    const milestone = ChapterTreasureTable.getMilestoneById(milestoneId);
+    if (!milestone) return Result.fail('마일스톤을 찾을 수 없습니다');
+    return this.chapterTreasure.claim(milestone, this.player);
   }
 
   checkDailyReset(): void {
