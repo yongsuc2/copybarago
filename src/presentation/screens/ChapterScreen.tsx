@@ -314,9 +314,7 @@ export function ChapterScreen() {
 
   function startChapter() {
     const nextId = game.player.clearedChapterMax + 1;
-    const type = nextId <= 3 ? ChapterType.FIVE_DAY
-      : nextId % 2 === 0 ? ChapterType.THIRTY_DAY
-      : ChapterType.SIXTY_DAY;
+    const type = ChapterType.SIXTY_DAY;
 
     game.startChapter(nextId, type);
     setBattleResult(null);

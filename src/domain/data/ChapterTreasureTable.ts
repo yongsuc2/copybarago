@@ -10,18 +10,12 @@ export interface ChapterMilestone {
   reward: Reward;
 }
 
-function getChapterType(chapterId: number): ChapterType {
-  if (chapterId <= 3) return ChapterType.FIVE_DAY;
-  if (chapterId % 2 === 0) return ChapterType.THIRTY_DAY;
+function getChapterType(_chapterId: number): ChapterType {
   return ChapterType.SIXTY_DAY;
 }
 
-function getTotalDays(type: ChapterType): number {
-  switch (type) {
-    case ChapterType.SIXTY_DAY: return 60;
-    case ChapterType.THIRTY_DAY: return 30;
-    case ChapterType.FIVE_DAY: return 5;
-  }
+function getTotalDays(_type: ChapterType): number {
+  return 60;
 }
 
 function buildReward(id: number, gold: number, gems: number, eqStone: number, pwStone: number): Reward {
@@ -67,22 +61,6 @@ export const ChapterTreasureTable = {
   },
 
   getMilestonesForChapter(chapterId: number): ChapterMilestone[] {
-    const type = getChapterType(chapterId);
-
-    if (type === ChapterType.FIVE_DAY) {
-      return [
-        makeClearMilestone(chapterId, 200, 50, 2, 0),
-      ];
-    }
-
-    if (type === ChapterType.THIRTY_DAY) {
-      return [
-        makeSurviveMilestone(chapterId, 10, 300, 30, 3, 0),
-        makeSurviveMilestone(chapterId, 20, 500, 50, 5, 1),
-        makeClearMilestone(chapterId, 800, 100, 8, 2),
-      ];
-    }
-
     return [
       makeSurviveMilestone(chapterId, 15, 300, 30, 3, 0),
       makeSurviveMilestone(chapterId, 25, 500, 60, 5, 1),
