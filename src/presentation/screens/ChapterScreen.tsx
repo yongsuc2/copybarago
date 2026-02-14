@@ -126,8 +126,14 @@ export function ChapterScreen() {
     }
 
     const enc = game.currentChapter.advanceDay();
+
+    if (!enc && game.currentChapter.isBossDay()) {
+      startBossBattle();
+      return;
+    }
+
     setEncounter(enc);
-    setLog(prev => [...prev, `${game.currentChapter!.currentDay}일차: ${enc?.type ?? '보스'}`]);
+    setLog(prev => [...prev, `${game.currentChapter!.currentDay}일차: ${enc?.type ?? '???'}`]);
     refresh();
   }, [game, refresh]);
 
@@ -325,6 +331,9 @@ export function ChapterScreen() {
   }
 
   useEffect(() => {
+    if (game.currentChapter && !encounter && !isBattling) {
+      advanceDay();
+    }
     return () => {
       cancelledRef.current = true;
     };
