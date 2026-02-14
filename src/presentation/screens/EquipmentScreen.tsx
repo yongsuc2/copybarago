@@ -21,6 +21,29 @@ export function EquipmentScreen() {
 
   const mergeCandidates = game.forge.findMergeCandidates(game.player.inventory);
 
+  function getForgeGroups() {
+    const epicIndex = EquipmentTable.getGradeIndex(EquipmentGrade.EPIC);
+    const groups = new Map<string, Equipment[]>();
+
+    for (const eq of game.player.inventory) {
+      if (eq.isS) continue;
+      const required = EquipmentTable.getMergeCount(eq.grade);
+      if (required <= 0) continue;
+      const isEpicPlus = EquipmentTable.getGradeIndex(eq.grade) >= epicIndex;
+      const key = isEpicPlus
+        ? `${eq.slot}_${eq.grade}_${eq.upgradeCount}`
+        : `${eq.slot}_${eq.grade}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(eq);
+    }
+
+    return [...groups.values()].sort((a, b) => {
+      const gi = EquipmentTable.getGradeIndex(b[0].grade) - EquipmentTable.getGradeIndex(a[0].grade);
+      if (gi !== 0) return gi;
+      return a[0].slot.localeCompare(b[0].slot);
+    });
+  }
+
   function upgradeEquipment(slotType: SlotType, index: number) {
     const slot = game.player.getEquipmentSlot(slotType);
     const eq = slot.equipped[index];
@@ -226,113 +249,210 @@ export function EquipmentScreen() {
         </>
       )}
 
-      {tab === 'forge' && (
-        <>
-          {mergeCandidates.length === 0 ? (
-            <div className="card" style={{ textAlign: 'center', color: '#555', padding: 24 }}>
-              합성 가능한 장비가 없습니다
-            </div>
-          ) : (
-            mergeCandidates.map((group, groupIndex) => {
-              const source = group[0];
-              const nextGrade = EquipmentTable.getNextGrade(source.grade);
-              const epicIndex = EquipmentTable.getGradeIndex(EquipmentGrade.EPIC);
-              const isEpicPlus = EquipmentTable.getGradeIndex(source.grade) >= epicIndex;
-              const isSelected = selectedMergeIndex === groupIndex;
+      {tab === 'forge' && (() => {
+        const forgeGroups = getForgeGroups();
+        return (
+          <>
+            {forgeGroups.length === 0 ? (
+              <div className="card" style={{ textAlign: 'center', color: '#555', padding: 24 }}>
+                보관함에 합성 가능한 장비가 없습니다
+              </div>
+            ) : (
+              forgeGroups.map((group, groupIndex) => {
+                const source = group[0];
+                const required = EquipmentTable.getMergeCount(source.grade);
+                const nextGrade = EquipmentTable.getNextGrade(source.grade);
+                const epicIndex = EquipmentTable.getGradeIndex(EquipmentGrade.EPIC);
+                const isEpicPlus = EquipmentTable.getGradeIndex(source.grade) >= epicIndex;
+                const canMerge = group.length >= required;
+                const isSelected = selectedMergeIndex === groupIndex;
 
-              return (
-                <div
-                  className="card"
-                  key={`${source.slot}_${source.grade}_${source.upgradeCount}_${groupIndex}`}
-                  style={{
-                    cursor: 'pointer',
-                    borderColor: isSelected ? '#e94560' : undefined,
-                  }}
-                  onClick={() => setSelectedMergeIndex(isSelected ? null : groupIndex)}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <span className={`grade-${source.grade.toLowerCase()}`} style={{ fontWeight: 'bold' }}>
-                        {GRADE_LABELS[source.grade]} {SLOT_LABELS[source.slot]}
-                      </span>
-                      {isEpicPlus && (
-                        <span style={{ fontSize: 12, color: '#888', marginLeft: 4 }}>
-                          +{source.upgradeCount}
+                return (
+                  <div
+                    className="card"
+                    key={`${source.slot}_${source.grade}_${source.upgradeCount}_${groupIndex}`}
+                    style={{
+                      cursor: 'pointer',
+                      borderColor: isSelected ? '#e94560' : undefined,
+                    }}
+                    onClick={() => setSelectedMergeIndex(isSelected ? null : groupIndex)}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <span className={`grade-${source.grade.toLowerCase()}`} style={{ fontWeight: 'bold' }}>
+                          {GRADE_LABELS[source.grade]} {SLOT_LABELS[source.slot]}
                         </span>
-                      )}
-                      <span style={{ fontSize: 12, color: '#888', marginLeft: 8 }}>
-                        {group.length}개
+                        {isEpicPlus && (
+                          <span style={{ fontSize: 12, color: '#888', marginLeft: 4 }}>
+                            +{source.upgradeCount}
+                          </span>
+                        )}
+                      </div>
+                      <span style={{
+                        fontSize: 13,
+                        fontWeight: 'bold',
+                        color: canMerge ? '#4caf50' : '#888',
+                      }}>
+                        {group.length} / {required}
                       </span>
                     </div>
-                    <div style={{ fontSize: 12 }}>
-                      {isEpicPlus && source.upgradeCount < 3 && nextGrade ? (
-                        <span style={{ color: '#aaa' }}>
-                          →{' '}
-                          <span className={`grade-${source.grade.toLowerCase()}`}>
-                            {GRADE_LABELS[source.grade]}+{source.upgradeCount + 1}
-                          </span>
-                        </span>
-                      ) : isEpicPlus && source.upgradeCount >= 3 && nextGrade ? (
-                        <span style={{ color: '#aaa' }}>
-                          →{' '}
-                          <span className={`grade-${nextGrade.toLowerCase()}`}>
-                            {GRADE_LABELS[nextGrade]}
-                          </span>
-                        </span>
-                      ) : nextGrade ? (
-                        <span style={{ color: '#aaa' }}>
-                          {group.length}개 →{' '}
-                          <span className={`grade-${nextGrade.toLowerCase()}`}>
-                            {GRADE_LABELS[nextGrade]}
-                          </span>
-                        </span>
-                      ) : null}
-                    </div>
-                  </div>
 
-                  {isEpicPlus && (
                     <div style={{ marginTop: 6 }}>
                       <div className="progress-bar">
                         <div
                           className="progress-fill"
-                          style={{ width: `${(source.upgradeCount / 4) * 100}%` }}
+                          style={{
+                            width: `${Math.min((group.length / required) * 100, 100)}%`,
+                            background: canMerge ? '#4caf50' : '#e94560',
+                          }}
                         />
                       </div>
-                      <div style={{ fontSize: 11, color: '#666', textAlign: 'center' }}>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 12 }}>
+                      {canMerge ? (
+                        <span style={{ color: '#4caf50' }}>합성 가능!</span>
+                      ) : (
+                        <span style={{ color: '#888' }}>{required - group.length}개 더 필요</span>
+                      )}
+                      <span style={{ color: '#aaa' }}>
+                        {isEpicPlus && source.upgradeCount < 3 && nextGrade ? (
+                          <>
+                            →{' '}
+                            <span className={`grade-${source.grade.toLowerCase()}`}>
+                              {GRADE_LABELS[source.grade]}+{source.upgradeCount + 1}
+                            </span>
+                          </>
+                        ) : isEpicPlus && source.upgradeCount >= 3 && nextGrade ? (
+                          <>
+                            →{' '}
+                            <span className={`grade-${nextGrade.toLowerCase()}`}>
+                              {GRADE_LABELS[nextGrade]}
+                            </span>
+                          </>
+                        ) : nextGrade ? (
+                          <>
+                            →{' '}
+                            <span className={`grade-${nextGrade.toLowerCase()}`}>
+                              {GRADE_LABELS[nextGrade]}
+                            </span>
+                          </>
+                        ) : null}
+                      </span>
+                    </div>
+
+                    {isEpicPlus && (
+                      <div style={{ marginTop: 4, fontSize: 11, color: '#666', textAlign: 'center' }}>
                         승급 진행: {source.upgradeCount} / 4
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {isSelected && (
-                    <div style={{ marginTop: 8 }}>
-                      <div style={{ fontSize: 12, color: '#aaa', marginBottom: 6 }}>
-                        재료:
-                      </div>
-                      {group.map(eq => (
-                        <div key={eq.id} style={{ fontSize: 12, color: '#ccc', padding: '2px 0' }}>
-                          <span className={`grade-${eq.grade.toLowerCase()}`}>{eq.name}</span>
-                          <span style={{ color: '#666', marginLeft: 6 }}>Lv.{eq.level}</span>
+                    {isSelected && (
+                      <div style={{ marginTop: 8, borderTop: '1px solid #333', paddingTop: 8 }}>
+                        <div style={{
+                          background: '#0f1923',
+                          borderRadius: 6,
+                          padding: 10,
+                          marginBottom: 8,
+                          fontSize: 13,
+                        }}>
+                          <div style={{ fontWeight: 'bold', marginBottom: 6, color: '#ddd' }}>합성 조건</div>
+                          <div className="stat-row">
+                            <span style={{ color: '#aaa' }}>필요 수량</span>
+                            <span>
+                              동일 장비{' '}
+                              <span style={{ color: canMerge ? '#4caf50' : '#ff5252', fontWeight: 'bold' }}>
+                                {group.length}
+                              </span>
+                              {' / '}
+                              <span style={{ fontWeight: 'bold' }}>{required}</span>개
+                            </span>
+                          </div>
+                          <div className="stat-row">
+                            <span style={{ color: '#aaa' }}>합성 결과</span>
+                            <span>
+                              {isEpicPlus && source.upgradeCount < 3 && nextGrade ? (
+                                <span className={`grade-${source.grade.toLowerCase()}`} style={{ fontWeight: 'bold' }}>
+                                  {GRADE_LABELS[source.grade]} {SLOT_LABELS[source.slot]} +{source.upgradeCount + 1}
+                                </span>
+                              ) : isEpicPlus && source.upgradeCount >= 3 && nextGrade ? (
+                                <span className={`grade-${nextGrade.toLowerCase()}`} style={{ fontWeight: 'bold' }}>
+                                  {GRADE_LABELS[nextGrade]} {SLOT_LABELS[source.slot]}
+                                </span>
+                              ) : nextGrade ? (
+                                <span className={`grade-${nextGrade.toLowerCase()}`} style={{ fontWeight: 'bold' }}>
+                                  {GRADE_LABELS[nextGrade]} {SLOT_LABELS[source.slot]}
+                                </span>
+                              ) : (
+                                <span style={{ color: '#888' }}>-</span>
+                              )}
+                            </span>
+                          </div>
+                          {isEpicPlus && (
+                            <div className="stat-row">
+                              <span style={{ color: '#aaa' }}>승급 진행</span>
+                              <span>
+                                {source.upgradeCount} / 4{' '}
+                                {source.upgradeCount >= 3 && (
+                                  <span style={{ color: '#ffd700', fontSize: 11 }}>(다음 합성 시 등급 UP)</span>
+                                )}
+                              </span>
+                            </div>
+                          )}
+                          {!canMerge && (
+                            <div style={{ marginTop: 6, padding: '6px 0', color: '#ff5252', fontSize: 12 }}>
+                              같은 등급/슬롯{isEpicPlus ? '/합성단계' : ''} 장비가 {required - group.length}개 더 필요합니다
+                            </div>
+                          )}
                         </div>
-                      ))}
-                      <button
-                        className="btn btn-primary"
-                        style={{ marginTop: 8, width: '100%' }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          mergeEquipment(group);
-                        }}
-                      >
-                        합성
-                      </button>
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          )}
-        </>
-      )}
+
+                        <div style={{ fontSize: 12, color: '#aaa', marginBottom: 4 }}>
+                          보유 장비 ({group.length}개)
+                        </div>
+                        {group.map(eq => (
+                          <div key={eq.id} style={{
+                            fontSize: 12,
+                            color: '#ccc',
+                            padding: '4px 8px',
+                            background: '#1a1a2e',
+                            borderRadius: 4,
+                            marginBottom: 2,
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                          }}>
+                            <span className={`grade-${eq.grade.toLowerCase()}`}>{eq.name}</span>
+                            <span style={{ color: '#666' }}>Lv.{eq.level}</span>
+                          </div>
+                        ))}
+                        {canMerge ? (
+                          <button
+                            className="btn btn-primary"
+                            style={{ marginTop: 8, width: '100%' }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              mergeEquipment(group.slice(0, required));
+                            }}
+                          >
+                            합성하기
+                          </button>
+                        ) : (
+                          <button
+                            className="btn btn-secondary"
+                            style={{ marginTop: 8, width: '100%' }}
+                            disabled
+                          >
+                            재료 부족
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </>
+        );
+      })()}
     </div>
   );
 }
