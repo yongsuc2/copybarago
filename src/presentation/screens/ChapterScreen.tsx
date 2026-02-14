@@ -8,7 +8,7 @@ import type { BattleLogEntry } from '../../domain/battle/BattleLog';
 import { BattleLogType } from '../../domain/battle/BattleLog';
 import { BattleArena, type AttackPhase } from '../components/BattleArena';
 import { PlayerStatsBar } from '../components/PlayerStatsBar';
-import { Package } from 'lucide-react';
+import { Package, Home, Swords } from 'lucide-react';
 
 const MAX_BATTLE_TURNS = 15;
 
@@ -52,27 +52,37 @@ export function ChapterScreen() {
   const [turnCount, setTurnCount] = useState(0);
   const [isBattling, setIsBattling] = useState(false);
   const [isBossFight, setIsBossFight] = useState(false);
+  const [chapterResult, setChapterResult] = useState<{ type: 'victory' | 'defeat'; chapterId: number; gold: number } | null>(null);
 
   const cancelledRef = useRef(false);
   const battleRef = useRef<Battle | null>(null);
 
   const chapter = game.currentChapter;
 
+  const clearBattleState = useCallback(() => {
+    setIsBattling(false);
+    setBattle(null);
+    setPlayerUnit(null);
+    setEnemyUnit(null);
+    setAttackPhase('idle');
+    setDamageEntries([]);
+    setTurnCount(0);
+    battleRef.current = null;
+  }, []);
+
   const finishBattle = useCallback((b: Battle, boss: boolean) => {
     if (boss) {
+      const chId = game.currentChapter?.id ?? 0;
       if (b.state === BattleState.VICTORY) {
         game.currentChapter?.onBossDefeated();
         if (game.currentChapter) {
           game.player.clearedChapterMax = Math.max(game.player.clearedChapterMax, game.currentChapter.id);
           game.travel.maxClearedChapter = game.player.clearedChapterMax;
           game.player.resources.add('GOLD' as any, 500);
-          setLog(prev => [...prev, `보스 클리어! 챕터 ${game.currentChapter!.id} 완료!`]);
         }
       } else {
         game.currentChapter?.onBattleEnd(b.state);
-        setLog(prev => [...prev, `보스에게 패배했습니다...`]);
       }
-      setBattleResult(b.state);
       if (game.currentChapter) {
         game.player.updateBestSurvivalDay(
           game.currentChapter.id,
@@ -81,12 +91,23 @@ export function ChapterScreen() {
         );
       }
       game.currentChapter = null;
+
+      setTimeout(() => {
+        clearBattleState();
+        setChapterResult({
+          type: b.state === BattleState.VICTORY ? 'victory' : 'defeat',
+          chapterId: chId,
+          gold: b.state === BattleState.VICTORY ? 500 : 0,
+        });
+        refresh();
+      }, 1500);
     } else {
       game.currentChapter?.onBattleEnd(b.state);
       setLog(prev => [...prev, `  전투: ${b.state} (${b.turnCount}턴)`]);
       setBattleResult(b.state);
 
       if (b.state === BattleState.DEFEAT) {
+        const chId = game.currentChapter?.id ?? 0;
         if (game.currentChapter) {
           game.player.updateBestSurvivalDay(
             game.currentChapter.id,
@@ -95,27 +116,26 @@ export function ChapterScreen() {
           );
         }
         game.currentChapter = null;
+
+        setTimeout(() => {
+          clearBattleState();
+          setChapterResult({
+            type: 'defeat',
+            chapterId: chId,
+            gold: 0,
+          });
+          refresh();
+        }, 1500);
+      } else {
+        setTimeout(() => {
+          clearBattleState();
+          setEncounter(null);
+          setTimeout(() => advanceDay(), 400);
+          refresh();
+        }, 1500);
       }
     }
-
-    setTimeout(() => {
-      setIsBattling(false);
-      setBattle(null);
-      setPlayerUnit(null);
-      setEnemyUnit(null);
-      setAttackPhase('idle');
-      setDamageEntries([]);
-      setTurnCount(0);
-      battleRef.current = null;
-
-      if (b.state === BattleState.VICTORY && !boss && game.currentChapter) {
-        setEncounter(null);
-        setTimeout(() => advanceDay(), 400);
-      }
-
-      refresh();
-    }, 1500);
-  }, [game, refresh]);
+  }, [game, refresh, clearBattleState]);
 
   const advanceDay = useCallback(() => {
     if (!game.currentChapter) return;
@@ -298,6 +318,7 @@ export function ChapterScreen() {
 
     game.startChapter(nextId, type);
     setBattleResult(null);
+    setChapterResult(null);
     setLog([]);
     advanceDay();
   }
@@ -345,7 +366,54 @@ export function ChapterScreen() {
     <div className="screen">
       <h2>모험</h2>
 
-      {!chapter && !isBattling && (
+      {chapterResult && !isBattling && (
+        <div className="chapter-result-overlay">
+          <div className={`chapter-result-icon ${chapterResult.type}`}>
+            {chapterResult.type === 'victory' ? '🎉' : '💀'}
+          </div>
+          <div className={`chapter-result-title ${chapterResult.type}`}>
+            {chapterResult.type === 'victory' ? '챕터 클리어!' : '챕터 실패'}
+          </div>
+          <div className="chapter-result-sub">
+            챕터 {chapterResult.chapterId}
+          </div>
+          {chapterResult.gold > 0 && (
+            <div className="chapter-result-reward">
+              <span style={{ color: '#ffd700' }}>+{chapterResult.gold} G</span>
+            </div>
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16, width: '100%' }}>
+            <button
+              className="btn btn-primary"
+              style={{ width: '100%', padding: '12px 16px', fontSize: 15 }}
+              onClick={() => { setChapterResult(null); setScreen('main'); }}
+            >
+              <Home size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+              메인으로
+            </button>
+            {chapterResult.type === 'victory' && game.player.resources.stamina >= 5 && (
+              <button
+                className="btn btn-secondary"
+                style={{ width: '100%', padding: '12px 16px', fontSize: 15 }}
+                onClick={() => { setChapterResult(null); startChapter(); }}
+              >
+                <Swords size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+                다음 챕터 시작
+              </button>
+            )}
+            <button
+              className="btn btn-secondary"
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}
+              onClick={() => { setChapterResult(null); setScreen('chapter-treasure'); }}
+            >
+              <Package size={16} />
+              보물상자 확인
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!chapter && !isBattling && !chapterResult && (
         <div>
           <div className="card">
             <div className="stat-row">
@@ -375,11 +443,6 @@ export function ChapterScreen() {
               보물상자
             </button>
           </div>
-          {battleResult && (
-            <div className={`battle-result-banner ${battleResult === BattleState.VICTORY ? 'victory' : 'defeat'}`}>
-              {battleResult === BattleState.VICTORY ? '챕터 클리어!' : '챕터 실패'}
-            </div>
-          )}
         </div>
       )}
 

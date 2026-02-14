@@ -407,6 +407,40 @@ body {
   border: 1px solid #e94560;
 }
 
+.chapter-result-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  min-height: 300px;
+}
+.chapter-result-icon {
+  font-size: 56px;
+  margin-bottom: 12px;
+}
+.chapter-result-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.chapter-result-title.victory {
+  color: #69f0ae;
+}
+.chapter-result-title.defeat {
+  color: #ff5252;
+}
+.chapter-result-sub {
+  font-size: 14px;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+.chapter-result-reward {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
 .treasure-title-banner {
   text-align: center;
   padding: 10px 24px;
