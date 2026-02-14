@@ -369,7 +369,7 @@ export function ChapterScreen() {
     const result = game.currentChapter.resolveEncounter(index, stats.hp, stats.maxHp);
     if (result) {
       if (result.skillsGained.length > 0) {
-        setLog(prev => [...prev, `  획득: ${result.skillsGained.map(s => s.name).join(', ')}`]);
+        setLog(prev => [...prev, `  획득: ${result.skillsGained.map(s => `${s.icon} ${s.name}`).join(', ')}`]);
       }
       if (result.hpChange !== 0) {
         setLog(prev => [...prev, `  체력 변화: ${result.hpChange > 0 ? '+' : ''}${result.hpChange}`]);

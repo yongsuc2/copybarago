@@ -20,6 +20,7 @@ export class Skill {
   constructor(
     public readonly id: string,
     public readonly name: string,
+    public readonly icon: string,
     public readonly grade: SkillGrade,
     public readonly category: SkillCategory,
     public readonly heritageSynergy: HeritageRoute[],

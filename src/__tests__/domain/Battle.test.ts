@@ -6,7 +6,7 @@ import { BattleState, EffectType, TriggerCondition, SkillGrade, SkillCategory } 
 import { Skill } from '../../domain/entities/Skill';
 
 function makeSkill(id: string, effectType: EffectType, value: number, trigger: TriggerCondition): Skill {
-  return new Skill(id, id, SkillGrade.NORMAL, SkillCategory.ATTACK, [], {
+  return new Skill(id, id, '⚔️', SkillGrade.NORMAL, SkillCategory.ATTACK, [], {
     type: effectType, value, duration: 0, scalingStat: null, statusEffectType: null,
   }, trigger);
 }
@@ -46,7 +46,7 @@ describe('BattleUnit', () => {
   });
 
   it('applies lifesteal from passive skill', () => {
-    const lifesteal = new Skill('ls', 'Lifesteal', SkillGrade.NORMAL, SkillCategory.SURVIVAL, [], {
+    const lifesteal = new Skill('ls', 'Lifesteal', '🩸', SkillGrade.NORMAL, SkillCategory.SURVIVAL, [], {
       type: EffectType.LIFESTEAL, value: 0.15, duration: 0, scalingStat: null, statusEffectType: null,
     }, TriggerCondition.PASSIVE);
 
@@ -90,7 +90,7 @@ describe('Battle', () => {
   });
 
   it('revive allows player to survive once', () => {
-    const revive = new Skill('revive', 'Revive', SkillGrade.MYTHIC, SkillCategory.SURVIVAL, [], {
+    const revive = new Skill('revive', 'Revive', '✨', SkillGrade.MYTHIC, SkillCategory.SURVIVAL, [], {
       type: EffectType.REVIVE, value: 0.3, duration: 0, scalingStat: null, statusEffectType: null,
     }, TriggerCondition.ON_DEATH);
 
@@ -121,7 +121,7 @@ describe('Battle', () => {
   });
 
   it('lifesteal heals player during combat', () => {
-    const lifesteal = new Skill('ls', 'Lifesteal', SkillGrade.NORMAL, SkillCategory.SURVIVAL, [], {
+    const lifesteal = new Skill('ls', 'Lifesteal', '🩸', SkillGrade.NORMAL, SkillCategory.SURVIVAL, [], {
       type: EffectType.LIFESTEAL, value: 0.5, duration: 0, scalingStat: null, statusEffectType: null,
     }, TriggerCondition.PASSIVE);
 
@@ -137,7 +137,7 @@ describe('Battle', () => {
   });
 
   it('turn-start skills fire each turn', () => {
-    const lance = new Skill('lance', 'Lance', SkillGrade.NORMAL, SkillCategory.ATTACK, [], {
+    const lance = new Skill('lance', 'Lance', '🔱', SkillGrade.NORMAL, SkillCategory.ATTACK, [], {
       type: EffectType.DAMAGE, value: 20, duration: 0, scalingStat: null, statusEffectType: null,
     }, TriggerCondition.TURN_START);
 

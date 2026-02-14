@@ -97,8 +97,8 @@ export class EncounterGenerator {
 
     for (const skill of skills) {
       options.push({
-        label: `획득: ${skill.name}`,
-        description: `${skill.name} 스킬 획득`,
+        label: `획득: ${skill.icon} ${skill.name}`,
+        description: `${skill.icon} ${skill.name} 스킬 획득`,
         hpCostPercent: 0,
         goldCost: 0,
         successRate: 1.0,
@@ -128,8 +128,8 @@ export class EncounterGenerator {
 
     if (skill) {
       options.push({
-        label: `희생: ${skill.name}`,
-        description: `최대 체력 20% 소모, ${skill.name} 획득`,
+        label: `희생: ${skill.icon} ${skill.name}`,
+        description: `최대 체력 20% 소모, ${skill.icon} ${skill.name} 획득`,
         hpCostPercent: 0.2,
         goldCost: 0,
         successRate: 1.0,
@@ -219,8 +219,8 @@ export class EncounterGenerator {
     for (const skill of skills) {
       const price = skill.grade === SkillGrade.LEGENDARY ? 300 : 150;
       options.push({
-        label: `구매: ${skill.name} (${price}g)`,
-        description: `${skill.name}을(를) ${price} 골드에 구매`,
+        label: `구매: ${skill.icon} ${skill.name} (${price}g)`,
+        description: `${skill.icon} ${skill.name}을(를) ${price} 골드에 구매`,
         hpCostPercent: 0,
         goldCost: price,
         successRate: 1.0,
