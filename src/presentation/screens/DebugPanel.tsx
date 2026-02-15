@@ -66,6 +66,11 @@ export function DebugPanel() {
     }
   }
 
+  function resetSave() {
+    localStorage.clear();
+    window.location.reload();
+  }
+
   function completeAllQuests() {
     for (const event of game.eventManager.getActiveEvents()) {
       for (const mission of event.missions) {
@@ -140,6 +145,13 @@ export function DebugPanel() {
         <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>퀘스트</div>
         <div className="debug-row">
           <button className="debug-btn" onClick={completeAllQuests}>모든 퀘스트 완료</button>
+        </div>
+      </div>
+
+      <div className="debug-section">
+        <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>초기화</div>
+        <div className="debug-row">
+          <button className="debug-btn" style={{ color: '#ff5252' }} onClick={resetSave}>세이브 초기화</button>
         </div>
       </div>
     </div>

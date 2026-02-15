@@ -92,7 +92,7 @@ export class GameManager {
   }
 
   private initNewGame(): void {
-    this.player.resources.setAmount(ResourceType.GOLD, 2000);
+    this.player.resources.setAmount(ResourceType.GOLD, 500);
     this.player.resources.setAmount(ResourceType.GEMS, 500);
     this.player.resources.setAmount(ResourceType.STAMINA, 100);
     this.player.resources.dailyReset();
