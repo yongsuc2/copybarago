@@ -41,7 +41,6 @@ export class EncounterGenerator {
       case EncounterType.DEMON: return this.createDemonEncounter(existingSkillIds);
       case EncounterType.COMBAT: return this.createCombatEncounter();
       case EncounterType.CHANCE: return this.createChanceEncounter();
-      case EncounterType.MERCHANT: return this.createMerchantEncounter(existingSkillIds);
       case EncounterType.ROULETTE: return this.createRouletteEncounter();
       case EncounterType.LUCKY_MACHINE: return this.createLuckyMachineEncounter();
       default: return this.createCombatEncounter();
@@ -188,35 +187,6 @@ export class EncounterGenerator {
     }
 
     return new Encounter(EncounterType.CHANCE, options);
-  }
-
-  private createMerchantEncounter(existingSkillIds: string[]): Encounter {
-    const skills = this.getRandomSkills(3, existingSkillIds);
-    const d = EncounterDataTable.merchant;
-    const options: EncounterOption[] = [];
-
-    for (const skill of skills) {
-      const price = d.getPrice(skill.grade);
-      options.push({
-        label: d.buyLabel(skill.icon, skill.name, price),
-        description: d.buyDescription(skill.description),
-        hpCostPercent: 0,
-        goldCost: price,
-        successRate: 1.0,
-        reward: skillReward([skill]),
-      });
-    }
-
-    options.push({
-      label: d.leaveLabel,
-      description: d.leaveDescription,
-      hpCostPercent: 0,
-      goldCost: 0,
-      successRate: 1.0,
-      reward: emptyReward(),
-    });
-
-    return new Encounter(EncounterType.MERCHANT, options);
   }
 
   private createRouletteEncounter(): Encounter {

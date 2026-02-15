@@ -9,7 +9,6 @@ const ENCOUNTER_EMOJI: Record<EncounterType, string> = {
   [EncounterType.ANGEL]: '😇',
   [EncounterType.DEMON]: '😈',
   [EncounterType.CHANCE]: '🎁',
-  [EncounterType.MERCHANT]: '🏪',
   [EncounterType.ROULETTE]: '🎰',
   [EncounterType.LUCKY_MACHINE]: '🎰',
 };
