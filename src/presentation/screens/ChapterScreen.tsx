@@ -9,8 +9,9 @@ import { BattleLogType } from '../../domain/battle/BattleLog';
 import type { AttackPhase } from '../components/BattleArena';
 import { AdventureStage } from '../components/AdventureStage';
 import { PlayerStatsBar } from '../components/PlayerStatsBar';
+import { DamageGraph, type DamageSource } from '../components/DamageGraph';
 import { EncounterDataTable } from '../../domain/data/EncounterDataTable';
-import { Package, Home, Swords, Zap, Star } from 'lucide-react';
+import { Package, Home, Swords, Zap, Star, BarChart3 } from 'lucide-react';
 
 const MAX_BATTLE_TURNS = 15;
 
@@ -73,10 +74,56 @@ export function ChapterScreen() {
   const [isBossFight, setIsBossFight] = useState(false);
   const [chapterResult, setChapterResult] = useState<{ type: 'victory' | 'defeat'; chapterId: number; gold: number } | null>(null);
 
+  const [showDamageGraph, setShowDamageGraph] = useState(false);
+  const [damageSourcesSnapshot, setDamageSourcesSnapshot] = useState<DamageSource[]>([]);
+  const damageMapRef = useRef<Map<string, DamageSource>>(new Map());
+
   const cancelledRef = useRef(false);
   const battleRef = useRef<Battle | null>(null);
 
   const chapter = game.currentChapter;
+
+  function accumulateDamage(entries: BattleLogEntry[], playerName: string) {
+    const map = damageMapRef.current;
+    for (const entry of entries) {
+      const isDmgType = entry.type === BattleLogType.ATTACK
+        || entry.type === BattleLogType.CRIT
+        || entry.type === BattleLogType.SKILL_DAMAGE
+        || entry.type === BattleLogType.COUNTER;
+      const isDot = entry.type === BattleLogType.DOT_DAMAGE;
+
+      if (isDmgType && entry.source === playerName && entry.target !== playerName) {
+        let key: string;
+        let icon: string;
+        if (entry.type === BattleLogType.SKILL_DAMAGE && entry.skillName) {
+          key = entry.skillName;
+          icon = entry.skillIcon ?? '✨';
+        } else if (entry.type === BattleLogType.COUNTER) {
+          key = '반격';
+          icon = '🛡️';
+        } else {
+          key = '일반 공격';
+          icon = '⚔️';
+        }
+        const existing = map.get(key);
+        if (existing) {
+          existing.total += entry.value;
+        } else {
+          map.set(key, { label: key, icon, total: entry.value });
+        }
+      } else if (isDot && entry.target !== playerName) {
+        const key = '독 피해';
+        const icon = '☠️';
+        const existing = map.get(key);
+        if (existing) {
+          existing.total += entry.value;
+        } else {
+          map.set(key, { label: key, icon, total: entry.value });
+        }
+      }
+    }
+    setDamageSourcesSnapshot([...map.values()]);
+  }
 
   const clearBattleState = useCallback(() => {
     setIsBattling(false);
@@ -290,6 +337,7 @@ export function ChapterScreen() {
 
     const result = b.executeTurn();
     setTurnCount(result.turnNumber);
+    accumulateDamage(result.entries, playerName);
 
     const playerEntries: BattleLogEntry[] = [];
     const enemyEntries: BattleLogEntry[] = [];
@@ -352,6 +400,8 @@ export function ChapterScreen() {
   function startBattle(b: Battle, boss: boolean) {
     cancelledRef.current = false;
     battleRef.current = b;
+    damageMapRef.current = new Map();
+    setDamageSourcesSnapshot([]);
     setBattle(b);
     setPlayerUnit(cloneUnit(b.player));
     setEnemyUnit(cloneUnit(b.enemy));
@@ -522,12 +572,26 @@ export function ChapterScreen() {
           />
 
           {isBattling && playerUnit ? (
-            <PlayerStatsBar
-              hp={playerUnit.currentHp}
-              maxHp={playerUnit.maxHp}
-              atk={playerUnit.getEffectiveAtk()}
-              def={playerUnit.getEffectiveDef()}
-            />
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div style={{ flex: 1 }}>
+                  <PlayerStatsBar
+                    hp={playerUnit.currentHp}
+                    maxHp={playerUnit.maxHp}
+                    atk={playerUnit.getEffectiveAtk()}
+                    def={playerUnit.getEffectiveDef()}
+                  />
+                </div>
+                <button
+                  className={`btn-icon ${showDamageGraph ? 'active' : ''}`}
+                  onClick={() => setShowDamageGraph(v => !v)}
+                  title="딜 그래프"
+                >
+                  <BarChart3 size={18} />
+                </button>
+              </div>
+              {showDamageGraph && <DamageGraph sources={damageSourcesSnapshot} />}
+            </>
           ) : (
             <PlayerStatsBar
               hp={chapter ? chapter.sessionCurrentHp : playerStats.hp}

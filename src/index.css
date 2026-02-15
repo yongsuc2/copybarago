@@ -723,3 +723,72 @@ body {
   from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #444;
+  border-radius: 6px;
+  background: #1a1a2e;
+  color: #aaa;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.btn-icon:hover { background: #2a2a4e; color: #fff; }
+.btn-icon.active { background: #e94560; color: #fff; border-color: #e94560; }
+
+.damage-graph {
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 6px;
+}
+.dg-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #e94560;
+}
+.dg-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+.dg-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 90px;
+  flex-shrink: 0;
+}
+.dg-icon { font-size: 14px; }
+.dg-name { font-size: 11px; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dg-bar-wrap {
+  flex: 1;
+  height: 14px;
+  background: #222;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.dg-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e94560, #ff6b6b);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+.dg-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 55px;
+  flex-shrink: 0;
+}
+.dg-value span { font-size: 11px; font-weight: bold; color: #fff; }
+.dg-pct { color: #aaa !important; font-weight: normal !important; font-size: 10px !important; }
