@@ -47,8 +47,8 @@ const ALL_SKILLS: Skill[] = [
     '매 턴 체력 10 회복'),
 
   new Skill('counter', 'Counter Attack', '🛡️', SkillGrade.NORMAL, SkillCategory.ATTACK,
-    [HeritageRoute.KNIGHT], makeEffect(EffectType.COUNTER, 0.5), TriggerCondition.ON_HIT,
-    '피격 시 받은 피해의 50%를 반격'),
+    [HeritageRoute.KNIGHT], makeEffect(EffectType.COUNTER, 0.3), TriggerCondition.ON_HIT,
+    '피격 시 받은 피해의 30%를 반격'),
 
   new Skill('iron_shield', 'Iron Shield', '🔰', SkillGrade.NORMAL, SkillCategory.SURVIVAL,
     [], makeEffect(EffectType.SHIELD, 0.15), TriggerCondition.PASSIVE,
