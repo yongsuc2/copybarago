@@ -722,21 +722,25 @@ export function ChapterScreen() {
                 <div className="progress-fill" style={{ width: `${chapter.getProgress() * 100}%` }} />
               </div>
               {!isBattling && (
-                <>
-                  <div className="stat-row">
-                    <span>스킬</span>
-                    <span>{chapter.sessionSkills.length}</span>
-                  </div>
-                  <div className="stat-row" style={{ fontSize: 12, color: '#aaa' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <Zap size={12} /> 중박 {chapter.jungbakCount}/{EncounterDataTable.counterThreshold.jungbak}
-                    </span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <Star size={12} /> 대박 {chapter.daebakCount}/{EncounterDataTable.counterThreshold.daebak}
-                    </span>
-                  </div>
-                </>
+                <div className="stat-row">
+                  <span>스킬</span>
+                  <span>{chapter.sessionSkills.length}</span>
+                </div>
               )}
+              <div className="counter-bars">
+                <div className="counter-bar-item">
+                  <span className="counter-bar-label"><Zap size={11} /> 중박 {chapter.jungbakCount}/{EncounterDataTable.counterThreshold.jungbak}</span>
+                  <div className="counter-bar-track jungbak">
+                    <div className="counter-bar-fill jungbak" style={{ width: `${(chapter.jungbakCount / EncounterDataTable.counterThreshold.jungbak) * 100}%` }} />
+                  </div>
+                </div>
+                <div className="counter-bar-item">
+                  <span className="counter-bar-label"><Star size={11} /> 대박 {chapter.daebakCount}/{EncounterDataTable.counterThreshold.daebak}</span>
+                  <div className="counter-bar-track daebak">
+                    <div className="counter-bar-fill daebak" style={{ width: `${(chapter.daebakCount / EncounterDataTable.counterThreshold.daebak) * 100}%` }} />
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

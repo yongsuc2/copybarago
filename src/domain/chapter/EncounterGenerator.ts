@@ -237,12 +237,11 @@ export class EncounterGenerator {
   private createDaebakRouletteEncounter(existingSkillIds: string[]): Encounter {
     const mythicSkills = SkillTable.getSkillsByGrade(SkillGrade.MYTHIC)
       .filter(s => !existingSkillIds.includes(s.id));
-    const immortalSkills = SkillTable.getSkillsByGrade(SkillGrade.IMMORTAL)
-      .filter(s => !existingSkillIds.includes(s.id));
     const d = EncounterDataTable.daebakRoulette;
 
     const mythicSkill = mythicSkills.length > 0 ? this.rng.pick(mythicSkills) : null;
-    const immortalSkill = immortalSkills.length > 0 ? this.rng.pick(immortalSkills) : null;
+    const angelPower = !existingSkillIds.includes('angel_power') ? SkillTable.getSkillById('angel_power') : null;
+    const demonPower = !existingSkillIds.includes('demon_power') ? SkillTable.getSkillById('demon_power') : null;
 
     const options: EncounterOption[] = [
       {
@@ -255,25 +254,38 @@ export class EncounterGenerator {
         successRate: d.normalRate,
         reward: skillReward(mythicSkill ? [mythicSkill] : []),
       },
-      {
-        label: d.jackpotLabel,
-        description: immortalSkill
-          ? `${immortalSkill.icon} ${immortalSkill.name}: ${immortalSkill.description}`
-          : d.jackpotDescription,
-        hpCostPercent: 0,
-        goldCost: 0,
-        successRate: d.jackpotRate,
-        reward: skillReward(immortalSkill ? [immortalSkill] : []),
-      },
-      {
-        label: d.skipLabel,
-        description: d.skipDescription,
-        hpCostPercent: 0,
-        goldCost: 0,
-        successRate: 1.0,
-        reward: emptyReward(),
-      },
     ];
+
+    if (angelPower) {
+      options.push({
+        label: d.angelLabel,
+        description: `${angelPower.icon} ${angelPower.name}: ${angelPower.description}`,
+        hpCostPercent: 0,
+        goldCost: 0,
+        successRate: d.angelRate,
+        reward: skillReward([angelPower]),
+      });
+    }
+
+    if (demonPower) {
+      options.push({
+        label: d.demonLabel,
+        description: `${demonPower.icon} ${demonPower.name}: ${demonPower.description}`,
+        hpCostPercent: 0,
+        goldCost: 0,
+        successRate: d.demonRate,
+        reward: skillReward([demonPower]),
+      });
+    }
+
+    options.push({
+      label: d.skipLabel,
+      description: d.skipDescription,
+      hpCostPercent: 0,
+      goldCost: 0,
+      successRate: 1.0,
+      reward: emptyReward(),
+    });
 
     return new Encounter(EncounterType.DAEBAK_ROULETTE, options);
   }

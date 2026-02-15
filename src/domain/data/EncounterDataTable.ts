@@ -81,11 +81,14 @@ const JUNGBAK_ROULETTE = {
 
 const DAEBAK_ROULETTE = {
   normalRate: 0.8,
-  jackpotRate: 0.3,
+  angelRate: 0.1,
+  demonRate: 0.1,
   normalLabel: '일반 돌리기',
   normalDescription: '80% 확률로 신화 스킬 획득',
-  jackpotLabel: '대박 돌리기',
-  jackpotDescription: '30% 확률로 불멸 스킬 획득',
+  angelLabel: '😇 천사의 힘',
+  angelDescription: '10% 확률로 천사의 힘 획득',
+  demonLabel: '😈 악마의 힘',
+  demonDescription: '10% 확률로 악마의 힘 획득',
   skipLabel: '건너뛰기',
   skipDescription: '그냥 지나가기',
 };
