@@ -71,7 +71,7 @@ export class EncounterGenerator {
     for (const skill of skills) {
       options.push({
         label: d.skillLabel(skill.icon, skill.name),
-        description: d.skillDescription(skill.icon, skill.name),
+        description: d.skillDescription(skill.description),
         hpCostPercent: 0,
         goldCost: 0,
         successRate: 1.0,
@@ -103,7 +103,7 @@ export class EncounterGenerator {
     if (skill) {
       options.push({
         label: d.skillLabel(skill.icon, skill.name),
-        description: d.skillDescription(skill.icon, skill.name),
+        description: d.skillDescription(skill.description),
         hpCostPercent: d.hpCostPercent,
         goldCost: 0,
         successRate: 1.0,
@@ -199,7 +199,7 @@ export class EncounterGenerator {
       const price = d.getPrice(skill.grade);
       options.push({
         label: d.buyLabel(skill.icon, skill.name, price),
-        description: d.buyDescription(skill.icon, skill.name, price),
+        description: d.buyDescription(skill.description),
         hpCostPercent: 0,
         goldCost: price,
         successRate: 1.0,
@@ -224,22 +224,29 @@ export class EncounterGenerator {
     const immortalSkills = SkillTable.getSkillsByGrade(SkillGrade.IMMORTAL);
     const d = EncounterDataTable.roulette;
 
+    const mythicSkill = mythicSkills.length > 0 ? this.rng.pick(mythicSkills) : null;
+    const immortalSkill = immortalSkills.length > 0 ? this.rng.pick(immortalSkills) : null;
+
     const options: EncounterOption[] = [
       {
         label: d.normalLabel,
-        description: d.normalDescription,
+        description: mythicSkill
+          ? `${mythicSkill.icon} ${mythicSkill.name}: ${mythicSkill.description}`
+          : d.normalDescription,
         hpCostPercent: 0,
         goldCost: 0,
         successRate: d.normalRate,
-        reward: skillReward(mythicSkills.length > 0 ? [this.rng.pick(mythicSkills)] : []),
+        reward: skillReward(mythicSkill ? [mythicSkill] : []),
       },
       {
         label: d.jackpotLabel,
-        description: d.jackpotDescription,
+        description: immortalSkill
+          ? `${immortalSkill.icon} ${immortalSkill.name}: ${immortalSkill.description}`
+          : d.jackpotDescription,
         hpCostPercent: 0,
         goldCost: 0,
         successRate: d.jackpotRate,
-        reward: skillReward(immortalSkills.length > 0 ? [this.rng.pick(immortalSkills)] : []),
+        reward: skillReward(immortalSkill ? [immortalSkill] : []),
       },
       {
         label: d.skipLabel,

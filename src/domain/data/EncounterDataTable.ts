@@ -47,15 +47,15 @@ const WEIGHTS: Record<ChapterType, EncounterWeight[]> = {
 const ANGEL = {
   healPercent: 0.3,
   healLabel: '체력 30% 회복',
-  healDescription: '최대 체력의 30% 회복',
-  skillLabel: (icon: string, name: string) => `획득: ${icon} ${name}`,
-  skillDescription: (icon: string, name: string) => `${icon} ${name} 스킬 획득`,
+  healDescription: '전투 중 잃은 체력을 회복합니다',
+  skillLabel: (icon: string, name: string) => `${icon} ${name}`,
+  skillDescription: (desc: string) => desc,
 };
 
 const DEMON = {
   hpCostPercent: 0.2,
-  skillLabel: (icon: string, name: string) => `희생: ${icon} ${name}`,
-  skillDescription: (icon: string, name: string) => `최대 체력 20% 소모, ${icon} ${name} 획득`,
+  skillLabel: (icon: string, name: string) => `${icon} ${name}`,
+  skillDescription: (desc: string) => `체력 20% 소모 | ${desc}`,
   rejectLabel: '거절',
   rejectDescription: '안전하게 떠나기',
 };
@@ -65,10 +65,10 @@ const MERCHANT = {
   getPrice(grade: SkillGrade): number {
     return this.prices[grade] ?? this.prices.default;
   },
-  buyLabel: (icon: string, name: string, price: number) => `구매: ${icon} ${name} (${price}g)`,
-  buyDescription: (icon: string, name: string, price: number) => `${icon} ${name}을(를) ${price} 골드에 구매`,
+  buyLabel: (icon: string, name: string, price: number) => `${icon} ${name} (${price}g)`,
+  buyDescription: (desc: string) => desc,
   leaveLabel: '떠나기',
-  leaveDescription: '상인을 떠나기',
+  leaveDescription: '골드를 아끼고 떠나기',
 };
 
 const CHANCE = {
