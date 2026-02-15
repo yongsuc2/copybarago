@@ -38,7 +38,10 @@ export class Player {
       [SlotType.WEAPON, new EquipmentSlot(SlotType.WEAPON)],
       [SlotType.ARMOR, new EquipmentSlot(SlotType.ARMOR)],
       [SlotType.RING, new EquipmentSlot(SlotType.RING)],
-      [SlotType.ACCESSORY, new EquipmentSlot(SlotType.ACCESSORY)],
+      [SlotType.NECKLACE, new EquipmentSlot(SlotType.NECKLACE)],
+      [SlotType.SHOES, new EquipmentSlot(SlotType.SHOES)],
+      [SlotType.GLOVES, new EquipmentSlot(SlotType.GLOVES)],
+      [SlotType.HAT, new EquipmentSlot(SlotType.HAT)],
     ]);
     this.inventory = [];
     this.activePet = null;

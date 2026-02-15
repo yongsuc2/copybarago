@@ -57,7 +57,7 @@ const CHEST_CONFIGS: Record<ChestType, ChestConfig> = {
   },
 };
 
-const SLOTS = [SlotType.WEAPON, SlotType.ARMOR, SlotType.RING, SlotType.ACCESSORY];
+const SLOTS = [SlotType.WEAPON, SlotType.ARMOR, SlotType.RING, SlotType.NECKLACE, SlotType.SHOES, SlotType.GLOVES, SlotType.HAT];
 const S_RATE = 0.02;
 
 export interface PullResult {

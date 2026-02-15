@@ -29,12 +29,33 @@ const BASE_STATS: EquipmentBaseStats[] = [
   { slot: SlotType.RING, grade: EquipmentGrade.LEGENDARY, stats: Stats.create({ atk: 100 }) },
   { slot: SlotType.RING, grade: EquipmentGrade.MYTHIC, stats: Stats.create({ atk: 200 }) },
 
-  { slot: SlotType.ACCESSORY, grade: EquipmentGrade.COMMON, stats: Stats.create({ maxHp: 30 }) },
-  { slot: SlotType.ACCESSORY, grade: EquipmentGrade.UNCOMMON, stats: Stats.create({ maxHp: 70 }) },
-  { slot: SlotType.ACCESSORY, grade: EquipmentGrade.RARE, stats: Stats.create({ maxHp: 150 }) },
-  { slot: SlotType.ACCESSORY, grade: EquipmentGrade.EPIC, stats: Stats.create({ maxHp: 300 }) },
-  { slot: SlotType.ACCESSORY, grade: EquipmentGrade.LEGENDARY, stats: Stats.create({ maxHp: 600 }) },
-  { slot: SlotType.ACCESSORY, grade: EquipmentGrade.MYTHIC, stats: Stats.create({ maxHp: 1200 }) },
+  { slot: SlotType.NECKLACE, grade: EquipmentGrade.COMMON, stats: Stats.create({ atk: 3, maxHp: 30 }) },
+  { slot: SlotType.NECKLACE, grade: EquipmentGrade.UNCOMMON, stats: Stats.create({ atk: 8, maxHp: 70 }) },
+  { slot: SlotType.NECKLACE, grade: EquipmentGrade.RARE, stats: Stats.create({ atk: 15, maxHp: 150 }) },
+  { slot: SlotType.NECKLACE, grade: EquipmentGrade.EPIC, stats: Stats.create({ atk: 30, maxHp: 300 }) },
+  { slot: SlotType.NECKLACE, grade: EquipmentGrade.LEGENDARY, stats: Stats.create({ atk: 60, maxHp: 600 }) },
+  { slot: SlotType.NECKLACE, grade: EquipmentGrade.MYTHIC, stats: Stats.create({ atk: 120, maxHp: 1200 }) },
+
+  { slot: SlotType.SHOES, grade: EquipmentGrade.COMMON, stats: Stats.create({ maxHp: 40 }) },
+  { slot: SlotType.SHOES, grade: EquipmentGrade.UNCOMMON, stats: Stats.create({ maxHp: 90 }) },
+  { slot: SlotType.SHOES, grade: EquipmentGrade.RARE, stats: Stats.create({ maxHp: 190 }) },
+  { slot: SlotType.SHOES, grade: EquipmentGrade.EPIC, stats: Stats.create({ maxHp: 380 }) },
+  { slot: SlotType.SHOES, grade: EquipmentGrade.LEGENDARY, stats: Stats.create({ maxHp: 760 }) },
+  { slot: SlotType.SHOES, grade: EquipmentGrade.MYTHIC, stats: Stats.create({ maxHp: 1520 }) },
+
+  { slot: SlotType.GLOVES, grade: EquipmentGrade.COMMON, stats: Stats.create({ atk: 7 }) },
+  { slot: SlotType.GLOVES, grade: EquipmentGrade.UNCOMMON, stats: Stats.create({ atk: 18 }) },
+  { slot: SlotType.GLOVES, grade: EquipmentGrade.RARE, stats: Stats.create({ atk: 35 }) },
+  { slot: SlotType.GLOVES, grade: EquipmentGrade.EPIC, stats: Stats.create({ atk: 70 }) },
+  { slot: SlotType.GLOVES, grade: EquipmentGrade.LEGENDARY, stats: Stats.create({ atk: 140 }) },
+  { slot: SlotType.GLOVES, grade: EquipmentGrade.MYTHIC, stats: Stats.create({ atk: 280 }) },
+
+  { slot: SlotType.HAT, grade: EquipmentGrade.COMMON, stats: Stats.create({ maxHp: 35 }) },
+  { slot: SlotType.HAT, grade: EquipmentGrade.UNCOMMON, stats: Stats.create({ maxHp: 80 }) },
+  { slot: SlotType.HAT, grade: EquipmentGrade.RARE, stats: Stats.create({ maxHp: 170 }) },
+  { slot: SlotType.HAT, grade: EquipmentGrade.EPIC, stats: Stats.create({ maxHp: 340 }) },
+  { slot: SlotType.HAT, grade: EquipmentGrade.LEGENDARY, stats: Stats.create({ maxHp: 680 }) },
+  { slot: SlotType.HAT, grade: EquipmentGrade.MYTHIC, stats: Stats.create({ maxHp: 1360 }) },
 ];
 
 const UPGRADE_MULTIPLIER_PER_LEVEL = 0.05;
@@ -92,11 +113,7 @@ export const EquipmentTable = {
   },
 
   getSlotMaxCount(slot: SlotType): number {
-    switch (slot) {
-      case SlotType.WEAPON: return 1;
-      case SlotType.ARMOR: return 1;
-      case SlotType.RING: return 2;
-      case SlotType.ACCESSORY: return 2;
-    }
+    if (slot === SlotType.RING) return 2;
+    return 1;
   },
 };

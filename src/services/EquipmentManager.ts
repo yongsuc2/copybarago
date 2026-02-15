@@ -18,7 +18,7 @@ export class EquipmentManager {
   autoEquipBest(player: Player, inventory: Equipment[]): Equipment[] {
     const replaced: Equipment[] = [];
 
-    for (const slotType of [SlotType.WEAPON, SlotType.ARMOR, SlotType.RING, SlotType.ACCESSORY]) {
+    for (const slotType of [SlotType.WEAPON, SlotType.ARMOR, SlotType.RING, SlotType.NECKLACE, SlotType.SHOES, SlotType.GLOVES, SlotType.HAT]) {
       const slot = player.getEquipmentSlot(slotType);
       const candidates = inventory.filter(e => e.slot === slotType);
 
@@ -43,14 +43,17 @@ export class EquipmentManager {
   getUpgradePriority(player: Player): { slot: SlotType; index: number } | null {
     const priorities: { slot: SlotType; index: number; score: number }[] = [];
 
-    for (const slotType of [SlotType.WEAPON, SlotType.RING, SlotType.ARMOR, SlotType.ACCESSORY]) {
+    for (const slotType of [SlotType.WEAPON, SlotType.RING, SlotType.GLOVES, SlotType.ARMOR, SlotType.NECKLACE, SlotType.SHOES, SlotType.HAT]) {
       const slot = player.getEquipmentSlot(slotType);
       for (let i = 0; i < slot.maxCount; i++) {
         const eq = slot.equipped[i];
         if (eq && !eq.needsPromote()) {
-          const baseScore = slotType === SlotType.WEAPON ? 4
-            : slotType === SlotType.RING ? 3
-            : slotType === SlotType.ARMOR ? 2
+          const baseScore = slotType === SlotType.WEAPON ? 7
+            : slotType === SlotType.RING ? 6
+            : slotType === SlotType.GLOVES ? 5
+            : slotType === SlotType.ARMOR ? 4
+            : slotType === SlotType.NECKLACE ? 3
+            : slotType === SlotType.SHOES ? 2
             : 1;
           const gradeBonus = eq.isS ? 2 : 0;
           priorities.push({ slot: slotType, index: i, score: baseScore + gradeBonus - eq.level * 0.01 });

@@ -4,20 +4,20 @@ import { SlotType, ResourceType, EquipmentGrade } from '../../domain/enums';
 import { EquipmentTable } from '../../domain/data/EquipmentTable';
 import { EquipmentDataTable } from '../../domain/data/EquipmentDataTable';
 import type { Equipment } from '../../domain/entities/Equipment';
+import { EquipmentIcon } from '../components/EquipmentIcon';
 
 const SLOT_LABELS = EquipmentDataTable.slotLabels;
 const GRADE_LABELS = EquipmentDataTable.gradeLabels;
 const SELL_PRICES = EquipmentDataTable.sellPrices;
 
-type Tab = 'equipped' | 'inventory' | 'forge';
-type SlotFilter = 'all' | SlotType;
+const SLOTS = [SlotType.WEAPON, SlotType.ARMOR, SlotType.RING, SlotType.NECKLACE, SlotType.SHOES, SlotType.GLOVES, SlotType.HAT];
+
+type Tab = SlotType | 'forge';
 
 export function EquipmentScreen() {
   const { game, refresh } = useGame();
-  const [tab, setTab] = useState<Tab>('equipped');
-  const [filter, setFilter] = useState<SlotFilter>('all');
+  const [tab, setTab] = useState<Tab>(SlotType.WEAPON);
   const [selectedMergeIndex, setSelectedMergeIndex] = useState<number | null>(null);
-  const slots = [SlotType.WEAPON, SlotType.ARMOR, SlotType.RING, SlotType.ACCESSORY];
 
   const mergeCandidates = game.forge.findMergeCandidates(game.player.inventory);
 
@@ -92,11 +92,8 @@ export function EquipmentScreen() {
     refresh();
   }
 
-  function getFilteredInventory(): Equipment[] {
-    let items = [...game.player.inventory];
-    if (filter !== 'all') {
-      items = items.filter(e => e.slot === filter);
-    }
+  function getInventoryForSlot(slotType: SlotType): Equipment[] {
+    const items = game.player.inventory.filter(e => e.slot === slotType);
     items.sort((a, b) => {
       const gradeA = EquipmentTable.getGradeIndex(a.grade);
       const gradeB = EquipmentTable.getGradeIndex(b.grade);
@@ -107,23 +104,119 @@ export function EquipmentScreen() {
     return items;
   }
 
+  function renderSlotTab(slotType: SlotType) {
+    const slot = game.player.getEquipmentSlot(slotType);
+    const inventoryItems = getInventoryForSlot(slotType);
+
+    return (
+      <>
+        <div className="card">
+          <div className="stat-row">
+            <span style={{ fontSize: 12, color: '#888' }}>강화석</span>
+            <span style={{ fontSize: 12 }}>{game.player.resources.equipmentStones}</span>
+          </div>
+        </div>
+
+        <h3 style={{ fontSize: 14, color: '#e94560', margin: '12px 0 6px' }}>
+          장착 중 ({slot.getEquipped().length}/{slot.maxCount})
+        </h3>
+        {slot.equipped.map((eq, i) => (
+          <div className="equip-slot" key={i} style={{ borderColor: eq ? '#e94560' : undefined }}>
+            {eq ? (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <EquipmentIcon slot={slotType} grade={eq.grade} size={32} />
+                  <div>
+                    <span className={`grade-${eq.grade.toLowerCase()}`}>
+                      {eq.isS && <span className="grade-s">[S] </span>}
+                      {eq.name}
+                    </span>
+                    <div style={{ fontSize: 12, color: '#888' }}>
+                      {GRADE_LABELS[eq.grade]} Lv.{eq.level} | ATK +{eq.getStats().atk} HP +{eq.getStats().maxHp}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => upgradeEquipment(slotType, i)}
+                    disabled={game.player.resources.equipmentStones < 1}
+                  >
+                    강화
+                  </button>
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => unequip(slotType, i)}
+                  >
+                    해제
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <span style={{ color: '#555' }}>빈 슬롯</span>
+            )}
+          </div>
+        ))}
+
+        <h3 style={{ fontSize: 14, color: '#aaa', margin: '16px 0 6px' }}>
+          보관함 ({inventoryItems.length})
+        </h3>
+        {inventoryItems.length === 0 ? (
+          <div className="card" style={{ textAlign: 'center', color: '#555', padding: 16 }}>
+            보관 중인 {SLOT_LABELS[slotType]}이 없습니다
+          </div>
+        ) : (
+          inventoryItems.map(eq => (
+            <div className="inv-item" key={eq.id}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                <EquipmentIcon slot={eq.slot} grade={eq.grade} size={28} />
+                <div style={{ flex: 1 }}>
+                  <div>
+                    <span className={`grade-${eq.grade.toLowerCase()}`}>
+                      {eq.isS && <span className="grade-s">[S] </span>}
+                      {eq.name}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
+                    {GRADE_LABELS[eq.grade]} Lv.{eq.level} | ATK +{eq.getStats().atk} HP +{eq.getStats().maxHp}
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                <button className="btn btn-primary" onClick={() => equipFromInventory(eq.id)}>
+                  장착
+                </button>
+                {eq.isS ? (
+                  <button className="btn btn-secondary" disabled>판매불가</button>
+                ) : (
+                  <button className="btn btn-secondary" onClick={() => sell(eq.id)}>
+                    {SELL_PRICES[eq.grade]}G
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </>
+    );
+  }
+
   return (
     <div className="screen">
       <h2>장비</h2>
 
-      <div className="inv-filter-bar">
-        <button
-          className={`inv-filter-btn ${tab === 'equipped' ? 'active' : ''}`}
-          onClick={() => setTab('equipped')}
-        >
-          장착
-        </button>
-        <button
-          className={`inv-filter-btn ${tab === 'inventory' ? 'active' : ''}`}
-          onClick={() => setTab('inventory')}
-        >
-          보관함 ({game.player.inventory.length})
-        </button>
+      <div className="inv-filter-bar" style={{ flexWrap: 'wrap' }}>
+        {SLOTS.map(s => (
+          <button
+            key={s}
+            className={`inv-filter-btn ${tab === s ? 'active' : ''}`}
+            onClick={() => setTab(s)}
+            style={{ display: 'flex', alignItems: 'center', gap: 2, padding: '4px 8px', fontSize: 12 }}
+          >
+            <EquipmentIcon slot={s} size={16} />
+            {SLOT_LABELS[s]}
+          </button>
+        ))}
         <button
           className={`inv-filter-btn ${tab === 'forge' ? 'active' : ''}`}
           onClick={() => { setTab('forge'); setSelectedMergeIndex(null); }}
@@ -132,122 +225,7 @@ export function EquipmentScreen() {
         </button>
       </div>
 
-      {tab === 'equipped' && (
-        <>
-          <div className="card">
-            <div className="stat-row">
-              <span>장비 강화석</span>
-              <span>{game.player.resources.equipmentStones}</span>
-            </div>
-            <div className="stat-row">
-              <span>파워 스톤</span>
-              <span>{game.player.resources.powerStones}</span>
-            </div>
-          </div>
-
-          {slots.map(slotType => {
-            const slot = game.player.getEquipmentSlot(slotType);
-            return (
-              <div key={slotType}>
-                <h3>{SLOT_LABELS[slotType]} ({slot.getEquipped().length}/{slot.maxCount})</h3>
-                {slot.equipped.map((eq, i) => (
-                  <div className="equip-slot" key={i}>
-                    {eq ? (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                          <span className={`grade-${eq.grade.toLowerCase()}`}>
-                            {eq.isS && <span className="grade-s">[S] </span>}
-                            {eq.name}
-                          </span>
-                          <div style={{ fontSize: 12, color: '#888' }}>
-                            {GRADE_LABELS[eq.grade]} {eq.level}레벨 | 공격력 +{eq.getStats().atk} 체력 +{eq.getStats().maxHp}
-                          </div>
-                        </div>
-                        <div style={{ display: 'flex', gap: 4 }}>
-                          <button
-                            className="btn btn-secondary"
-                            onClick={() => upgradeEquipment(slotType, i)}
-                            disabled={game.player.resources.equipmentStones < 1}
-                          >
-                            강화
-                          </button>
-                          <button
-                            className="btn btn-secondary"
-                            onClick={() => unequip(slotType, i)}
-                          >
-                            해제
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <span style={{ color: '#555' }}>빈 슬롯</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            );
-          })}
-        </>
-      )}
-
-      {tab === 'inventory' && (
-        <>
-          <div className="inv-filter-bar" style={{ marginTop: 8 }}>
-            <button
-              className={`inv-filter-btn ${filter === 'all' ? 'active' : ''}`}
-              onClick={() => setFilter('all')}
-            >
-              전체
-            </button>
-            {slots.map(s => (
-              <button
-                key={s}
-                className={`inv-filter-btn ${filter === s ? 'active' : ''}`}
-                onClick={() => setFilter(s)}
-              >
-                {SLOT_LABELS[s]}
-              </button>
-            ))}
-          </div>
-
-          {getFilteredInventory().length === 0 ? (
-            <div className="card" style={{ textAlign: 'center', color: '#555', padding: 24 }}>
-              보관함이 비어 있습니다
-            </div>
-          ) : (
-            getFilteredInventory().map(eq => (
-              <div className="inv-item" key={eq.id}>
-                <div style={{ flex: 1 }}>
-                  <div>
-                    <span className={`grade-${eq.grade.toLowerCase()}`}>
-                      {eq.isS && <span className="grade-s">[S] </span>}
-                      {eq.name}
-                    </span>
-                    <span style={{ fontSize: 11, color: '#666', marginLeft: 6 }}>
-                      {SLOT_LABELS[eq.slot]}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
-                    {GRADE_LABELS[eq.grade]} {eq.level}레벨 | 공격력 +{eq.getStats().atk} 체력 +{eq.getStats().maxHp}
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-                  <button className="btn btn-primary" onClick={() => equipFromInventory(eq.id)}>
-                    장착
-                  </button>
-                  {eq.isS ? (
-                    <button className="btn btn-secondary" disabled>판매불가</button>
-                  ) : (
-                    <button className="btn btn-secondary" onClick={() => sell(eq.id)}>
-                      판매 {SELL_PRICES[eq.grade]}G
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-        </>
-      )}
+      {tab !== 'forge' && renderSlotTab(tab)}
 
       {tab === 'forge' && (() => {
         const forgeGroups = getForgeGroups();

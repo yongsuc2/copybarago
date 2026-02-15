@@ -50,7 +50,10 @@ export enum SlotType {
   WEAPON = 'WEAPON',
   ARMOR = 'ARMOR',
   RING = 'RING',
-  ACCESSORY = 'ACCESSORY',
+  NECKLACE = 'NECKLACE',
+  SHOES = 'SHOES',
+  GLOVES = 'GLOVES',
+  HAT = 'HAT',
 }
 
 export enum PetTier {

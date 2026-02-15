@@ -159,6 +159,22 @@ function deserializeReward(data: RewardData): Reward {
   return new Reward(data.resources, data.equipmentIds, data.skillIds, data.petIds);
 }
 
+function migrateAccessoryToNecklace(
+  slots: Record<string, (EquipmentData | null)[]>,
+): Record<string, (EquipmentData | null)[]> {
+  if (!slots['ACCESSORY']) return slots;
+  const result = { ...slots };
+  const accessoryItems = result['ACCESSORY'];
+  delete result['ACCESSORY'];
+  if (!result['NECKLACE']) {
+    result['NECKLACE'] = accessoryItems.map(eq => {
+      if (eq) eq.slot = SlotType.NECKLACE;
+      return eq;
+    });
+  }
+  return result;
+}
+
 export class SaveSerializer {
   static serialize(game: GameManager): SaveState {
     const player = game.player;
@@ -249,7 +265,8 @@ export class SaveSerializer {
 
     player.resources = Resources.fromJSON(data.player.resources);
 
-    for (const [slotTypeStr, equippedArr] of Object.entries(data.player.equipmentSlots)) {
+    const migratedSlots = migrateAccessoryToNecklace(data.player.equipmentSlots);
+    for (const [slotTypeStr, equippedArr] of Object.entries(migratedSlots)) {
       const slotType = slotTypeStr as SlotType;
       const slot = player.equipmentSlots.get(slotType);
       if (!slot) continue;
@@ -259,7 +276,12 @@ export class SaveSerializer {
       }
     }
 
-    player.inventory = data.player.inventory.map(deserializeEquipment);
+    player.inventory = data.player.inventory.map(eqData => {
+      if ((eqData.slot as string) === 'ACCESSORY') {
+        eqData.slot = SlotType.NECKLACE;
+      }
+      return deserializeEquipment(eqData);
+    });
 
     player.ownedPets = data.player.ownedPets.map(deserializePet);
     if (data.player.activePetId) {

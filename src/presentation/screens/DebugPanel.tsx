@@ -15,7 +15,7 @@ const GRADES = [
 
 const GRADE_LABELS = EquipmentDataTable.gradeLabels;
 
-const SLOTS = [SlotType.WEAPON, SlotType.ARMOR, SlotType.RING, SlotType.ACCESSORY];
+const SLOTS = [SlotType.WEAPON, SlotType.ARMOR, SlotType.RING, SlotType.NECKLACE, SlotType.SHOES, SlotType.GLOVES, SlotType.HAT];
 
 export function DebugPanel() {
   const { game, refresh } = useGame();

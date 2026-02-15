@@ -13,7 +13,10 @@ const SLOT_LABELS: Record<SlotType, string> = {
   [SlotType.WEAPON]: '무기',
   [SlotType.ARMOR]: '방어구',
   [SlotType.RING]: '반지',
-  [SlotType.ACCESSORY]: '장신구',
+  [SlotType.NECKLACE]: '목걸이',
+  [SlotType.SHOES]: '신발',
+  [SlotType.GLOVES]: '장갑',
+  [SlotType.HAT]: '모자',
 };
 
 const SELL_PRICES: Record<EquipmentGrade, number> = {
