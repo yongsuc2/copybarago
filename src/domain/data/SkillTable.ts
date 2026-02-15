@@ -55,8 +55,8 @@ const ALL_SKILLS: Skill[] = [
     '최대 체력의 30%만큼 방어막 생성'),
 
   new Skill('multi_hit_mastery', 'Multi-Hit Mastery', '💫', SkillGrade.LEGENDARY, SkillCategory.MASTERY,
-    [HeritageRoute.SKULL], makeEffect(EffectType.MULTI_HIT, 0.5), TriggerCondition.PASSIVE,
-    '공격 시 50% 확률로 추가 타격'),
+    [HeritageRoute.SKULL], makeEffect(EffectType.MULTI_HIT, 0.25), TriggerCondition.PASSIVE,
+    '공격 시 25% 확률로 추가 타격'),
 
   new Skill('crit_mastery', 'Critical Mastery', '🎯', SkillGrade.LEGENDARY, SkillCategory.MASTERY,
     [HeritageRoute.RANGER], makeEffect(EffectType.BUFF, 0.15, 99, StatusEffectType.CRIT_UP), TriggerCondition.PASSIVE,
