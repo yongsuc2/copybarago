@@ -2,6 +2,7 @@ import { Stats } from '../value-objects/Stats';
 import { Skill } from '../entities/Skill';
 import { StatusEffect } from './StatusEffect';
 import { StatusEffectType, EffectType, TriggerCondition } from '../enums';
+import { BattleDataTable } from '../data/BattleDataTable';
 
 export class BattleUnit {
   currentHp: number;
@@ -44,8 +45,8 @@ export class BattleUnit {
     this.lifestealRate = 0;
     this.counterRate = 0;
     this.rage = 0;
-    this.maxRage = 100;
-    this.ragePerAttack = isPlayer ? 25 : 0;
+    this.maxRage = BattleDataTable.rage.maxRage;
+    this.ragePerAttack = isPlayer ? BattleDataTable.rage.playerRagePerAttack : 0;
     this.bonusRagePerAttack = 0;
     this.rageDamageMultiplier = 1.0;
     this.shield = 0;

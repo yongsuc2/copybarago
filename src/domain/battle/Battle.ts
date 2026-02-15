@@ -3,6 +3,7 @@ import { BattleUnit } from './BattleUnit';
 import { BattleLog, type BattleLogEntry, BattleLogType } from './BattleLog';
 import { StatusEffect } from './StatusEffect';
 import { SeededRandom } from '../../infrastructure/SeededRandom';
+import { BattleDataTable } from '../data/BattleDataTable';
 
 export interface TurnResult {
   turnNumber: number;
@@ -105,7 +106,7 @@ export class Battle {
 
     const baseDamage = this.calculateDamage(attacker, defender);
     const isCrit = this.rng.chance(attacker.getEffectiveCrit());
-    const finalDamage = isCrit ? Math.floor(baseDamage * 1.5) : baseDamage;
+    const finalDamage = isCrit ? Math.floor(baseDamage * BattleDataTable.damage.critMultiplier) : baseDamage;
 
     const dealt = defender.takeDamage(finalDamage);
 
@@ -137,7 +138,7 @@ export class Battle {
 
     this.processOnAttackSkills(attacker, defender);
 
-    if (defender.isAlive() && defender.counterRate > 0 && this.rng.chance(0.5)) {
+    if (defender.isAlive() && defender.counterRate > 0 && this.rng.chance(BattleDataTable.counter.triggerChance)) {
       this.processCounter(defender, attacker);
     }
   }
@@ -148,7 +149,7 @@ export class Battle {
       if (!defender.isAlive()) break;
 
       if (skill.effect.type === EffectType.DAMAGE) {
-        const skillDamage = Math.floor(skill.effect.value + attacker.getEffectiveAtk() * 0.3);
+        const skillDamage = Math.floor(skill.effect.value + attacker.getEffectiveAtk() * BattleDataTable.skill.onAttackAtkRatio);
         const dealt = defender.takeDamage(skillDamage);
         this.log.add({
           turn: this.turnCount, type: BattleLogType.SKILL_DAMAGE,
@@ -163,7 +164,7 @@ export class Battle {
   private processRageAttack(attacker: BattleUnit, defender: BattleUnit): void {
     if (!defender.isAlive()) return;
 
-    const rageDamage = Math.floor(attacker.getEffectiveAtk() * 1.2 * attacker.rageDamageMultiplier);
+    const rageDamage = Math.floor(attacker.getEffectiveAtk() * BattleDataTable.rage.attackMultiplier * attacker.rageDamageMultiplier);
     const dealt = defender.takeDamage(rageDamage);
     this.log.add({
       turn: this.turnCount, type: BattleLogType.RAGE_ATTACK,
@@ -181,7 +182,7 @@ export class Battle {
       if (!defender.isAlive()) break;
 
       if (skill.effect.type === EffectType.DAMAGE) {
-        const skillDamage = Math.floor(skill.effect.value + attacker.getEffectiveAtk() * 0.3);
+        const skillDamage = Math.floor(skill.effect.value + attacker.getEffectiveAtk() * BattleDataTable.skill.onRageAtkRatio);
         const dealt = defender.takeDamage(skillDamage);
         this.log.add({
           turn: this.turnCount, type: BattleLogType.SKILL_DAMAGE,
@@ -218,7 +219,7 @@ export class Battle {
       if (!opponent.isAlive()) break;
 
       if (skill.effect.type === EffectType.DAMAGE) {
-        const skillDamage = Math.floor(skill.effect.value + unit.getEffectiveAtk() * 0.2);
+        const skillDamage = Math.floor(skill.effect.value + unit.getEffectiveAtk() * BattleDataTable.skill.turnStartAtkRatio);
         const dealt = opponent.takeDamage(skillDamage);
         this.log.add({
           turn: this.turnCount, type: BattleLogType.SKILL_DAMAGE,
@@ -275,8 +276,8 @@ export class Battle {
   private calculateDamage(attacker: BattleUnit, defender: BattleUnit): number {
     const atk = attacker.getEffectiveAtk();
     const def = defender.getEffectiveDef();
-    const raw = Math.max(1, atk - Math.floor(def * 0.5));
-    const variance = this.rng.nextFloat(0.9, 1.1);
+    const raw = Math.max(1, atk - Math.floor(def * BattleDataTable.damage.defenseReduction));
+    const variance = this.rng.nextFloat(BattleDataTable.damage.varianceMin, BattleDataTable.damage.varianceMax);
     return Math.max(1, Math.floor(raw * variance));
   }
 
@@ -336,7 +337,7 @@ export class Battle {
     };
   }
 
-  runToCompletion(maxTurns: number = 100): TurnResult {
+  runToCompletion(maxTurns: number = BattleDataTable.maxTurns): TurnResult {
     while (this.state === BattleState.IN_PROGRESS && this.turnCount < maxTurns) {
       this.executeTurn();
     }

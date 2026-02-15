@@ -1,4 +1,5 @@
 import { Stats } from '../value-objects/Stats';
+import { BattleDataTable } from './BattleDataTable';
 
 export interface EnemyTemplateData {
   id: string;
@@ -13,8 +14,8 @@ const BASE_ENEMY_STATS = Stats.create({ hp: 80, maxHp: 80, atk: 8, def: 3 });
 const BASE_ELITE_STATS = Stats.create({ hp: 150, maxHp: 150, atk: 15, def: 6 });
 const BASE_BOSS_STATS = Stats.create({ hp: 300, maxHp: 300, atk: 20, def: 10 });
 
-const SCALING_PER_CHAPTER = 1.12;
-const TOWER_SCALING_PER_FLOOR = 1.08;
+const SCALING_PER_CHAPTER = BattleDataTable.enemy.scalingPerChapter;
+const TOWER_SCALING_PER_FLOOR = BattleDataTable.enemy.scalingPerTowerFloor;
 
 const ENEMY_TEMPLATES: EnemyTemplateData[] = [
   { id: 'slime', name: 'Slime', baseStats: Stats.create({ hp: 60, maxHp: 60, atk: 6, def: 2 }), skillIds: [], isBoss: false, ragePerAttack: 25 },

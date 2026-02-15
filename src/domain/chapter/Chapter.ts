@@ -8,6 +8,7 @@ import { Skill } from '../entities/Skill';
 import { Reward } from '../value-objects/Reward';
 import { EnemyTable } from '../data/EnemyTable';
 import { EncounterDataTable } from '../data/EncounterDataTable';
+import { BattleDataTable } from '../data/BattleDataTable';
 import { SeededRandom } from '../../infrastructure/SeededRandom';
 
 export enum ChapterState {
@@ -174,14 +175,14 @@ export class Chapter {
     const template1 = EnemyTemplate.fromId(id1);
     if (!template1) return null;
 
-    const isDual = this.rng.chance(0.5);
+    const isDual = this.rng.chance(BattleDataTable.enemy.dualSpawnChance);
     if (isDual) {
       const remaining = pool.filter(id => id !== id1);
       const idx2 = this.rng.nextInt(0, remaining.length - 1);
       const template2 = EnemyTemplate.fromId(remaining[idx2]);
       if (template2) {
-        const e1 = template1.createInstance(this.id, 0.7);
-        const e2 = template2.createInstance(this.id, 0.7);
+        const e1 = template1.createInstance(this.id, BattleDataTable.enemy.dualStatMultiplier);
+        const e2 = template2.createInstance(this.id, BattleDataTable.enemy.dualStatMultiplier);
         this.currentBattle = new Battle(playerUnit, [e1, e2], this.rng.nextInt(0, 999999));
         return this.currentBattle;
       }
