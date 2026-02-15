@@ -77,6 +77,7 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
   }, [damageEntries, playerUnit.name, enemyUnits, speedMultiplier]);
 
   const playerHpPct = playerUnit.maxHp > 0 ? (playerUnit.currentHp / playerUnit.maxHp) * 100 : 0;
+  const playerShieldPct = playerUnit.maxHp > 0 ? Math.min(100, (playerUnit.shield / playerUnit.maxHp) * 100) : 0;
   const playerType = getCharacterType(playerUnit.name);
   const playerPopups = popups.filter(p => p.side === 'player');
 
@@ -127,6 +128,15 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
           <div className="ba-hp-bar-wrap">
             <div className="ba-hp-bar">
               <div className="ba-hp-fill player" style={{ width: `${playerHpPct}%` }} />
+              {playerUnit.shield > 0 && (
+                <div
+                  className="ba-shield-fill"
+                  style={{
+                    width: `${playerShieldPct}%`,
+                    left: `${Math.min(playerHpPct, 100 - playerShieldPct)}%`,
+                  }}
+                />
+              )}
             </div>
             <span className="ba-power">{formatNumber(playerUnit.maxHp)}</span>
           </div>
@@ -177,17 +187,21 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
                   ))}
                 </div>
                 <CharacterSprite type={eType} size={spriteSize} isBoss={isBoss && enemyUnits.length === 1} />
-                {eu.shield > 0 && (
-                  <div className="ba-shield-bar-wrap">
-                    <div className="ba-shield-bar">
-                      <div className="ba-shield-fill" style={{ width: `${Math.min(100, (eu.shield / eu.maxHp) * 100)}%` }} />
-                    </div>
-                    <span className="ba-shield-label">🔰 {formatNumber(eu.shield)}</span>
-                  </div>
-                )}
                 <div className="ba-hp-bar-wrap">
                   <div className="ba-hp-bar">
                     <div className="ba-hp-fill enemy" style={{ width: `${eHpPct}%` }} />
+                    {eu.shield > 0 && (() => {
+                      const shieldPct = Math.min(100, (eu.shield / eu.maxHp) * 100);
+                      return (
+                        <div
+                          className="ba-shield-fill"
+                          style={{
+                            width: `${shieldPct}%`,
+                            left: `${Math.min(eHpPct, 100 - shieldPct)}%`,
+                          }}
+                        />
+                      );
+                    })()}
                   </div>
                   <span className="ba-power">{formatNumber(eu.maxHp)}</span>
                 </div>

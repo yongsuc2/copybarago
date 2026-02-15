@@ -287,6 +287,7 @@ body {
   border-radius: 4px;
   overflow: hidden;
   min-width: 60px;
+  position: relative;
 }
 
 .ba-hp-fill {
@@ -355,31 +356,13 @@ body {
   align-items: flex-end;
 }
 
-.ba-shield-bar-wrap {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 2px;
-  width: 100%;
-}
-.ba-shield-bar {
-  flex: 1;
-  height: 5px;
-  background: #333;
-  border-radius: 3px;
-  overflow: hidden;
-  min-width: 60px;
-}
 .ba-shield-fill {
+  position: absolute;
+  top: 0;
   height: 100%;
-  background: linear-gradient(90deg, #4da6ff, #2196f3);
-  transition: width calc(0.3s / var(--battle-speed, 1)) ease;
-  border-radius: 3px;
-}
-.ba-shield-label {
-  font-size: 9px;
-  color: #4da6ff;
-  white-space: nowrap;
+  background: rgba(240, 240, 255, 0.75);
+  transition: width calc(0.3s / var(--battle-speed, 1)) ease, left calc(0.3s / var(--battle-speed, 1)) ease;
+  border-radius: 4px;
 }
 
 .ba-dead {
