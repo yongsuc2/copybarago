@@ -188,6 +188,22 @@ export function ChapterScreen() {
       return;
     }
 
+    if (enc && enc.options.length === 1) {
+      const stats = game.player.computeStats();
+      const result = game.currentChapter.resolveEncounter(0, stats.hp, stats.maxHp);
+      if (result) {
+        if (result.skillsGained.length > 0) {
+          setLog(prev => [...prev, `  획득: ${result.skillsGained.map(s => `${s.icon} ${s.name}`).join(', ')}`]);
+        }
+        if (result.hpChange !== 0) {
+          setLog(prev => [...prev, `  체력 변화: ${result.hpChange > 0 ? '+' : ''}${result.hpChange}`]);
+        }
+      }
+      refresh();
+      setTimeout(() => advanceDay(), 300);
+      return;
+    }
+
     setEncounter(enc);
     refresh();
   }, [game, refresh]);
