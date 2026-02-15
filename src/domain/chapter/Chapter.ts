@@ -40,6 +40,8 @@ export class Chapter {
   currentBattle: Battle | null;
   totalReward: Reward;
   sessionGold: number;
+  sessionCurrentHp: number;
+  sessionMaxHp: number;
 
   private encounterGenerator: EncounterGenerator;
   private rng: SeededRandom;
@@ -55,8 +57,15 @@ export class Chapter {
     this.currentBattle = null;
     this.totalReward = Reward.empty();
     this.sessionGold = 0;
+    this.sessionCurrentHp = 0;
+    this.sessionMaxHp = 0;
     this.encounterGenerator = new EncounterGenerator(seed);
     this.rng = new SeededRandom(seed + 1);
+  }
+
+  initSessionHp(maxHp: number): void {
+    this.sessionCurrentHp = maxHp;
+    this.sessionMaxHp = maxHp;
   }
 
   private getDaysForType(type: ChapterType): number {
@@ -109,7 +118,16 @@ export class Chapter {
     this.totalReward = this.totalReward.merge(result.reward);
     this.currentEncounter = null;
 
+    this.sessionCurrentHp = Math.max(0, Math.min(
+      this.sessionCurrentHp + result.hpChange,
+      this.sessionMaxHp,
+    ));
+
     return result;
+  }
+
+  updateSessionHpAfterBattle(remainingHp: number): void {
+    this.sessionCurrentHp = Math.max(0, Math.min(remainingHp, this.sessionMaxHp));
   }
 
   createCombatBattle(playerUnit: BattleUnit): Battle | null {

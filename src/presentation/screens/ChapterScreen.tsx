@@ -124,6 +124,9 @@ export function ChapterScreen() {
         refresh();
       }, 1500);
     } else {
+      if (game.currentChapter && b.state === BattleState.VICTORY) {
+        game.currentChapter.updateSessionHpAfterBattle(b.player.currentHp);
+      }
       game.currentChapter?.onBattleEnd(b.state);
       setLog(prev => [...prev, `  전투: ${b.state} (${b.turnCount}턴)`]);
       setBattleResult(b.state);
@@ -179,7 +182,8 @@ export function ChapterScreen() {
 
     if (enc?.type === EncounterType.COMBAT) {
       const stats = game.player.computeStats();
-      const pu = new BattleUnit('Capybara', stats, [...game.currentChapter.sessionSkills], true);
+      const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
+      const pu = new BattleUnit('Capybara', battleStats, [...game.currentChapter.sessionSkills], true);
       const b = game.currentChapter.createCombatBattle(pu);
       if (b) {
         startBattle(b, false);
@@ -189,8 +193,8 @@ export function ChapterScreen() {
     }
 
     if (enc && enc.options.length === 1) {
-      const stats = game.player.computeStats();
-      const result = game.currentChapter.resolveEncounter(0, stats.hp, stats.maxHp);
+      const ch = game.currentChapter;
+      const result = ch.resolveEncounter(0, ch.sessionCurrentHp, ch.sessionMaxHp);
       if (result) {
         if (result.skillsGained.length > 0) {
           setLog(prev => [...prev, `  획득: ${result.skillsGained.map(s => `${s.icon} ${s.name}`).join(', ')}`]);
@@ -364,7 +368,8 @@ export function ChapterScreen() {
     if (!game.currentChapter) return;
 
     const stats = game.player.computeStats();
-    const pu = new BattleUnit('Capybara', stats, [...game.currentChapter.sessionSkills], true);
+    const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
+    const pu = new BattleUnit('Capybara', battleStats, [...game.currentChapter.sessionSkills], true);
     const b = game.currentChapter.createBossBattle(pu);
     if (!b) return;
 
@@ -376,6 +381,8 @@ export function ChapterScreen() {
     const type = ChapterType.SIXTY_DAY;
 
     game.startChapter(nextId, type);
+    const stats = game.player.computeStats();
+    game.currentChapter!.initSessionHp(stats.maxHp);
     setBattleResult(null);
     setChapterResult(null);
     setLog([]);
@@ -403,8 +410,8 @@ export function ChapterScreen() {
   function selectOption(index: number) {
     if (!game.currentChapter || !encounter) return;
 
-    const stats = game.player.computeStats();
-    const result = game.currentChapter.resolveEncounter(index, stats.hp, stats.maxHp);
+    const ch = game.currentChapter;
+    const result = ch.resolveEncounter(index, ch.sessionCurrentHp, ch.sessionMaxHp);
     if (result) {
       if (result.skillsGained.length > 0) {
         setLog(prev => [...prev, `  획득: ${result.skillsGained.map(s => `${s.icon} ${s.name}`).join(', ')}`]);
@@ -421,6 +428,10 @@ export function ChapterScreen() {
 
   useEffect(() => {
     if (game.currentChapter && !encounter && !isBattling) {
+      if (game.currentChapter.sessionMaxHp === 0) {
+        const stats = game.player.computeStats();
+        game.currentChapter.initSessionHp(stats.maxHp);
+      }
       advanceDay();
     }
     return () => {
@@ -509,8 +520,8 @@ export function ChapterScreen() {
             />
           ) : (
             <PlayerStatsBar
-              hp={playerStats.hp}
-              maxHp={playerStats.maxHp}
+              hp={chapter ? chapter.sessionCurrentHp : playerStats.hp}
+              maxHp={chapter ? chapter.sessionMaxHp : playerStats.maxHp}
               atk={playerStats.atk}
               def={playerStats.def}
             />
