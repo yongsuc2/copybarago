@@ -10,7 +10,7 @@ import type { AttackPhase } from '../components/BattleArena';
 import { AdventureStage } from '../components/AdventureStage';
 import { PlayerStatsBar } from '../components/PlayerStatsBar';
 import { EncounterDataTable } from '../../domain/data/EncounterDataTable';
-import { Package, Home, Swords } from 'lucide-react';
+import { Package, Home, Swords, Zap, Star } from 'lucide-react';
 
 const MAX_BATTLE_TURNS = 15;
 
@@ -490,10 +490,20 @@ export function ChapterScreen() {
                 <div className="progress-fill" style={{ width: `${chapter.getProgress() * 100}%` }} />
               </div>
               {!isBattling && (
-                <div className="stat-row">
-                  <span>스킬</span>
-                  <span>{chapter.sessionSkills.length}</span>
-                </div>
+                <>
+                  <div className="stat-row">
+                    <span>스킬</span>
+                    <span>{chapter.sessionSkills.length}</span>
+                  </div>
+                  <div className="stat-row" style={{ fontSize: 12, color: '#aaa' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <Zap size={12} /> 중박 {chapter.jungbakCount}/{EncounterDataTable.counterThreshold.jungbak}
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <Star size={12} /> 대박 {chapter.daebakCount}/{EncounterDataTable.counterThreshold.daebak}
+                    </span>
+                  </div>
+                </>
               )}
             </div>
           )}

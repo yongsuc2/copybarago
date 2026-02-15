@@ -9,8 +9,8 @@ const ENCOUNTER_EMOJI: Record<EncounterType, string> = {
   [EncounterType.ANGEL]: '😇',
   [EncounterType.DEMON]: '😈',
   [EncounterType.CHANCE]: '🎁',
-  [EncounterType.ROULETTE]: '🎰',
-  [EncounterType.LUCKY_MACHINE]: '🎰',
+  [EncounterType.JUNGBAK_ROULETTE]: '🎲',
+  [EncounterType.DAEBAK_ROULETTE]: '⭐',
 };
 
 function getChanceEmoji(optionLabel?: string): string {

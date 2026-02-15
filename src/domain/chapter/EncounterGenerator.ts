@@ -41,10 +41,16 @@ export class EncounterGenerator {
       case EncounterType.DEMON: return this.createDemonEncounter(existingSkillIds);
       case EncounterType.COMBAT: return this.createCombatEncounter();
       case EncounterType.CHANCE: return this.createChanceEncounter();
-      case EncounterType.ROULETTE: return this.createRouletteEncounter();
-      case EncounterType.LUCKY_MACHINE: return this.createLuckyMachineEncounter();
       default: return this.createCombatEncounter();
     }
+  }
+
+  generateJungbakRoulette(existingSkillIds: string[]): Encounter {
+    return this.createJungbakRouletteEncounter(existingSkillIds);
+  }
+
+  generateDaebakRoulette(existingSkillIds: string[]): Encounter {
+    return this.createDaebakRouletteEncounter(existingSkillIds);
   }
 
   private getRandomSkills(count: number, excludeIds: string[]): Skill[] {
@@ -189,10 +195,51 @@ export class EncounterGenerator {
     return new Encounter(EncounterType.CHANCE, options);
   }
 
-  private createRouletteEncounter(): Encounter {
-    const mythicSkills = SkillTable.getSkillsByGrade(SkillGrade.MYTHIC);
-    const immortalSkills = SkillTable.getSkillsByGrade(SkillGrade.IMMORTAL);
-    const d = EncounterDataTable.roulette;
+  private createJungbakRouletteEncounter(existingSkillIds: string[]): Encounter {
+    const d = EncounterDataTable.jungbakRoulette;
+    const skills = this.getRandomSkills(1, existingSkillIds);
+    const skill = skills.length > 0 ? skills[0] : null;
+
+    const options: EncounterOption[] = [
+      {
+        label: d.healLabel,
+        description: d.healDescription,
+        hpCostPercent: 0,
+        goldCost: 0,
+        successRate: 1.0,
+        reward: healReward(d.healPercent),
+      },
+    ];
+
+    if (skill) {
+      options.push({
+        label: d.skillLabel(skill.icon, skill.name),
+        description: d.skillDescription(skill.description),
+        hpCostPercent: 0,
+        goldCost: 0,
+        successRate: 1.0,
+        reward: skillReward([skill]),
+      });
+    }
+
+    options.push({
+      label: d.goldLabel,
+      description: d.goldDescription,
+      hpCostPercent: 0,
+      goldCost: 0,
+      successRate: 1.0,
+      reward: resourceReward(ResourceType.GOLD, d.goldAmount),
+    });
+
+    return new Encounter(EncounterType.JUNGBAK_ROULETTE, options);
+  }
+
+  private createDaebakRouletteEncounter(existingSkillIds: string[]): Encounter {
+    const mythicSkills = SkillTable.getSkillsByGrade(SkillGrade.MYTHIC)
+      .filter(s => !existingSkillIds.includes(s.id));
+    const immortalSkills = SkillTable.getSkillsByGrade(SkillGrade.IMMORTAL)
+      .filter(s => !existingSkillIds.includes(s.id));
+    const d = EncounterDataTable.daebakRoulette;
 
     const mythicSkill = mythicSkills.length > 0 ? this.rng.pick(mythicSkills) : null;
     const immortalSkill = immortalSkills.length > 0 ? this.rng.pick(immortalSkills) : null;
@@ -228,42 +275,6 @@ export class EncounterGenerator {
       },
     ];
 
-    return new Encounter(EncounterType.ROULETTE, options);
-  }
-
-  private createLuckyMachineEncounter(): Encounter {
-    const d = EncounterDataTable.luckyMachine;
-    const baseGold = d.baseGold;
-    const safeGold = Math.floor(baseGold * d.safeMultiplier);
-    const riskyGold = baseGold * d.riskyMultiplier;
-
-    const options: EncounterOption[] = [
-      {
-        label: d.safeLabel(safeGold),
-        description: d.safeDescription(safeGold),
-        hpCostPercent: 0,
-        goldCost: 0,
-        successRate: d.safeRate,
-        reward: resourceReward(ResourceType.GOLD, safeGold),
-      },
-      {
-        label: d.normalLabel(baseGold),
-        description: d.normalDescription(baseGold),
-        hpCostPercent: 0,
-        goldCost: 0,
-        successRate: d.normalRate,
-        reward: resourceReward(ResourceType.GOLD, baseGold),
-      },
-      {
-        label: d.riskyLabel(riskyGold),
-        description: d.riskyDescription(riskyGold),
-        hpCostPercent: 0,
-        goldCost: 0,
-        successRate: d.riskyRate,
-        reward: resourceReward(ResourceType.GOLD, riskyGold),
-      },
-    ];
-
-    return new Encounter(EncounterType.LUCKY_MACHINE, options);
+    return new Encounter(EncounterType.DAEBAK_ROULETTE, options);
   }
 }

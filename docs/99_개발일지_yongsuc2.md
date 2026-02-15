@@ -142,6 +142,29 @@ docs/04_스킬시스템.md (연타 마스터리 효과 변경)
 docs/02_캐릭터성장시스템.md (해골 계승 연타 설명 변경)
 ```
 
+- **쪽박/중박/대박 카운터 기반 룰렛 시스템 구현**
+  - 원작 카피바라고의 카운터 기반 룰렛 시스템 반영
+  - ANGEL=중박(12회→중박 룰렛), DEMON=대박(7회→대박 룰렛), CHANCE=쪽박
+  - ROULETTE/LUCKY_MACHINE/MERCHANT 인카운터 타입 제거
+  - JUNGBAK_ROULETTE/DAEBAK_ROULETTE 신규 타입 추가
+  - Chapter에 jungbakCount/daebakCount 카운터 추가
+  - advanceDay()에서 카운터 임계값 체크 후 룰렛 자동 발동
+  - resolveEncounter()에서 ANGEL/DEMON 해결 시 카운터 증가
+  - 인카운터 가중치 재배분: COMBAT(40%), ANGEL(25%), DEMON(15%), CHANCE(20%)
+  - ChapterScreen에 중박/대박 카운터 진행도 표시 UI 추가
+
+### 수정된 파일
+```
+src/domain/enums/index.ts (EncounterType 변경)
+src/domain/data/EncounterDataTable.ts (룰렛 데이터, 가중치 변경)
+src/domain/chapter/EncounterGenerator.ts (룰렛 생성 메서드 변경)
+src/domain/chapter/Chapter.ts (카운터 필드/로직 추가)
+src/presentation/components/AdventureStage.tsx (이모지 매핑 변경)
+src/presentation/screens/ChapterScreen.tsx (카운터 표시 UI)
+docs/12_모험시스템.md (카운터 시스템 설명)
+docs/04_스킬시스템.md (스킬 획득 경로 변경)
+```
+
 ### 누적 현황
 - 테스트: 19개 파일, 142개 테스트 전부 통과
 - tsc 타입 체크 통과

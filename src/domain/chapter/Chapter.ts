@@ -7,6 +7,7 @@ import { Battle } from '../battle/Battle';
 import { Skill } from '../entities/Skill';
 import { Reward } from '../value-objects/Reward';
 import { EnemyTable } from '../data/EnemyTable';
+import { EncounterDataTable } from '../data/EncounterDataTable';
 import { SeededRandom } from '../../infrastructure/SeededRandom';
 
 export enum ChapterState {
@@ -42,6 +43,8 @@ export class Chapter {
   sessionGold: number;
   sessionCurrentHp: number;
   sessionMaxHp: number;
+  jungbakCount: number;
+  daebakCount: number;
 
   private encounterGenerator: EncounterGenerator;
   private rng: SeededRandom;
@@ -59,6 +62,8 @@ export class Chapter {
     this.sessionGold = 0;
     this.sessionCurrentHp = 0;
     this.sessionMaxHp = 0;
+    this.jungbakCount = 0;
+    this.daebakCount = 0;
     this.encounterGenerator = new EncounterGenerator(seed);
     this.rng = new SeededRandom(seed + 1);
   }
@@ -87,6 +92,20 @@ export class Chapter {
     }
 
     const existingIds = this.sessionSkills.map(s => s.id);
+    const threshold = EncounterDataTable.counterThreshold;
+
+    if (this.daebakCount >= threshold.daebak) {
+      this.daebakCount = 0;
+      this.currentEncounter = this.encounterGenerator.generateDaebakRoulette(existingIds);
+      return this.currentEncounter;
+    }
+
+    if (this.jungbakCount >= threshold.jungbak) {
+      this.jungbakCount = 0;
+      this.currentEncounter = this.encounterGenerator.generateJungbakRoulette(existingIds);
+      return this.currentEncounter;
+    }
+
     this.currentEncounter = this.encounterGenerator.generate(
       this.type, this.currentDay, existingIds
     );
@@ -101,7 +120,9 @@ export class Chapter {
   ): EncounterResult | null {
     if (!this.currentEncounter) return null;
 
-    if (this.currentEncounter.type === EncounterType.COMBAT && choiceIndex === 0) {
+    const encType = this.currentEncounter.type;
+
+    if (encType === EncounterType.COMBAT && choiceIndex === 0) {
       return null;
     }
 
@@ -116,6 +137,13 @@ export class Chapter {
 
     this.sessionGold += result.goldChange;
     this.totalReward = this.totalReward.merge(result.reward);
+
+    if (encType === EncounterType.ANGEL) {
+      this.jungbakCount++;
+    } else if (encType === EncounterType.DEMON) {
+      this.daebakCount++;
+    }
+
     this.currentEncounter = null;
 
     this.sessionCurrentHp = Math.max(0, Math.min(
