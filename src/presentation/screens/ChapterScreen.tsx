@@ -18,6 +18,13 @@ import { Package, Home, Swords, Zap, Star, BarChart3, FastForward } from 'lucide
 
 const MAX_BATTLE_TURNS = 15;
 
+const SKILL_GRADE_COLORS: Record<SkillGrade, string> = {
+  [SkillGrade.NORMAL]: '#aaa',
+  [SkillGrade.LEGENDARY]: '#ff9800',
+  [SkillGrade.MYTHIC]: '#e94560',
+  [SkillGrade.IMMORTAL]: '#ffd700',
+};
+
 const PHASE_DURATION = {
   approach: 350,
   hit: 300,
@@ -757,6 +764,7 @@ export function ChapterScreen() {
             activeEnemyIndex={activeEnemyIndex}
             encounterType={encounter?.type}
             encounterOptionLabel={encounter?.options[0]?.label}
+            skills={chapter?.sessionSkills}
             speedMultiplier={battleSpeed}
           />
 

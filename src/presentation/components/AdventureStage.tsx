@@ -1,8 +1,16 @@
-import { EncounterType } from '../../domain/enums';
+import { EncounterType, SkillGrade } from '../../domain/enums';
 import type { BattleUnit } from '../../domain/battle/BattleUnit';
 import type { BattleLogEntry } from '../../domain/battle/BattleLog';
+import type { Skill } from '../../domain/entities/Skill';
 import { BattleArena, type AttackPhase } from './BattleArena';
 import { CharacterSprite } from './CharacterSprite';
+
+const SKILL_GRADE_COLORS: Record<SkillGrade, string> = {
+  [SkillGrade.NORMAL]: '#aaa',
+  [SkillGrade.LEGENDARY]: '#ff9800',
+  [SkillGrade.MYTHIC]: '#e94560',
+  [SkillGrade.IMMORTAL]: '#ffd700',
+};
 
 const ENCOUNTER_EMOJI: Record<EncounterType, string> = {
   [EncounterType.COMBAT]: '⚔️',
@@ -34,6 +42,7 @@ interface AdventureStageProps {
   encounterType?: EncounterType | null;
   encounterOptionLabel?: string;
   speedMultiplier?: number;
+  skills?: Skill[];
 }
 
 export function AdventureStage({
@@ -50,10 +59,40 @@ export function AdventureStage({
   encounterType,
   encounterOptionLabel,
   speedMultiplier = 1,
+  skills = [],
 }: AdventureStageProps) {
+  const skillIcons = skills.length > 0 ? (
+    <div style={{
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: 3,
+      padding: '3px 0',
+    }}>
+      {skills.map((skill, i) => (
+        <span
+          key={i}
+          title={`${skill.name}: ${skill.description}`}
+          style={{
+            fontSize: 12,
+            width: 22,
+            height: 22,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#1a1a2e',
+            borderRadius: 3,
+            border: `1px solid ${SKILL_GRADE_COLORS[skill.grade]}`,
+          }}
+        >
+          {skill.icon}
+        </span>
+      ))}
+    </div>
+  ) : null;
   if (isBattling && playerUnit && enemyUnits && enemyUnits.length > 0) {
     return (
       <div className="adventure-stage">
+        {skillIcons}
         <BattleArena
           playerUnit={playerUnit}
           enemyUnits={enemyUnits}
@@ -78,6 +117,7 @@ export function AdventureStage({
 
   return (
     <div className="adventure-stage">
+      {skillIcons}
       <div className="ba-field">
         <div className="ba-character">
           <CharacterSprite type="capybara" size={72} />
