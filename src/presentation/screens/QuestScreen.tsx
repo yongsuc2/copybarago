@@ -6,8 +6,20 @@ import type { GameEvent, EventMission } from '../../domain/meta/GameEvent';
 
 type QuestTab = 'daily' | 'weekly';
 
+const MISSION_SCREEN_MAP: Record<string, string> = {
+  daily_chapter: 'chapter',
+  weekly_chapter: 'chapter',
+  daily_dungeon: 'content',
+  daily_tower: 'content',
+  weekly_tower: 'content',
+  daily_arena: 'content',
+  daily_travel: 'content',
+  weekly_gacha: 'gacha',
+  weekly_sell: 'equipment',
+};
+
 export function QuestScreen() {
-  const { game, refresh } = useGame();
+  const { game, refresh, setScreen } = useGame();
   const [tab, setTab] = useState<QuestTab>('daily');
 
   const activeEvents = game.eventManager.getActiveEvents();
@@ -75,7 +87,13 @@ export function QuestScreen() {
               수령
             </button>
           ) : (
-            <button className="btn btn-secondary" disabled>진행 중</button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                const screen = MISSION_SCREEN_MAP[mission.id];
+                if (screen) setScreen(screen);
+              }}
+            >진행 중</button>
           )}
         </div>
       </div>
