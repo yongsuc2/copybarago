@@ -86,6 +86,7 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
   const isEnemyHit = attackPhase === 'player-hit';
 
   const skillEntry = damageEntries.find(e => e.type === BattleLogType.SKILL_DAMAGE && e.skillName);
+  const counterEntry = damageEntries.find(e => e.type === BattleLogType.COUNTER);
   const attackerIsPlayer = attackPhase.startsWith('player-');
   const attackerIsEnemy = attackPhase.startsWith('enemy-');
 
@@ -104,6 +105,12 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
             <div className="ba-skill-indicator">
               {skillEntry.skillIcon && <span>{skillEntry.skillIcon}</span>}
               <span>{skillEntry.skillName}</span>
+            </div>
+          )}
+          {counterEntry && counterEntry.source === playerUnit.name && (
+            <div className="ba-skill-indicator counter">
+              <span>🔄</span>
+              <span>반격</span>
             </div>
           )}
           <div className="ba-popup-area">
@@ -151,6 +158,12 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
                   <div className="ba-skill-indicator">
                     {skillEntry.skillIcon && <span>{skillEntry.skillIcon}</span>}
                     <span>{skillEntry.skillName}</span>
+                  </div>
+                )}
+                {counterEntry && counterEntry.source === eu.name && (
+                  <div className="ba-skill-indicator counter">
+                    <span>🔄</span>
+                    <span>반격</span>
                   </div>
                 )}
                 <div className="ba-popup-area">

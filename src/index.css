@@ -407,6 +407,10 @@ body {
   animation: skillPopIn 0.25s ease-out;
   z-index: 10;
 }
+.ba-skill-indicator.counter {
+  border-color: #64b5f6;
+  color: #64b5f6;
+}
 
 @keyframes skillPopIn {
   0% { opacity: 0; transform: translateX(-50%) scale(0.6); }
