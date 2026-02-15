@@ -163,7 +163,7 @@ export class Battle {
   private processRageAttack(attacker: BattleUnit, defender: BattleUnit): void {
     if (!defender.isAlive()) return;
 
-    const rageDamage = Math.floor(attacker.getEffectiveAtk() * 2.0 * attacker.rageDamageMultiplier);
+    const rageDamage = Math.floor(attacker.getEffectiveAtk() * 1.2 * attacker.rageDamageMultiplier);
     const dealt = defender.takeDamage(rageDamage);
     this.log.add({
       turn: this.turnCount, type: BattleLogType.RAGE_ATTACK,
