@@ -347,7 +347,9 @@ export function ChapterScreen() {
     b: Battle,
     playerName: string,
     enemyNames: string[],
-  ): Promise<RunningHps> {
+    prevPlayerUnit: BattleUnit,
+    prevEnemyUnits: BattleUnit[],
+  ): Promise<{ hps: RunningHps; player: BattleUnit; enemies: BattleUnit[] }> {
     const newHps = computeMidTurnHp(
       runningHps, hitGroup, playerName,
       b.player.maxHp,
@@ -359,37 +361,57 @@ export function ChapterScreen() {
 
     setAttackPhase(`${side}-approach`);
     await delay(PHASE_DURATION.approach / speed);
-    if (cancelledRef.current) return newHps;
+    if (cancelledRef.current) return { hps: newHps, player: prevPlayerUnit, enemies: prevEnemyUnits };
 
     setDamageEntries(hitGroup);
-    const midPlayer = cloneUnit(b.player);
+    const midPlayer = cloneUnit(prevPlayerUnit);
     midPlayer.currentHp = newHps.playerHp;
-    const midEnemies = b.enemies.map((e, i) => {
-      const clone = cloneUnit(e);
+
+    const hasRageEntry = hitGroup.some(e => e.type === BattleLogType.RAGE_ATTACK);
+
+    const midEnemies = prevEnemyUnits.map((prev, i) => {
+      const clone = cloneUnit(prev);
       clone.currentHp = newHps.enemyHps[i];
+      if (side === 'enemy') {
+        const eName = enemyNames[i];
+        const isAttacker = hitGroup.some(e => e.source === eName);
+        if (isAttacker) {
+          clone.rage = b.enemies[i].rage;
+          if (hasRageEntry && hitGroup.some(e => e.source === eName && e.type === BattleLogType.RAGE_ATTACK)) {
+            clone.rage = 0;
+          }
+        }
+      }
       return clone;
     });
+
+    if (side === 'player') {
+      midPlayer.rage = b.player.rage;
+    }
+
     setPlayerUnit(midPlayer);
     setEnemyUnits(midEnemies);
     setAttackPhase(`${side}-hit`);
     await delay(PHASE_DURATION.hit / speed);
-    if (cancelledRef.current) return newHps;
+    if (cancelledRef.current) return { hps: newHps, player: midPlayer, enemies: midEnemies };
 
     setAttackPhase(`${side}-retreat`);
     await delay(PHASE_DURATION.retreat / speed);
-    if (cancelledRef.current) return newHps;
+    if (cancelledRef.current) return { hps: newHps, player: midPlayer, enemies: midEnemies };
 
     setDamageEntries([]);
     setAttackPhase('idle');
     await delay(PHASE_DURATION.pause / speed);
 
-    return newHps;
+    return { hps: newHps, player: midPlayer, enemies: midEnemies };
   }
 
   async function animateTurn(b: Battle, playerName: string) {
     if (cancelledRef.current) return;
 
     const enemyNames = b.enemies.map(e => e.name);
+    const prevPlayerRage = b.player.rage;
+    const prevEnemyRages = b.enemies.map(e => e.rage);
 
     const result = b.executeTurn();
     setTurnCount(result.turnNumber);
@@ -436,6 +458,11 @@ export function ChapterScreen() {
       return -delta;
     }
 
+    let curPlayer = cloneUnit(b.player);
+    let curEnemies = b.enemies.map(e => cloneUnit(e));
+    curPlayer.rage = prevPlayerRage;
+    curEnemies.forEach((ce, i) => { ce.rage = prevEnemyRages[i]; });
+
     if (playerEntries.length > 0 && !cancelledRef.current) {
       const targetEnemy = playerEntries[0]?.target;
       const targetIdx = enemyNames.indexOf(targetEnemy);
@@ -446,7 +473,10 @@ export function ChapterScreen() {
         if (cancelledRef.current) break;
         const targetHpIdx = enemyNames.indexOf(group[0]?.target ?? '');
         if (targetHpIdx >= 0 && running.enemyHps[targetHpIdx] <= 0) break;
-        running = await animateHitGroup(group, 'player', running, b, playerName, enemyNames);
+        const res = await animateHitGroup(group, 'player', running, b, playerName, enemyNames, curPlayer, curEnemies);
+        running = res.hps;
+        curPlayer = res.player;
+        curEnemies = res.enemies;
       }
     }
 
@@ -458,7 +488,10 @@ export function ChapterScreen() {
       const groups = splitToAnimationGroups(entries);
       for (const group of groups) {
         if (cancelledRef.current || running.playerHp <= 0) break;
-        running = await animateHitGroup(group, 'enemy', running, b, playerName, enemyNames);
+        const res = await animateHitGroup(group, 'enemy', running, b, playerName, enemyNames, curPlayer, curEnemies);
+        running = res.hps;
+        curPlayer = res.player;
+        curEnemies = res.enemies;
       }
     }
 
