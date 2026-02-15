@@ -189,6 +189,36 @@ docs/04_스킬시스템.md (흡혈 스킬 효과 상세화)
 docs/화면기획문서/모험화면_기획서.md (딜 그래프 항목 추가)
 ```
 
+- **분노(Rage) 게이지 시스템 구현**
+  - 원작 카피바라고의 분노 시스템 반영
+  - BattleUnit: rage/maxRage/ragePerAttack/bonusRagePerAttack/rageDamageMultiplier 필드 추가
+  - Battle: processAttack 끝에 분노 충전, processRageAttack(ATK×2.0×multiplier), processOnRageSkills
+  - EffectType: RAGE_POWER/RAGE_BOOST, TriggerCondition: ON_RAGE, BattleLogType: RAGE_ATTACK 추가
+  - rage_mastery 변경: ATK_UP 버프 → RAGE_POWER (분노 공격 데미지 +100%)
+  - complete_rage_mastery 추가: RAGE_BOOST (게이지 2배속 충전)
+  - 분노 공격 스킬 3종 추가: rage_lightning(⚡30), rage_lance(🔱35), rage_flame_wave(🔥25)
+  - BattleArena: 플레이어 HP 바 아래 분노 게이지 바 (주황→빨강 그라데이션)
+  - ChapterScreen: RAGE_ATTACK 딜 그래프/애니메이션 처리
+  - SYNERGY_MAP 업데이트 (SKULL/KNIGHT/GHOST에 분노 스킬 추가)
+
+### 생성된 파일
+(없음)
+
+### 수정된 파일
+```
+src/domain/enums/index.ts (RAGE_POWER, RAGE_BOOST, ON_RAGE 추가)
+src/domain/battle/BattleLog.ts (RAGE_ATTACK 추가)
+src/domain/battle/BattleUnit.ts (분노 필드 5종, 패시브 처리)
+src/domain/battle/Battle.ts (processRageAttack, processOnRageSkills)
+src/domain/data/SkillTable.ts (rage_mastery 변경, 5종 스킬 추가/수정)
+src/presentation/components/BattleArena.tsx (분노 게이지 바, RAGE_ATTACK 팝업)
+src/presentation/screens/ChapterScreen.tsx (RAGE_ATTACK 딜그래프/애니메이션)
+src/index.css (분노 게이지/팝업 스타일)
+docs/01_전투시스템.md (분노 시스템 섹션 추가)
+docs/04_스킬시스템.md (분노 스킬 추가/변경)
+docs/화면기획문서/모험화면_기획서.md (분노 게이지, RAGE_ATTACK 팝업)
+```
+
 ### 누적 현황
 - 테스트: 19개 파일, 142개 테스트 전부 통과
 - tsc 타입 체크 통과

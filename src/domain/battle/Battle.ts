@@ -69,6 +69,14 @@ export class Battle {
     }
 
     this.processOnAttackDebuffs(attacker, defender);
+
+    if (defender.isAlive() && attacker.ragePerAttack > 0) {
+      attacker.rage += attacker.ragePerAttack + attacker.bonusRagePerAttack;
+      if (attacker.rage >= attacker.maxRage) {
+        attacker.rage = 0;
+        this.processRageAttack(attacker, defender);
+      }
+    }
   }
 
   private processSingleHit(attacker: BattleUnit, defender: BattleUnit): void {
@@ -115,6 +123,39 @@ export class Battle {
 
   private processOnAttackSkills(attacker: BattleUnit, defender: BattleUnit): void {
     const skills = attacker.getSkillsByTrigger(TriggerCondition.ON_ATTACK);
+    for (const skill of skills) {
+      if (!defender.isAlive()) break;
+
+      if (skill.effect.type === EffectType.DAMAGE) {
+        const skillDamage = Math.floor(skill.effect.value + attacker.getEffectiveAtk() * 0.3);
+        const dealt = defender.takeDamage(skillDamage);
+        this.log.add({
+          turn: this.turnCount, type: BattleLogType.SKILL_DAMAGE,
+          source: attacker.name, target: defender.name, value: dealt,
+          skillName: skill.name, skillIcon: skill.icon,
+          message: `${attacker.name}'s ${skill.name} deals ${dealt}`,
+        });
+      }
+    }
+  }
+
+  private processRageAttack(attacker: BattleUnit, defender: BattleUnit): void {
+    if (!defender.isAlive()) return;
+
+    const rageDamage = Math.floor(attacker.getEffectiveAtk() * 2.0 * attacker.rageDamageMultiplier);
+    const dealt = defender.takeDamage(rageDamage);
+    this.log.add({
+      turn: this.turnCount, type: BattleLogType.RAGE_ATTACK,
+      source: attacker.name, target: defender.name, value: dealt,
+      skillName: '분노 공격', skillIcon: '💢',
+      message: `${attacker.name} RAGE ATTACK ${defender.name} for ${dealt}`,
+    });
+
+    this.processOnRageSkills(attacker, defender);
+  }
+
+  private processOnRageSkills(attacker: BattleUnit, defender: BattleUnit): void {
+    const skills = attacker.getSkillsByTrigger(TriggerCondition.ON_RAGE);
     for (const skill of skills) {
       if (!defender.isAlive()) break;
 

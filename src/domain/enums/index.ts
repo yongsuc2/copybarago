@@ -116,6 +116,8 @@ export enum EffectType {
   LIFESTEAL = 'LIFESTEAL',
   COUNTER = 'COUNTER',
   MULTI_HIT = 'MULTI_HIT',
+  RAGE_POWER = 'RAGE_POWER',
+  RAGE_BOOST = 'RAGE_BOOST',
 }
 
 export enum TriggerCondition {
@@ -124,6 +126,7 @@ export enum TriggerCondition {
   ON_HIT = 'ON_HIT',
   PASSIVE = 'PASSIVE',
   ON_DEATH = 'ON_DEATH',
+  ON_RAGE = 'ON_RAGE',
 }
 
 export enum StatusEffectType {

@@ -320,6 +320,34 @@ body {
 .ba-damage-popup.damage { color: #ff5252; }
 .ba-damage-popup.heal { color: #69f0ae; }
 .ba-damage-popup.crit { color: #ffd740; font-size: 20px; }
+.ba-damage-popup.rage { color: #ff6b00; font-size: 20px; text-shadow: 0 0 6px rgba(255, 107, 0, 0.6); }
+
+.ba-rage-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  width: 100%;
+}
+.ba-rage-bar {
+  flex: 1;
+  height: 5px;
+  background: #333;
+  border-radius: 3px;
+  overflow: hidden;
+  min-width: 60px;
+}
+.ba-rage-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff6b00, #ff0000);
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+.ba-rage-label {
+  font-size: 9px;
+  color: #ff6b00;
+  white-space: nowrap;
+}
 
 .ba-skill-indicator {
   position: absolute;

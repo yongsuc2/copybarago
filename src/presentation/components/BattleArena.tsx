@@ -10,6 +10,7 @@ interface DamagePopup {
   value: number;
   isHeal: boolean;
   isCrit: boolean;
+  isRage: boolean;
   side: 'player' | 'enemy';
 }
 
@@ -42,7 +43,8 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
         || entry.type === BattleLogType.SKILL_DAMAGE
         || entry.type === BattleLogType.COUNTER
         || entry.type === BattleLogType.CRIT
-        || entry.type === BattleLogType.DOT_DAMAGE;
+        || entry.type === BattleLogType.DOT_DAMAGE
+        || entry.type === BattleLogType.RAGE_ATTACK;
 
       if (!isDamageType && !isHealType) continue;
       if (entry.value === 0) continue;
@@ -53,6 +55,7 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
         value: entry.value,
         isHeal: isHealType,
         isCrit: entry.type === BattleLogType.CRIT,
+        isRage: entry.type === BattleLogType.RAGE_ATTACK,
         side: targetIsPlayer ? 'player' : 'enemy',
       });
     }
@@ -99,7 +102,7 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
             {playerPopups.map(p => (
               <span
                 key={p.id}
-                className={`ba-damage-popup ${p.isHeal ? 'heal' : 'damage'} ${p.isCrit ? 'crit' : ''}`}
+                className={`ba-damage-popup ${p.isHeal ? 'heal' : 'damage'} ${p.isCrit ? 'crit' : ''} ${p.isRage ? 'rage' : ''}`}
               >
                 {p.isHeal ? '+' : '-'}{formatNumber(p.value)}
               </span>
@@ -112,6 +115,14 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
             </div>
             <span className="ba-power">{formatNumber(playerUnit.maxHp)}</span>
           </div>
+          {playerUnit.isPlayer && playerUnit.ragePerAttack > 0 && (
+            <div className="ba-rage-bar-wrap">
+              <div className="ba-rage-bar">
+                <div className="ba-rage-fill" style={{ width: `${(playerUnit.rage / playerUnit.maxRage) * 100}%` }} />
+              </div>
+              <span className="ba-rage-label">💢 {playerUnit.rage}/{playerUnit.maxRage}</span>
+            </div>
+          )}
         </div>
 
         <div className="ba-vs">대</div>
@@ -127,7 +138,7 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
             {enemyPopups.map(p => (
               <span
                 key={p.id}
-                className={`ba-damage-popup ${p.isHeal ? 'heal' : 'damage'} ${p.isCrit ? 'crit' : ''}`}
+                className={`ba-damage-popup ${p.isHeal ? 'heal' : 'damage'} ${p.isCrit ? 'crit' : ''} ${p.isRage ? 'rage' : ''}`}
               >
                 {p.isHeal ? '+' : '-'}{formatNumber(p.value)}
               </span>

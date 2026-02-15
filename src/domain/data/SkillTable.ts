@@ -59,8 +59,24 @@ const ALL_SKILLS: Skill[] = [
     '치명타 확률 15% 증가'),
 
   new Skill('rage_mastery', 'Rage Mastery', '💢', SkillGrade.LEGENDARY, SkillCategory.MASTERY,
-    [HeritageRoute.SKULL, HeritageRoute.KNIGHT], makeEffect(EffectType.BUFF, 0.2, 99, StatusEffectType.ATK_UP), TriggerCondition.PASSIVE,
-    '공격력 20% 증가'),
+    [HeritageRoute.SKULL, HeritageRoute.KNIGHT], makeEffect(EffectType.RAGE_POWER, 1.0), TriggerCondition.PASSIVE,
+    '분노 공격 데미지 100% 증가'),
+
+  new Skill('complete_rage_mastery', 'Complete Rage Mastery', '🔥', SkillGrade.LEGENDARY, SkillCategory.MASTERY,
+    [HeritageRoute.SKULL, HeritageRoute.KNIGHT], makeEffect(EffectType.RAGE_BOOST, 25), TriggerCondition.PASSIVE,
+    '분노 게이지 충전량 2배'),
+
+  new Skill('rage_lightning', 'Rage Lightning', '⚡', SkillGrade.NORMAL, SkillCategory.ATTACK,
+    [HeritageRoute.GHOST], makeEffect(EffectType.DAMAGE, 30), TriggerCondition.ON_RAGE,
+    '분노 공격 시 번개로 30의 추가 피해'),
+
+  new Skill('rage_lance', 'Rage Lance', '🔱', SkillGrade.NORMAL, SkillCategory.ATTACK,
+    [HeritageRoute.KNIGHT], makeEffect(EffectType.DAMAGE, 35), TriggerCondition.ON_RAGE,
+    '분노 공격 시 광창으로 35의 추가 피해'),
+
+  new Skill('rage_flame_wave', 'Rage Flame Wave', '🔥', SkillGrade.NORMAL, SkillCategory.ATTACK,
+    [], makeEffect(EffectType.DAMAGE, 25), TriggerCondition.ON_RAGE,
+    '분노 공격 시 화염파로 25의 추가 피해'),
 
   new Skill('shrink_magic', 'Shrink Magic', '🔮', SkillGrade.LEGENDARY, SkillCategory.DEBUFF,
     [], makeEffect(EffectType.DEBUFF, 0.2, 3, StatusEffectType.ATK_DOWN), TriggerCondition.TURN_START,
@@ -116,10 +132,10 @@ const ALL_SKILLS: Skill[] = [
 ];
 
 const SYNERGY_MAP: Record<HeritageRoute, string[]> = {
-  [HeritageRoute.SKULL]: ['sword_aura', 'multi_hit_mastery', 'rage_mastery', 'tyrant'],
-  [HeritageRoute.KNIGHT]: ['lance', 'counter', 'rage_mastery'],
+  [HeritageRoute.SKULL]: ['sword_aura', 'multi_hit_mastery', 'rage_mastery', 'complete_rage_mastery', 'tyrant'],
+  [HeritageRoute.KNIGHT]: ['lance', 'counter', 'rage_mastery', 'complete_rage_mastery', 'rage_lance'],
   [HeritageRoute.RANGER]: ['shuriken', 'crit_mastery', 'crit_proficiency'],
-  [HeritageRoute.GHOST]: ['lightning', 'thunderstorm'],
+  [HeritageRoute.GHOST]: ['lightning', 'thunderstorm', 'rage_lightning'],
 };
 
 export const SkillTable = {

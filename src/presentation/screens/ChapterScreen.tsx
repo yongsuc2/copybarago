@@ -36,6 +36,7 @@ function isDamageOrHeal(type: BattleLogType): boolean {
     || type === BattleLogType.COUNTER
     || type === BattleLogType.CRIT
     || type === BattleLogType.DOT_DAMAGE
+    || type === BattleLogType.RAGE_ATTACK
     || type === BattleLogType.LIFESTEAL
     || type === BattleLogType.HOT_HEAL
     || type === BattleLogType.REVIVE;
@@ -51,6 +52,8 @@ function splitToAnimationGroups(entries: BattleLogEntry[]): BattleLogEntry[][] {
       } else {
         groups.push([entry]);
       }
+    } else if (entry.type === BattleLogType.RAGE_ATTACK) {
+      groups.push([entry]);
     } else {
       groups.push([entry]);
     }
@@ -89,13 +92,17 @@ export function ChapterScreen() {
       const isDmgType = entry.type === BattleLogType.ATTACK
         || entry.type === BattleLogType.CRIT
         || entry.type === BattleLogType.SKILL_DAMAGE
-        || entry.type === BattleLogType.COUNTER;
+        || entry.type === BattleLogType.COUNTER
+        || entry.type === BattleLogType.RAGE_ATTACK;
       const isDot = entry.type === BattleLogType.DOT_DAMAGE;
 
       if (isDmgType && entry.source === playerName && entry.target !== playerName) {
         let key: string;
         let icon: string;
-        if (entry.type === BattleLogType.SKILL_DAMAGE && entry.skillName) {
+        if (entry.type === BattleLogType.RAGE_ATTACK) {
+          key = '분노 공격';
+          icon = '💢';
+        } else if (entry.type === BattleLogType.SKILL_DAMAGE && entry.skillName) {
           key = entry.skillName;
           icon = entry.skillIcon ?? '✨';
         } else if (entry.type === BattleLogType.COUNTER) {

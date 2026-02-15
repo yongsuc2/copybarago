@@ -17,6 +17,11 @@ export class BattleUnit {
   multiHitChance: number;
   lifestealRate: number;
   counterRate: number;
+  rage: number;
+  maxRage: number;
+  ragePerAttack: number;
+  bonusRagePerAttack: number;
+  rageDamageMultiplier: number;
 
   constructor(
     name: string,
@@ -37,6 +42,11 @@ export class BattleUnit {
     this.multiHitChance = 0;
     this.lifestealRate = 0;
     this.counterRate = 0;
+    this.rage = 0;
+    this.maxRage = 100;
+    this.ragePerAttack = isPlayer ? 25 : 0;
+    this.bonusRagePerAttack = 0;
+    this.rageDamageMultiplier = 1.0;
 
     this.applyPassiveSkills();
   }
@@ -51,6 +61,12 @@ export class BattleUnit {
           break;
         case EffectType.LIFESTEAL:
           this.lifestealRate += skill.effect.value;
+          break;
+        case EffectType.RAGE_POWER:
+          this.rageDamageMultiplier += skill.effect.value;
+          break;
+        case EffectType.RAGE_BOOST:
+          this.bonusRagePerAttack += skill.effect.value;
           break;
         case EffectType.BUFF:
           if (skill.effect.statusEffectType && skill.effect.duration > 0) {
@@ -188,6 +204,12 @@ export class BattleUnit {
         break;
       case EffectType.LIFESTEAL:
         this.lifestealRate += skill.effect.value;
+        break;
+      case EffectType.RAGE_POWER:
+        this.rageDamageMultiplier += skill.effect.value;
+        break;
+      case EffectType.RAGE_BOOST:
+        this.bonusRagePerAttack += skill.effect.value;
         break;
       case EffectType.BUFF:
         if (skill.effect.statusEffectType && skill.effect.duration > 0) {
