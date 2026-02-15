@@ -20,6 +20,7 @@ export class Resources {
       this.amounts.set(type, 0);
     }
     this.amounts.set(ResourceType.STAMINA, this.staminaMax);
+    this.amounts.set(ResourceType.GOLD, 500);
   }
 
   get(type: ResourceType): number {
