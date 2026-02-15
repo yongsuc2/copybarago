@@ -50,6 +50,10 @@ const ALL_SKILLS: Skill[] = [
     [HeritageRoute.KNIGHT], makeEffect(EffectType.COUNTER, 0.5), TriggerCondition.ON_HIT,
     '피격 시 받은 피해의 50%를 반격'),
 
+  new Skill('iron_shield', 'Iron Shield', '🔰', SkillGrade.NORMAL, SkillCategory.SURVIVAL,
+    [], makeEffect(EffectType.SHIELD, 0.3), TriggerCondition.PASSIVE,
+    '최대 체력의 30%만큼 방어막 생성'),
+
   new Skill('multi_hit_mastery', 'Multi-Hit Mastery', '💫', SkillGrade.LEGENDARY, SkillCategory.MASTERY,
     [HeritageRoute.SKULL], makeEffect(EffectType.MULTI_HIT, 0.5), TriggerCondition.PASSIVE,
     '공격 시 50% 확률로 추가 타격'),

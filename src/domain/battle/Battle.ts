@@ -9,24 +9,33 @@ export interface TurnResult {
   state: BattleState;
   playerHp: number;
   enemyHp: number;
+  enemyHps: number[];
   entries: BattleLogEntry[];
 }
 
 export class Battle {
   player: BattleUnit;
-  enemy: BattleUnit;
+  enemies: BattleUnit[];
   turnCount: number;
   state: BattleState;
   log: BattleLog;
   private rng: SeededRandom;
 
-  constructor(player: BattleUnit, enemy: BattleUnit, seed: number = Date.now()) {
+  constructor(player: BattleUnit, enemies: BattleUnit | BattleUnit[], seed: number = Date.now()) {
     this.player = player;
-    this.enemy = enemy;
+    this.enemies = Array.isArray(enemies) ? enemies : [enemies];
     this.turnCount = 0;
     this.state = BattleState.IN_PROGRESS;
     this.log = new BattleLog();
     this.rng = new SeededRandom(seed);
+  }
+
+  get enemy(): BattleUnit {
+    return this.enemies[0];
+  }
+
+  private getFirstAliveEnemy(): BattleUnit | null {
+    return this.enemies.find(e => e.isAlive()) ?? null;
   }
 
   executeTurn(): TurnResult {
@@ -42,20 +51,32 @@ export class Battle {
       message: `Turn ${this.turnCount}`,
     });
 
-    this.processTurnStartSkills(this.player, this.enemy);
-    if (this.checkDeath()) return this.buildTurnResult();
+    for (const enemy of this.enemies) {
+      if (!enemy.isAlive()) continue;
+      this.processTurnStartSkills(this.player, enemy);
+      if (this.checkDeath()) return this.buildTurnResult();
+      this.processTurnStartSkills(enemy, this.player);
+      if (this.checkDeath()) return this.buildTurnResult();
+    }
 
-    this.processTurnStartSkills(this.enemy, this.player);
-    if (this.checkDeath()) return this.buildTurnResult();
+    const target = this.getFirstAliveEnemy();
+    if (target && this.player.isAlive()) {
+      this.processAttack(this.player, target);
+      if (this.checkDeath()) return this.buildTurnResult();
+    }
 
-    this.processAttack(this.player, this.enemy);
-    if (this.checkDeath()) return this.buildTurnResult();
-
-    this.processAttack(this.enemy, this.player);
-    if (this.checkDeath()) return this.buildTurnResult();
+    for (const enemy of this.enemies) {
+      if (!enemy.isAlive() || !this.player.isAlive()) continue;
+      this.processAttack(enemy, this.player);
+      if (this.checkDeath()) return this.buildTurnResult();
+    }
 
     this.processStatusEffects(this.player);
-    this.processStatusEffects(this.enemy);
+    for (const enemy of this.enemies) {
+      if (enemy.isAlive()) {
+        this.processStatusEffects(enemy);
+      }
+    }
     this.checkDeath();
 
     return this.buildTurnResult();
@@ -260,13 +281,23 @@ export class Battle {
   }
 
   private checkDeath(): boolean {
-    if (!this.enemy.isAlive()) {
+    const allEnemiesDead = this.enemies.every(e => !e.isAlive());
+    if (allEnemiesDead) {
       this.state = BattleState.VICTORY;
-      this.log.add({
-        turn: this.turnCount, type: BattleLogType.DEATH,
-        source: '', target: this.enemy.name, value: 0,
-        message: `${this.enemy.name} defeated`,
-      });
+      for (const enemy of this.enemies) {
+        if (!enemy.isAlive()) {
+          const alreadyLogged = this.log.entries.some(
+            e => e.type === BattleLogType.DEATH && e.target === enemy.name
+          );
+          if (!alreadyLogged) {
+            this.log.add({
+              turn: this.turnCount, type: BattleLogType.DEATH,
+              source: '', target: enemy.name, value: 0,
+              message: `${enemy.name} defeated`,
+            });
+          }
+        }
+      }
       return true;
     }
 
@@ -299,7 +330,8 @@ export class Battle {
       turnNumber: this.turnCount,
       state: this.state,
       playerHp: this.player.currentHp,
-      enemyHp: this.enemy.currentHp,
+      enemyHp: this.enemies[0].currentHp,
+      enemyHps: this.enemies.map(e => e.currentHp),
       entries: this.log.getEntriesForTurn(this.turnCount),
     };
   }

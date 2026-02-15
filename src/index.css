@@ -349,6 +349,45 @@ body {
   white-space: nowrap;
 }
 
+.ba-enemies {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.ba-shield-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  width: 100%;
+}
+.ba-shield-bar {
+  flex: 1;
+  height: 5px;
+  background: #333;
+  border-radius: 3px;
+  overflow: hidden;
+  min-width: 60px;
+}
+.ba-shield-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4da6ff, #2196f3);
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+.ba-shield-label {
+  font-size: 9px;
+  color: #4da6ff;
+  white-space: nowrap;
+}
+
+.ba-dead {
+  opacity: 0.3;
+  filter: grayscale(1);
+  pointer-events: none;
+}
+
 .ba-skill-indicator {
   position: absolute;
   top: -44px;
@@ -820,3 +859,48 @@ body {
 }
 .dg-value span { font-size: 11px; font-weight: bold; color: #fff; }
 .dg-pct { color: #aaa !important; font-weight: normal !important; font-size: 10px !important; }
+
+.golden-chest-overlay {
+  text-align: center;
+  padding: 16px;
+}
+.golden-chest-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+.golden-chest-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffd700;
+  margin-bottom: 4px;
+}
+.golden-chest-sub {
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 16px;
+}
+.golden-chest-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.golden-chest-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #1a1a2e;
+  border: 1px solid #ffd700;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+}
+.golden-chest-option:hover {
+  background: #2a2a4e;
+}
+.golden-chest-skill-icon {
+  font-size: 28px;
+  min-width: 36px;
+  text-align: center;
+}

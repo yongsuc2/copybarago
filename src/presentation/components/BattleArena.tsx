@@ -12,6 +12,7 @@ interface DamagePopup {
   isCrit: boolean;
   isRage: boolean;
   side: 'player' | 'enemy';
+  enemyIndex: number;
 }
 
 let popupIdCounter = 0;
@@ -20,15 +21,17 @@ export type AttackPhase = 'idle' | 'player-approach' | 'player-hit' | 'player-re
 
 interface BattleArenaProps {
   playerUnit: BattleUnit;
-  enemyUnit: BattleUnit;
+  enemyUnits: BattleUnit[];
   attackPhase: AttackPhase;
   damageEntries: BattleLogEntry[];
   turnCount: number;
   maxTurns: number;
   isBoss: boolean;
+  battleLabel?: string;
+  activeEnemyIndex?: number;
 }
 
-export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries, turnCount, maxTurns, isBoss }: BattleArenaProps) {
+export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries, turnCount, maxTurns, isBoss, battleLabel, activeEnemyIndex = 0 }: BattleArenaProps) {
   const [popups, setPopups] = useState<DamagePopup[]>([]);
 
   useEffect(() => {
@@ -50,6 +53,12 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
       if (entry.value === 0) continue;
 
       const targetIsPlayer = entry.target === playerUnit.name;
+      let eIdx = -1;
+      if (!targetIsPlayer) {
+        eIdx = enemyUnits.findIndex(e => e.name === entry.target);
+        if (eIdx < 0) eIdx = 0;
+      }
+
       newPopups.push({
         id: ++popupIdCounter,
         value: entry.value,
@@ -57,22 +66,18 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
         isCrit: entry.type === BattleLogType.CRIT,
         isRage: entry.type === BattleLogType.RAGE_ATTACK,
         side: targetIsPlayer ? 'player' : 'enemy',
+        enemyIndex: eIdx,
       });
     }
 
     setPopups(newPopups);
     const timer = setTimeout(() => setPopups([]), 600);
     return () => clearTimeout(timer);
-  }, [damageEntries, playerUnit.name]);
+  }, [damageEntries, playerUnit.name, enemyUnits]);
 
   const playerHpPct = playerUnit.maxHp > 0 ? (playerUnit.currentHp / playerUnit.maxHp) * 100 : 0;
-  const enemyHpPct = enemyUnit.maxHp > 0 ? (enemyUnit.currentHp / enemyUnit.maxHp) * 100 : 0;
-
   const playerType = getCharacterType(playerUnit.name);
-  const enemyType = getCharacterType(enemyUnit.name);
-
   const playerPopups = popups.filter(p => p.side === 'player');
-  const enemyPopups = popups.filter(p => p.side === 'enemy');
 
   const isPlayerApproach = attackPhase === 'player-approach' || attackPhase === 'player-hit';
   const isEnemyApproach = attackPhase === 'enemy-approach' || attackPhase === 'enemy-hit';
@@ -83,10 +88,12 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
   const attackerIsPlayer = attackPhase.startsWith('player-');
   const attackerIsEnemy = attackPhase.startsWith('enemy-');
 
+  const spriteSize = enemyUnits.length > 1 ? 56 : 72;
+
   return (
     <div className="battle-arena">
       <div className="ba-turn-counter">
-        {isBoss && <span className="ba-boss-badge">보스</span>}
+        {battleLabel && <span className="ba-boss-badge">{battleLabel}</span>}
         <span>턴 {turnCount}/{maxTurns}</span>
       </div>
 
@@ -115,7 +122,7 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
             </div>
             <span className="ba-power">{formatNumber(playerUnit.maxHp)}</span>
           </div>
-          {playerUnit.isPlayer && playerUnit.ragePerAttack > 0 && (
+          {playerUnit.ragePerAttack > 0 && (
             <div className="ba-rage-bar-wrap">
               <div className="ba-rage-bar">
                 <div className="ba-rage-fill" style={{ width: `${(playerUnit.rage / playerUnit.maxRage) * 100}%` }} />
@@ -127,30 +134,60 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
 
         <div className="ba-vs">대</div>
 
-        <div className={`ba-character ${isEnemyApproach ? 'ba-move-left' : ''} ${isEnemyHit ? 'ba-hit' : ''}`}>
-          {skillEntry && attackerIsEnemy && (
-            <div className="ba-skill-indicator">
-              {skillEntry.skillIcon && <span>{skillEntry.skillIcon}</span>}
-              <span>{skillEntry.skillName}</span>
-            </div>
-          )}
-          <div className="ba-popup-area">
-            {enemyPopups.map(p => (
-              <span
-                key={p.id}
-                className={`ba-damage-popup ${p.isHeal ? 'heal' : 'damage'} ${p.isCrit ? 'crit' : ''} ${p.isRage ? 'rage' : ''}`}
-              >
-                {p.isHeal ? '+' : '-'}{formatNumber(p.value)}
-              </span>
-            ))}
-          </div>
-          <CharacterSprite type={enemyType} size={72} isBoss={isBoss} />
-          <div className="ba-hp-bar-wrap">
-            <div className="ba-hp-bar">
-              <div className="ba-hp-fill enemy" style={{ width: `${enemyHpPct}%` }} />
-            </div>
-            <span className="ba-power">{formatNumber(enemyUnit.maxHp)}</span>
-          </div>
+        <div className="ba-enemies">
+          {enemyUnits.map((eu, i) => {
+            const eHpPct = eu.maxHp > 0 ? (eu.currentHp / eu.maxHp) * 100 : 0;
+            const eType = getCharacterType(eu.name);
+            const ePopups = popups.filter(p => p.side === 'enemy' && p.enemyIndex === i);
+            const isActive = i === activeEnemyIndex;
+            const thisApproach = isEnemyApproach && isActive;
+            const thisHit = isEnemyHit && isActive;
+            const isDead = eu.currentHp <= 0;
+
+            return (
+              <div key={i} className={`ba-character ${thisApproach ? 'ba-move-left' : ''} ${thisHit ? 'ba-hit' : ''} ${isDead ? 'ba-dead' : ''}`}>
+                {skillEntry && attackerIsEnemy && isActive && (
+                  <div className="ba-skill-indicator">
+                    {skillEntry.skillIcon && <span>{skillEntry.skillIcon}</span>}
+                    <span>{skillEntry.skillName}</span>
+                  </div>
+                )}
+                <div className="ba-popup-area">
+                  {ePopups.map(p => (
+                    <span
+                      key={p.id}
+                      className={`ba-damage-popup ${p.isHeal ? 'heal' : 'damage'} ${p.isCrit ? 'crit' : ''} ${p.isRage ? 'rage' : ''}`}
+                    >
+                      {p.isHeal ? '+' : '-'}{formatNumber(p.value)}
+                    </span>
+                  ))}
+                </div>
+                <CharacterSprite type={eType} size={spriteSize} isBoss={isBoss && enemyUnits.length === 1} />
+                {eu.shield > 0 && (
+                  <div className="ba-shield-bar-wrap">
+                    <div className="ba-shield-bar">
+                      <div className="ba-shield-fill" style={{ width: `${Math.min(100, (eu.shield / eu.maxHp) * 100)}%` }} />
+                    </div>
+                    <span className="ba-shield-label">🔰 {formatNumber(eu.shield)}</span>
+                  </div>
+                )}
+                <div className="ba-hp-bar-wrap">
+                  <div className="ba-hp-bar">
+                    <div className="ba-hp-fill enemy" style={{ width: `${eHpPct}%` }} />
+                  </div>
+                  <span className="ba-power">{formatNumber(eu.maxHp)}</span>
+                </div>
+                {eu.ragePerAttack > 0 && (
+                  <div className="ba-rage-bar-wrap">
+                    <div className="ba-rage-bar">
+                      <div className="ba-rage-fill" style={{ width: `${(eu.rage / eu.maxRage) * 100}%` }} />
+                    </div>
+                    <span className="ba-rage-label">💢 {eu.rage}/{eu.maxRage}</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

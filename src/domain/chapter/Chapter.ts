@@ -91,6 +91,11 @@ export class Chapter {
       return null;
     }
 
+    if (this.isEliteDay() || this.isMidBossDay()) {
+      this.currentEncounter = null;
+      return null;
+    }
+
     const existingIds = this.sessionSkills.map(s => s.id);
     const threshold = EncounterDataTable.counterThreshold;
 
@@ -163,12 +168,47 @@ export class Chapter {
       return null;
     }
 
-    const enemyId = EnemyTable.getRandomEnemyId();
-    const template = EnemyTemplate.fromId(enemyId);
+    const pool = EnemyTable.getChapterEnemyPool();
+    const idx1 = this.rng.nextInt(0, pool.length - 1);
+    const id1 = pool[idx1];
+    const template1 = EnemyTemplate.fromId(id1);
+    if (!template1) return null;
+
+    const isDual = this.rng.chance(0.5);
+    if (isDual) {
+      const remaining = pool.filter(id => id !== id1);
+      const idx2 = this.rng.nextInt(0, remaining.length - 1);
+      const template2 = EnemyTemplate.fromId(remaining[idx2]);
+      if (template2) {
+        const e1 = template1.createInstance(this.id, 0.7);
+        const e2 = template2.createInstance(this.id, 0.7);
+        this.currentBattle = new Battle(playerUnit, [e1, e2], this.rng.nextInt(0, 999999));
+        return this.currentBattle;
+      }
+    }
+
+    const enemy = template1.createInstance(this.id);
+    this.currentBattle = new Battle(playerUnit, enemy, this.rng.nextInt(0, 999999));
+    return this.currentBattle;
+  }
+
+  createEliteBattle(playerUnit: BattleUnit): Battle | null {
+    const eliteId = EnemyTable.getRandomEliteId();
+    const template = EnemyTemplate.fromId(eliteId);
     if (!template) return null;
 
-    const enemy = template.createInstance(this.id);
-    this.currentBattle = new Battle(playerUnit, enemy, this.rng.nextInt(0, 999999));
+    const elite = template.createInstance(this.id);
+    this.currentBattle = new Battle(playerUnit, elite, this.rng.nextInt(0, 999999));
+    return this.currentBattle;
+  }
+
+  createMidBossBattle(playerUnit: BattleUnit): Battle | null {
+    const bossId = EnemyTable.getRandomBossId();
+    const template = EnemyTemplate.fromId(bossId);
+    if (!template) return null;
+
+    const boss = template.createInstance(this.id);
+    this.currentBattle = new Battle(playerUnit, boss, this.rng.nextInt(0, 999999));
     return this.currentBattle;
   }
 
@@ -197,6 +237,16 @@ export class Chapter {
 
   onBossDefeated(): void {
     this.state = ChapterState.CLEARED;
+  }
+
+  isEliteDay(): boolean {
+    const days = EncounterDataTable.forcedBattleDays;
+    return this.type === ChapterType.SIXTY_DAY && this.currentDay === days.elite;
+  }
+
+  isMidBossDay(): boolean {
+    const days = EncounterDataTable.forcedBattleDays;
+    return this.type === ChapterType.SIXTY_DAY && this.currentDay === days.midBoss;
   }
 
   isBossDay(): boolean {

@@ -23,12 +23,14 @@ function getChanceEmoji(optionLabel?: string): string {
 interface AdventureStageProps {
   isBattling: boolean;
   playerUnit?: BattleUnit | null;
-  enemyUnit?: BattleUnit | null;
+  enemyUnits?: BattleUnit[];
   attackPhase?: AttackPhase;
   damageEntries?: BattleLogEntry[];
   turnCount?: number;
   maxTurns?: number;
   isBoss?: boolean;
+  battleLabel?: string;
+  activeEnemyIndex?: number;
   encounterType?: EncounterType | null;
   encounterOptionLabel?: string;
 }
@@ -36,26 +38,30 @@ interface AdventureStageProps {
 export function AdventureStage({
   isBattling,
   playerUnit,
-  enemyUnit,
+  enemyUnits,
   attackPhase = 'idle',
   damageEntries = [],
   turnCount = 0,
   maxTurns = 15,
   isBoss = false,
+  battleLabel,
+  activeEnemyIndex = 0,
   encounterType,
   encounterOptionLabel,
 }: AdventureStageProps) {
-  if (isBattling && playerUnit && enemyUnit) {
+  if (isBattling && playerUnit && enemyUnits && enemyUnits.length > 0) {
     return (
       <div className="adventure-stage">
         <BattleArena
           playerUnit={playerUnit}
-          enemyUnit={enemyUnit}
+          enemyUnits={enemyUnits}
           attackPhase={attackPhase}
           damageEntries={damageEntries}
           turnCount={turnCount}
           maxTurns={maxTurns}
           isBoss={isBoss}
+          battleLabel={battleLabel}
+          activeEnemyIndex={activeEnemyIndex}
         />
       </div>
     );

@@ -219,6 +219,56 @@ docs/04_스킬시스템.md (분노 스킬 추가/변경)
 docs/화면기획문서/모험화면_기획서.md (분노 게이지, RAGE_ATTACK 팝업)
 ```
 
+- **엘리트/중간보스 강제 전투 구간 구현**
+  - 원작 카피바라고의 특정 일차 강제 전투 구간 반영
+  - 20일차: 엘리트 전투 (CHAPTER_ELITE_POOL), 30일차: 중간보스 전투 (CHAPTER_BOSS_POOL)
+  - 승리 시 금상자: 신화 스킬 3개 중 1개 선택
+  - Chapter: isEliteDay()/isMidBossDay() 판정, createEliteBattle/createMidBossBattle 생성
+  - EncounterDataTable: forcedBattleDays = { elite: 20, midBoss: 30 }
+  - BattleArena: battleLabel prop (엘리트/보스/최종 보스 배지)
+  - ChapterScreen: battleType 상태, startEliteBattle/startMidBossBattle, 금상자 UI
+  - 패배 시 챕터 실패 (기존 패배 로직 동일)
+
+### 수정된 파일
+```
+src/domain/data/EncounterDataTable.ts (forcedBattleDays 추가)
+src/domain/chapter/Chapter.ts (엘리트/중간보스 판정/생성 메서드)
+src/presentation/components/BattleArena.tsx (battleLabel prop)
+src/presentation/components/AdventureStage.tsx (battleLabel 전달)
+src/presentation/screens/ChapterScreen.tsx (battleType, 금상자 UI)
+src/index.css (golden-chest 스타일)
+docs/12_모험시스템.md (강제 전투 구간 섹션)
+docs/화면기획문서/모험화면_기획서.md (보스/엘리트 전투, 금상자 UI)
+```
+
+- **몬스터 분노/스킬/2마리 전투 시스템 구현**
+  - 몬스터 분노: ragePerAttack 필드를 EnemyTemplate에 추가, Alpha Wolf(20), Demon Lord(15)에 적용
+  - 몬스터 스킬 확장: Orc(연타), Dark Knight(반격+방어막), Stone Golem(반격+방어막), Alpha Wolf(연타+반격)
+  - 방어막(Shield) 시스템: EffectType.SHIELD 추가, BattleUnit.takeDamage()에 쉴드 우선 흡수, iron_shield 스킬 추가
+  - 복수 적 전투(1vs2): Battle 클래스 enemies 배열화, 50% 확률로 2마리 등장 (각 0.7배 스탯, 서로 다른 종류)
+  - 순차 공격 타겟팅: 앞 적부터 처치, 죽으면 다음 적 자동 타겟
+  - BattleArena: 복수 적 렌더링, 방어막 바, 적 분노 게이지, 사망 적 반투명 처리
+  - ChapterScreen: 복수 적 HP 추적 (RunningHps), 적별 애니메이션 (activeEnemyIndex)
+
+### 수정된 파일
+```
+src/domain/enums/index.ts (EffectType.SHIELD 추가)
+src/domain/battle/BattleUnit.ts (shield 필드, takeDamage 쉴드 흡수)
+src/domain/battle/Battle.ts (enemies 배열화, 복수 적 전투 흐름)
+src/domain/data/SkillTable.ts (iron_shield 스킬 추가)
+src/domain/data/EnemyTable.ts (ragePerAttack, 몬스터 스킬 확장)
+src/domain/chapter/EnemyTemplate.ts (ragePerAttack, statMultiplier)
+src/domain/chapter/Chapter.ts (createCombatBattle 2마리 로직)
+src/presentation/components/BattleArena.tsx (복수 적 UI, 방어막/분노 바)
+src/presentation/components/AdventureStage.tsx (enemyUnits, activeEnemyIndex)
+src/presentation/screens/ChapterScreen.tsx (복수 적 HP 추적, 애니메이션)
+src/index.css (ba-enemies, ba-shield, ba-dead 스타일)
+docs/01_전투시스템.md (복수 적, 방어막, 몬스터 분노/스킬)
+docs/04_스킬시스템.md (방어막 스킬)
+docs/12_모험시스템.md (2마리 전투 설명)
+docs/화면기획문서/모험화면_기획서.md (복수 적 UI, 방어막 바)
+```
+
 ### 누적 현황
 - 테스트: 19개 파일, 142개 테스트 전부 통과
 - tsc 타입 체크 통과

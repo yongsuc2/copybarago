@@ -11,6 +11,9 @@ import { AdventureStage } from '../components/AdventureStage';
 import { PlayerStatsBar } from '../components/PlayerStatsBar';
 import { DamageGraph, type DamageSource } from '../components/DamageGraph';
 import { EncounterDataTable } from '../../domain/data/EncounterDataTable';
+import { SkillTable } from '../../domain/data/SkillTable';
+import { SkillGrade } from '../../domain/enums';
+import type { Skill } from '../../domain/entities/Skill';
 import { Package, Home, Swords, Zap, Star, BarChart3 } from 'lucide-react';
 
 const MAX_BATTLE_TURNS = 15;
@@ -61,6 +64,11 @@ function splitToAnimationGroups(entries: BattleLogEntry[]): BattleLogEntry[][] {
   return groups;
 }
 
+interface RunningHps {
+  playerHp: number;
+  enemyHps: number[];
+}
+
 export function ChapterScreen() {
   const { game, refresh, setScreen } = useGame();
   const [encounter, setEncounter] = useState<Encounter | null>(null);
@@ -69,13 +77,16 @@ export function ChapterScreen() {
 
   const [, setBattle] = useState<Battle | null>(null);
   const [playerUnit, setPlayerUnit] = useState<BattleUnit | null>(null);
-  const [enemyUnit, setEnemyUnit] = useState<BattleUnit | null>(null);
+  const [enemyUnits, setEnemyUnits] = useState<BattleUnit[]>([]);
   const [attackPhase, setAttackPhase] = useState<AttackPhase>('idle');
   const [damageEntries, setDamageEntries] = useState<BattleLogEntry[]>([]);
   const [turnCount, setTurnCount] = useState(0);
   const [isBattling, setIsBattling] = useState(false);
   const [isBossFight, setIsBossFight] = useState(false);
+  const [battleType, setBattleType] = useState<'normal' | 'elite' | 'midBoss' | 'boss'>('normal');
+  const [eliteReward, setEliteReward] = useState<Skill[] | null>(null);
   const [chapterResult, setChapterResult] = useState<{ type: 'victory' | 'defeat'; chapterId: number; gold: number } | null>(null);
+  const [activeEnemyIndex, setActiveEnemyIndex] = useState(0);
 
   const [showDamageGraph, setShowDamageGraph] = useState(false);
   const [damageSourcesSnapshot, setDamageSourcesSnapshot] = useState<DamageSource[]>([]);
@@ -136,10 +147,11 @@ export function ChapterScreen() {
     setIsBattling(false);
     setBattle(null);
     setPlayerUnit(null);
-    setEnemyUnit(null);
+    setEnemyUnits([]);
     setAttackPhase('idle');
     setDamageEntries([]);
     setTurnCount(0);
+    setActiveEnemyIndex(0);
     battleRef.current = null;
   }, []);
 
@@ -206,6 +218,18 @@ export function ChapterScreen() {
           });
           refresh();
         }, 1500);
+      } else if (battleType === 'elite' || battleType === 'midBoss') {
+        const existingIds = game.currentChapter?.getSessionSkillIds() ?? [];
+        const mythicSkills = SkillTable.getSkillsByGrade(SkillGrade.MYTHIC)
+          .filter(s => !existingIds.includes(s.id));
+        const shuffled = [...mythicSkills].sort(() => Math.random() - 0.5);
+        const choices = shuffled.slice(0, 3);
+
+        setTimeout(() => {
+          clearBattleState();
+          setEliteReward(choices);
+          refresh();
+        }, 1500);
       } else {
         setTimeout(() => {
           clearBattleState();
@@ -227,6 +251,16 @@ export function ChapterScreen() {
 
     const enc = game.currentChapter.advanceDay();
 
+    if (!enc && game.currentChapter.isEliteDay()) {
+      startEliteBattle();
+      return;
+    }
+
+    if (!enc && game.currentChapter.isMidBossDay()) {
+      startMidBossBattle();
+      return;
+    }
+
     if (!enc && game.currentChapter.isBossDay()) {
       startBossBattle();
       return;
@@ -240,6 +274,7 @@ export function ChapterScreen() {
       const pu = new BattleUnit('Capybara', battleStats, [...game.currentChapter.sessionSkills], true);
       const b = game.currentChapter.createCombatBattle(pu);
       if (b) {
+        setBattleType('normal');
         startBattle(b, false);
       }
       refresh();
@@ -267,15 +302,15 @@ export function ChapterScreen() {
   }, [game, refresh]);
 
   function computeMidTurnHp(
-    playerHpBefore: number,
-    enemyHpBefore: number,
+    hpsBefore: RunningHps,
     entries: BattleLogEntry[],
     playerName: string,
     playerMaxHp: number,
-    enemyMaxHp: number,
-  ) {
-    let playerHp = playerHpBefore;
-    let enemyHp = enemyHpBefore;
+    enemyMaxHps: number[],
+    enemyNames: string[],
+  ): RunningHps {
+    let playerHp = hpsBefore.playerHp;
+    const enemyHps = [...hpsBefore.enemyHps];
 
     for (const entry of entries) {
       const isHeal = entry.type === BattleLogType.LIFESTEAL
@@ -283,109 +318,151 @@ export function ChapterScreen() {
         || entry.type === BattleLogType.REVIVE;
       if (isHeal) {
         if (entry.target === playerName) playerHp += entry.value;
-        else enemyHp += entry.value;
+        else {
+          const idx = enemyNames.indexOf(entry.target);
+          if (idx >= 0) enemyHps[idx] += entry.value;
+        }
       } else {
         if (entry.target === playerName) playerHp -= entry.value;
-        else enemyHp -= entry.value;
+        else {
+          const idx = enemyNames.indexOf(entry.target);
+          if (idx >= 0) enemyHps[idx] -= entry.value;
+        }
       }
     }
 
     return {
       playerHp: Math.max(0, Math.min(playerHp, playerMaxHp)),
-      enemyHp: Math.max(0, Math.min(enemyHp, enemyMaxHp)),
+      enemyHps: enemyHps.map((hp, i) => Math.max(0, Math.min(hp, enemyMaxHps[i]))),
     };
   }
 
   async function animateHitGroup(
     hitGroup: BattleLogEntry[],
     side: 'player' | 'enemy',
-    runningPlayerHp: number,
-    runningEnemyHp: number,
+    runningHps: RunningHps,
     b: Battle,
     playerName: string,
-  ): Promise<{ playerHp: number; enemyHp: number }> {
-    const hp = computeMidTurnHp(
-      runningPlayerHp, runningEnemyHp,
-      hitGroup, playerName,
-      b.player.maxHp, b.enemy.maxHp,
+    enemyNames: string[],
+  ): Promise<RunningHps> {
+    const newHps = computeMidTurnHp(
+      runningHps, hitGroup, playerName,
+      b.player.maxHp,
+      b.enemies.map(e => e.maxHp),
+      enemyNames,
     );
 
     setAttackPhase(`${side}-approach`);
     await delay(PHASE_DURATION.approach);
-    if (cancelledRef.current) return hp;
+    if (cancelledRef.current) return newHps;
 
     setDamageEntries(hitGroup);
     const midPlayer = cloneUnit(b.player);
-    midPlayer.currentHp = hp.playerHp;
-    const midEnemy = cloneUnit(b.enemy);
-    midEnemy.currentHp = hp.enemyHp;
+    midPlayer.currentHp = newHps.playerHp;
+    const midEnemies = b.enemies.map((e, i) => {
+      const clone = cloneUnit(e);
+      clone.currentHp = newHps.enemyHps[i];
+      return clone;
+    });
     setPlayerUnit(midPlayer);
-    setEnemyUnit(midEnemy);
+    setEnemyUnits(midEnemies);
     setAttackPhase(`${side}-hit`);
     await delay(PHASE_DURATION.hit);
-    if (cancelledRef.current) return hp;
+    if (cancelledRef.current) return newHps;
 
     setAttackPhase(`${side}-retreat`);
     await delay(PHASE_DURATION.retreat);
-    if (cancelledRef.current) return hp;
+    if (cancelledRef.current) return newHps;
 
     setDamageEntries([]);
     setAttackPhase('idle');
     await delay(PHASE_DURATION.pause);
 
-    return hp;
+    return newHps;
   }
 
   async function animateTurn(b: Battle, playerName: string) {
     if (cancelledRef.current) return;
 
-    const playerHpBefore = b.player.currentHp;
-    const enemyHpBefore = b.enemy.currentHp;
+    const enemyNames = b.enemies.map(e => e.name);
 
     const result = b.executeTurn();
     setTurnCount(result.turnNumber);
     accumulateDamage(result.entries, playerName);
 
     const playerEntries: BattleLogEntry[] = [];
-    const enemyEntries: BattleLogEntry[] = [];
+    const enemyEntriesBySource = new Map<string, BattleLogEntry[]>();
 
     for (const entry of result.entries) {
       if (!isDamageOrHeal(entry.type)) continue;
       if (entry.source === playerName) {
         playerEntries.push(entry);
       } else {
-        enemyEntries.push(entry);
+        const arr = enemyEntriesBySource.get(entry.source) || [];
+        arr.push(entry);
+        enemyEntriesBySource.set(entry.source, arr);
       }
     }
 
-    let runningPlayerHp = playerHpBefore;
-    let runningEnemyHp = enemyHpBefore;
+    let running: RunningHps = {
+      playerHp: result.playerHp - computeHpDelta(result.entries, playerName, enemyNames),
+      enemyHps: b.enemies.map((e, i) => {
+        let hp = result.enemyHps[i];
+        for (const entry of result.entries) {
+          if (!isDamageOrHeal(entry.type)) continue;
+          const isHeal = entry.type === BattleLogType.LIFESTEAL || entry.type === BattleLogType.HOT_HEAL || entry.type === BattleLogType.REVIVE;
+          if (entry.target === e.name) {
+            hp += isHeal ? -entry.value : entry.value;
+          }
+        }
+        return Math.max(0, hp);
+      }),
+    };
+
+    function computeHpDelta(entries: BattleLogEntry[], pName: string, _eNames: string[]): number {
+      let delta = 0;
+      for (const entry of entries) {
+        if (!isDamageOrHeal(entry.type)) continue;
+        const isHeal = entry.type === BattleLogType.LIFESTEAL || entry.type === BattleLogType.HOT_HEAL || entry.type === BattleLogType.REVIVE;
+        if (entry.target === pName) {
+          delta += isHeal ? -entry.value : entry.value;
+        }
+      }
+      return -delta;
+    }
 
     if (playerEntries.length > 0 && !cancelledRef.current) {
+      const targetEnemy = playerEntries[0]?.target;
+      const targetIdx = enemyNames.indexOf(targetEnemy);
+      if (targetIdx >= 0) setActiveEnemyIndex(targetIdx);
+
       const groups = splitToAnimationGroups(playerEntries);
       for (const group of groups) {
-        if (cancelledRef.current || runningEnemyHp <= 0) break;
-        const hp = await animateHitGroup(group, 'player', runningPlayerHp, runningEnemyHp, b, playerName);
-        runningPlayerHp = hp.playerHp;
-        runningEnemyHp = hp.enemyHp;
+        if (cancelledRef.current) break;
+        const targetHpIdx = enemyNames.indexOf(group[0]?.target ?? '');
+        if (targetHpIdx >= 0 && running.enemyHps[targetHpIdx] <= 0) break;
+        running = await animateHitGroup(group, 'player', running, b, playerName, enemyNames);
       }
     }
 
-    if (enemyEntries.length > 0 && !cancelledRef.current && runningEnemyHp > 0) {
-      const groups = splitToAnimationGroups(enemyEntries);
+    for (const [source, entries] of enemyEntriesBySource) {
+      if (cancelledRef.current || running.playerHp <= 0) break;
+      const eIdx = enemyNames.indexOf(source);
+      if (eIdx >= 0) setActiveEnemyIndex(eIdx);
+
+      const groups = splitToAnimationGroups(entries);
       for (const group of groups) {
-        if (cancelledRef.current || runningPlayerHp <= 0) break;
-        const hp = await animateHitGroup(group, 'enemy', runningPlayerHp, runningEnemyHp, b, playerName);
-        runningPlayerHp = hp.playerHp;
-        runningEnemyHp = hp.enemyHp;
+        if (cancelledRef.current || running.playerHp <= 0) break;
+        running = await animateHitGroup(group, 'enemy', running, b, playerName, enemyNames);
       }
     }
 
-    if (playerEntries.length === 0 && enemyEntries.length === 0) {
-      setPlayerUnit(cloneUnit(b.player));
-      setEnemyUnit(cloneUnit(b.enemy));
+    if (playerEntries.length === 0 && enemyEntriesBySource.size === 0) {
       await delay(PHASE_DURATION.pause);
     }
+
+    setPlayerUnit(cloneUnit(b.player));
+    setEnemyUnits(b.enemies.map(e => cloneUnit(e)));
   }
 
   async function runBattleLoop(b: Battle, boss: boolean) {
@@ -411,14 +488,41 @@ export function ChapterScreen() {
     setDamageSourcesSnapshot([]);
     setBattle(b);
     setPlayerUnit(cloneUnit(b.player));
-    setEnemyUnit(cloneUnit(b.enemy));
+    setEnemyUnits(b.enemies.map(e => cloneUnit(e)));
     setIsBattling(true);
     setIsBossFight(boss);
     setAttackPhase('idle');
     setDamageEntries([]);
     setTurnCount(0);
+    setActiveEnemyIndex(0);
 
     runBattleLoop(b, boss);
+  }
+
+  function startEliteBattle() {
+    if (!game.currentChapter) return;
+
+    const stats = game.player.computeStats();
+    const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
+    const pu = new BattleUnit('Capybara', battleStats, [...game.currentChapter.sessionSkills], true);
+    const b = game.currentChapter.createEliteBattle(pu);
+    if (!b) return;
+
+    setBattleType('elite');
+    startBattle(b, false);
+  }
+
+  function startMidBossBattle() {
+    if (!game.currentChapter) return;
+
+    const stats = game.player.computeStats();
+    const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
+    const pu = new BattleUnit('Capybara', battleStats, [...game.currentChapter.sessionSkills], true);
+    const b = game.currentChapter.createMidBossBattle(pu);
+    if (!b) return;
+
+    setBattleType('midBoss');
+    startBattle(b, false);
   }
 
   function startBossBattle() {
@@ -430,6 +534,7 @@ export function ChapterScreen() {
     const b = game.currentChapter.createBossBattle(pu);
     if (!b) return;
 
+    setBattleType('boss');
     startBattle(b, true);
   }
 
@@ -568,12 +673,14 @@ export function ChapterScreen() {
           <AdventureStage
             isBattling={isBattling}
             playerUnit={playerUnit}
-            enemyUnit={enemyUnit}
+            enemyUnits={enemyUnits}
             attackPhase={attackPhase}
             damageEntries={damageEntries}
             turnCount={turnCount}
             maxTurns={MAX_BATTLE_TURNS}
             isBoss={isBossFight}
+            battleLabel={battleType === 'elite' ? '엘리트' : battleType === 'midBoss' ? '보스' : battleType === 'boss' ? '최종 보스' : undefined}
+            activeEnemyIndex={activeEnemyIndex}
             encounterType={encounter?.type}
             encounterOptionLabel={encounter?.options[0]?.label}
           />
@@ -633,6 +740,40 @@ export function ChapterScreen() {
           >
             포기하기
           </button>
+        </div>
+      )}
+
+      {eliteReward && !isBattling && (
+        <div>
+          <AdventureStage isBattling={false} />
+          <div className="golden-chest-overlay">
+            <div className="golden-chest-icon">📦</div>
+            <div className="golden-chest-title">금상자!</div>
+            <div className="golden-chest-sub">신화 스킬 1개를 선택하세요</div>
+            <div className="golden-chest-options">
+              {eliteReward.map((skill, i) => (
+                <div
+                  key={i}
+                  className="golden-chest-option"
+                  onClick={() => {
+                    if (game.currentChapter) {
+                      game.currentChapter.sessionSkills.push(skill);
+                      setLog(prev => [...prev, `  금상자: ${skill.icon} ${skill.name} 획득`]);
+                    }
+                    setEliteReward(null);
+                    refresh();
+                    setTimeout(() => advanceDay(), 400);
+                  }}
+                >
+                  <span className="golden-chest-skill-icon">{skill.icon}</span>
+                  <div>
+                    <div style={{ fontWeight: 'bold' }}>{skill.name}</div>
+                    <div style={{ fontSize: 12, color: '#aaa' }}>{skill.description}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 

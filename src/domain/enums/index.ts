@@ -118,6 +118,7 @@ export enum EffectType {
   MULTI_HIT = 'MULTI_HIT',
   RAGE_POWER = 'RAGE_POWER',
   RAGE_BOOST = 'RAGE_BOOST',
+  SHIELD = 'SHIELD',
 }
 
 export enum TriggerCondition {

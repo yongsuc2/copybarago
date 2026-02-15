@@ -22,6 +22,7 @@ export class BattleUnit {
   ragePerAttack: number;
   bonusRagePerAttack: number;
   rageDamageMultiplier: number;
+  shield: number;
 
   constructor(
     name: string,
@@ -47,6 +48,7 @@ export class BattleUnit {
     this.ragePerAttack = isPlayer ? 25 : 0;
     this.bonusRagePerAttack = 0;
     this.rageDamageMultiplier = 1.0;
+    this.shield = 0;
 
     this.applyPassiveSkills();
   }
@@ -67,6 +69,9 @@ export class BattleUnit {
           break;
         case EffectType.RAGE_BOOST:
           this.bonusRagePerAttack += skill.effect.value;
+          break;
+        case EffectType.SHIELD:
+          this.shield += Math.floor(this.maxHp * skill.effect.value);
           break;
         case EffectType.BUFF:
           if (skill.effect.statusEffectType && skill.effect.duration > 0) {
@@ -127,9 +132,18 @@ export class BattleUnit {
   }
 
   takeDamage(amount: number): number {
-    const actual = Math.max(0, Math.min(amount, this.currentHp));
-    this.currentHp -= actual;
-    return actual;
+    let remaining = amount;
+    let dealt = 0;
+    if (this.shield > 0) {
+      const absorbed = Math.min(remaining, this.shield);
+      this.shield -= absorbed;
+      remaining -= absorbed;
+      dealt += absorbed;
+    }
+    const hpDmg = Math.max(0, Math.min(remaining, this.currentHp));
+    this.currentHp -= hpDmg;
+    dealt += hpDmg;
+    return dealt;
   }
 
   heal(amount: number): number {
@@ -210,6 +224,9 @@ export class BattleUnit {
         break;
       case EffectType.RAGE_BOOST:
         this.bonusRagePerAttack += skill.effect.value;
+        break;
+      case EffectType.SHIELD:
+        this.shield += Math.floor(this.maxHp * skill.effect.value);
         break;
       case EffectType.BUFF:
         if (skill.effect.statusEffectType && skill.effect.duration > 0) {

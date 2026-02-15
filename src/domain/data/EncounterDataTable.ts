@@ -102,6 +102,11 @@ const COUNTER_THRESHOLD = {
   daebak: 7,
 };
 
+const FORCED_BATTLE_DAYS = {
+  elite: 20,
+  midBoss: 30,
+};
+
 export const EncounterDataTable = {
   getTypeInfo(type: EncounterType): EncounterTypeInfo {
     return TYPE_INFO[type];
@@ -122,4 +127,5 @@ export const EncounterDataTable = {
   daebakRoulette: DAEBAK_ROULETTE,
   combat: COMBAT,
   counterThreshold: COUNTER_THRESHOLD,
+  forcedBattleDays: FORCED_BATTLE_DAYS,
 };
