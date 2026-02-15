@@ -39,10 +39,10 @@ describe('BattleUnit', () => {
     expect(unit.getHpPercent()).toBeCloseTo(0.5);
   });
 
-  it('applies multi-hit from passive skill', () => {
-    const multiHit = makeSkill('mh', EffectType.MULTI_HIT, 3, TriggerCondition.PASSIVE);
+  it('applies multi-hit chance from passive skill', () => {
+    const multiHit = makeSkill('mh', EffectType.MULTI_HIT, 0.5, TriggerCondition.PASSIVE);
     const unit = new BattleUnit('Test', Stats.create({ hp: 100, maxHp: 100, atk: 10, def: 5 }), [multiHit]);
-    expect(unit.multiHitCount).toBe(3);
+    expect(unit.multiHitChance).toBeCloseTo(0.5);
   });
 
   it('applies lifesteal from passive skill', () => {

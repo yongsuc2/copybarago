@@ -40,6 +40,23 @@ function isDamageOrHeal(type: BattleLogType): boolean {
     || type === BattleLogType.REVIVE;
 }
 
+function splitToAnimationGroups(entries: BattleLogEntry[]): BattleLogEntry[][] {
+  const groups: BattleLogEntry[][] = [];
+
+  for (const entry of entries) {
+    if (entry.type === BattleLogType.LIFESTEAL) {
+      if (groups.length > 0) {
+        groups[groups.length - 1].push(entry);
+      } else {
+        groups.push([entry]);
+      }
+    } else {
+      groups.push([entry]);
+    }
+  }
+  return groups;
+}
+
 export function ChapterScreen() {
   const { game, refresh, setScreen } = useGame();
   const [encounter, setEncounter] = useState<Encounter | null>(null);
@@ -205,6 +222,46 @@ export function ChapterScreen() {
     };
   }
 
+  async function animateHitGroup(
+    hitGroup: BattleLogEntry[],
+    side: 'player' | 'enemy',
+    runningPlayerHp: number,
+    runningEnemyHp: number,
+    b: Battle,
+    playerName: string,
+  ): Promise<{ playerHp: number; enemyHp: number }> {
+    const hp = computeMidTurnHp(
+      runningPlayerHp, runningEnemyHp,
+      hitGroup, playerName,
+      b.player.maxHp, b.enemy.maxHp,
+    );
+
+    setAttackPhase(`${side}-approach`);
+    await delay(PHASE_DURATION.approach);
+    if (cancelledRef.current) return hp;
+
+    setDamageEntries(hitGroup);
+    const midPlayer = cloneUnit(b.player);
+    midPlayer.currentHp = hp.playerHp;
+    const midEnemy = cloneUnit(b.enemy);
+    midEnemy.currentHp = hp.enemyHp;
+    setPlayerUnit(midPlayer);
+    setEnemyUnit(midEnemy);
+    setAttackPhase(`${side}-hit`);
+    await delay(PHASE_DURATION.hit);
+    if (cancelledRef.current) return hp;
+
+    setAttackPhase(`${side}-retreat`);
+    await delay(PHASE_DURATION.retreat);
+    if (cancelledRef.current) return hp;
+
+    setDamageEntries([]);
+    setAttackPhase('idle');
+    await delay(PHASE_DURATION.pause);
+
+    return hp;
+  }
+
   async function animateTurn(b: Battle, playerName: string) {
     if (cancelledRef.current) return;
 
@@ -226,57 +283,27 @@ export function ChapterScreen() {
       }
     }
 
-    const midHp = computeMidTurnHp(
-      playerHpBefore, enemyHpBefore,
-      playerEntries, playerName,
-      b.player.maxHp, b.enemy.maxHp,
-    );
+    let runningPlayerHp = playerHpBefore;
+    let runningEnemyHp = enemyHpBefore;
 
     if (playerEntries.length > 0 && !cancelledRef.current) {
-      setAttackPhase('player-approach');
-      await delay(PHASE_DURATION.approach);
-      if (cancelledRef.current) return;
-
-      setDamageEntries(playerEntries);
-      const midPlayer = cloneUnit(b.player);
-      midPlayer.currentHp = midHp.playerHp;
-      const midEnemy = cloneUnit(b.enemy);
-      midEnemy.currentHp = midHp.enemyHp;
-      setPlayerUnit(midPlayer);
-      setEnemyUnit(midEnemy);
-      setAttackPhase('player-hit');
-      await delay(PHASE_DURATION.hit);
-      if (cancelledRef.current) return;
-
-      setAttackPhase('player-retreat');
-      await delay(PHASE_DURATION.retreat);
-      if (cancelledRef.current) return;
-
-      setDamageEntries([]);
-      setAttackPhase('idle');
-      await delay(PHASE_DURATION.pause);
-      if (cancelledRef.current) return;
+      const groups = splitToAnimationGroups(playerEntries);
+      for (const group of groups) {
+        if (cancelledRef.current || runningEnemyHp <= 0) break;
+        const hp = await animateHitGroup(group, 'player', runningPlayerHp, runningEnemyHp, b, playerName);
+        runningPlayerHp = hp.playerHp;
+        runningEnemyHp = hp.enemyHp;
+      }
     }
 
-    if (enemyEntries.length > 0 && !cancelledRef.current && b.enemy.isAlive()) {
-      setAttackPhase('enemy-approach');
-      await delay(PHASE_DURATION.approach);
-      if (cancelledRef.current) return;
-
-      setDamageEntries(enemyEntries);
-      setPlayerUnit(cloneUnit(b.player));
-      setEnemyUnit(cloneUnit(b.enemy));
-      setAttackPhase('enemy-hit');
-      await delay(PHASE_DURATION.hit);
-      if (cancelledRef.current) return;
-
-      setAttackPhase('enemy-retreat');
-      await delay(PHASE_DURATION.retreat);
-      if (cancelledRef.current) return;
-
-      setDamageEntries([]);
-      setAttackPhase('idle');
-      await delay(PHASE_DURATION.pause);
+    if (enemyEntries.length > 0 && !cancelledRef.current && runningEnemyHp > 0) {
+      const groups = splitToAnimationGroups(enemyEntries);
+      for (const group of groups) {
+        if (cancelledRef.current || runningPlayerHp <= 0) break;
+        const hp = await animateHitGroup(group, 'enemy', runningPlayerHp, runningEnemyHp, b, playerName);
+        runningPlayerHp = hp.playerHp;
+        runningEnemyHp = hp.enemyHp;
+      }
     }
 
     if (playerEntries.length === 0 && enemyEntries.length === 0) {

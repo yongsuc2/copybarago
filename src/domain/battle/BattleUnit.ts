@@ -14,7 +14,7 @@ export class BattleUnit {
   isPlayer: boolean;
   name: string;
   reviveUsed: boolean;
-  multiHitCount: number;
+  multiHitChance: number;
   lifestealRate: number;
   counterRate: number;
 
@@ -34,7 +34,7 @@ export class BattleUnit {
     this.statusEffects = [];
     this.isPlayer = isPlayer;
     this.reviveUsed = false;
-    this.multiHitCount = 1;
+    this.multiHitChance = 0;
     this.lifestealRate = 0;
     this.counterRate = 0;
 
@@ -47,7 +47,7 @@ export class BattleUnit {
 
       switch (skill.effect.type) {
         case EffectType.MULTI_HIT:
-          this.multiHitCount = Math.max(this.multiHitCount, Math.floor(skill.effect.value));
+          this.multiHitChance += skill.effect.value;
           break;
         case EffectType.LIFESTEAL:
           this.lifestealRate += skill.effect.value;
@@ -184,7 +184,7 @@ export class BattleUnit {
   private applyPassiveSkillSingle(skill: Skill): void {
     switch (skill.effect.type) {
       case EffectType.MULTI_HIT:
-        this.multiHitCount = Math.max(this.multiHitCount, Math.floor(skill.effect.value));
+        this.multiHitChance += skill.effect.value;
         break;
       case EffectType.LIFESTEAL:
         this.lifestealRate += skill.effect.value;

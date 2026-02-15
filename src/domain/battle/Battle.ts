@@ -62,51 +62,55 @@ export class Battle {
   }
 
   private processAttack(attacker: BattleUnit, defender: BattleUnit): void {
-    const hitCount = attacker.multiHitCount;
+    this.processSingleHit(attacker, defender);
 
-    for (let i = 0; i < hitCount; i++) {
-      if (!defender.isAlive()) break;
-
-      const baseDamage = this.calculateDamage(attacker, defender);
-      const isCrit = this.rng.chance(attacker.getEffectiveCrit());
-      const finalDamage = isCrit ? Math.floor(baseDamage * 1.5) : baseDamage;
-
-      const dealt = defender.takeDamage(finalDamage);
-
-      if (isCrit) {
-        this.log.add({
-          turn: this.turnCount, type: BattleLogType.CRIT,
-          source: attacker.name, target: defender.name, value: dealt,
-          message: `${attacker.name} CRIT ${defender.name} for ${dealt}`,
-        });
-      } else {
-        this.log.add({
-          turn: this.turnCount, type: BattleLogType.ATTACK,
-          source: attacker.name, target: defender.name, value: dealt,
-          message: `${attacker.name} attacks ${defender.name} for ${dealt}`,
-        });
-      }
-
-      if (attacker.lifestealRate > 0 && dealt > 0) {
-        const healAmount = Math.floor(dealt * attacker.lifestealRate);
-        const healed = attacker.heal(healAmount);
-        if (healed > 0) {
-          this.log.add({
-            turn: this.turnCount, type: BattleLogType.LIFESTEAL,
-            source: attacker.name, target: attacker.name, value: healed,
-            message: `${attacker.name} heals ${healed} from lifesteal`,
-          });
-        }
-      }
-
-      this.processOnAttackSkills(attacker, defender);
-
-      if (defender.isAlive() && defender.counterRate > 0 && this.rng.chance(0.5)) {
-        this.processCounter(defender, attacker);
-      }
+    if (defender.isAlive() && attacker.multiHitChance > 0 && this.rng.chance(attacker.multiHitChance)) {
+      this.processSingleHit(attacker, defender);
     }
 
     this.processOnAttackDebuffs(attacker, defender);
+  }
+
+  private processSingleHit(attacker: BattleUnit, defender: BattleUnit): void {
+    if (!defender.isAlive()) return;
+
+    const baseDamage = this.calculateDamage(attacker, defender);
+    const isCrit = this.rng.chance(attacker.getEffectiveCrit());
+    const finalDamage = isCrit ? Math.floor(baseDamage * 1.5) : baseDamage;
+
+    const dealt = defender.takeDamage(finalDamage);
+
+    if (isCrit) {
+      this.log.add({
+        turn: this.turnCount, type: BattleLogType.CRIT,
+        source: attacker.name, target: defender.name, value: dealt,
+        message: `${attacker.name} CRIT ${defender.name} for ${dealt}`,
+      });
+    } else {
+      this.log.add({
+        turn: this.turnCount, type: BattleLogType.ATTACK,
+        source: attacker.name, target: defender.name, value: dealt,
+        message: `${attacker.name} attacks ${defender.name} for ${dealt}`,
+      });
+    }
+
+    if (attacker.lifestealRate > 0 && dealt > 0) {
+      const healAmount = Math.floor(dealt * attacker.lifestealRate);
+      const healed = attacker.heal(healAmount);
+      if (healed > 0) {
+        this.log.add({
+          turn: this.turnCount, type: BattleLogType.LIFESTEAL,
+          source: attacker.name, target: attacker.name, value: healed,
+          message: `${attacker.name} heals ${healed} from lifesteal`,
+        });
+      }
+    }
+
+    this.processOnAttackSkills(attacker, defender);
+
+    if (defender.isAlive() && defender.counterRate > 0 && this.rng.chance(0.5)) {
+      this.processCounter(defender, attacker);
+    }
   }
 
   private processOnAttackSkills(attacker: BattleUnit, defender: BattleUnit): void {
@@ -120,7 +124,7 @@ export class Battle {
         this.log.add({
           turn: this.turnCount, type: BattleLogType.SKILL_DAMAGE,
           source: attacker.name, target: defender.name, value: dealt,
-          skillName: skill.name,
+          skillName: skill.name, skillIcon: skill.icon,
           message: `${attacker.name}'s ${skill.name} deals ${dealt}`,
         });
       }
@@ -139,7 +143,7 @@ export class Battle {
         this.log.add({
           turn: this.turnCount, type: BattleLogType.DEBUFF_APPLIED,
           source: attacker.name, target: defender.name, value: skill.effect.value,
-          skillName: skill.name,
+          skillName: skill.name, skillIcon: skill.icon,
           message: `${attacker.name} applies ${skill.name} to ${defender.name}`,
         });
       }
@@ -157,7 +161,7 @@ export class Battle {
         this.log.add({
           turn: this.turnCount, type: BattleLogType.SKILL_DAMAGE,
           source: unit.name, target: opponent.name, value: dealt,
-          skillName: skill.name,
+          skillName: skill.name, skillIcon: skill.icon,
           message: `${unit.name}'s ${skill.name} deals ${dealt}`,
         });
       }
@@ -171,7 +175,7 @@ export class Battle {
         this.log.add({
           turn: this.turnCount, type: BattleLogType.DEBUFF_APPLIED,
           source: unit.name, target: opponent.name, value: skill.effect.value,
-          skillName: skill.name,
+          skillName: skill.name, skillIcon: skill.icon,
           message: `${unit.name}'s ${skill.name} debuffs ${opponent.name}`,
         });
       }

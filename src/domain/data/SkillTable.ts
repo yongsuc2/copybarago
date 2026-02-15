@@ -51,8 +51,8 @@ const ALL_SKILLS: Skill[] = [
     '피격 시 받은 피해의 50%를 반격'),
 
   new Skill('multi_hit_mastery', 'Multi-Hit Mastery', '💫', SkillGrade.LEGENDARY, SkillCategory.MASTERY,
-    [HeritageRoute.SKULL], makeEffect(EffectType.MULTI_HIT, 3), TriggerCondition.PASSIVE,
-    '공격 횟수 3회로 증가'),
+    [HeritageRoute.SKULL], makeEffect(EffectType.MULTI_HIT, 0.5), TriggerCondition.PASSIVE,
+    '공격 시 50% 확률로 추가 타격'),
 
   new Skill('crit_mastery', 'Critical Mastery', '🎯', SkillGrade.LEGENDARY, SkillCategory.MASTERY,
     [HeritageRoute.RANGER], makeEffect(EffectType.BUFF, 0.15, 99, StatusEffectType.CRIT_UP), TriggerCondition.PASSIVE,

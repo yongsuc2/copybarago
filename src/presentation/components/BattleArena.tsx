@@ -76,6 +76,10 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
   const isPlayerHit = attackPhase === 'enemy-hit';
   const isEnemyHit = attackPhase === 'player-hit';
 
+  const skillEntry = damageEntries.find(e => e.type === BattleLogType.SKILL_DAMAGE && e.skillName);
+  const attackerIsPlayer = attackPhase.startsWith('player-');
+  const attackerIsEnemy = attackPhase.startsWith('enemy-');
+
   return (
     <div className="battle-arena">
       <div className="ba-turn-counter">
@@ -85,6 +89,12 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
 
       <div className="ba-field">
         <div className={`ba-character ${isPlayerApproach ? 'ba-move-right' : ''} ${isPlayerHit ? 'ba-hit' : ''}`}>
+          {skillEntry && attackerIsPlayer && (
+            <div className="ba-skill-indicator">
+              {skillEntry.skillIcon && <span>{skillEntry.skillIcon}</span>}
+              <span>{skillEntry.skillName}</span>
+            </div>
+          )}
           <div className="ba-popup-area">
             {playerPopups.map(p => (
               <span
@@ -107,6 +117,12 @@ export function BattleArena({ playerUnit, enemyUnit, attackPhase, damageEntries,
         <div className="ba-vs">대</div>
 
         <div className={`ba-character ${isEnemyApproach ? 'ba-move-left' : ''} ${isEnemyHit ? 'ba-hit' : ''}`}>
+          {skillEntry && attackerIsEnemy && (
+            <div className="ba-skill-indicator">
+              {skillEntry.skillIcon && <span>{skillEntry.skillIcon}</span>}
+              <span>{skillEntry.skillName}</span>
+            </div>
+          )}
           <div className="ba-popup-area">
             {enemyPopups.map(p => (
               <span

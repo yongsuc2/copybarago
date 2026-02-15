@@ -21,6 +21,7 @@ export interface BattleLogEntry {
   target: string;
   value: number;
   skillName?: string;
+  skillIcon?: string;
   message: string;
 }
 

@@ -122,7 +122,26 @@ src/presentation/screens/ContentScreen.tsx (ResourceDataTable 참조)
 docs/12_모험시스템.md (인카운터 데이터 파일 경로 추가)
 ```
 
+- **다단 히트 → 확률 기반 추가 타격으로 변경**
+  - 기존: Multi-Hit Mastery가 고정 3회 타격
+  - 변경: 공격 시 50% 확률로 1회 추가 타격 (총 2회)
+  - BattleUnit: multiHitCount → multiHitChance (확률값)
+  - Battle.processAttack(): 고정 루프 → 기본 1회 + 확률 추가 1회
+  - animateTurn(): 히트별 개별 접근→타격→후퇴 연출 (groupByHit)
+  - ON_ATTACK 스킬은 추가 타격에서도 동일 발동
+
+### 수정된 파일
+```
+src/domain/battle/BattleUnit.ts (multiHitCount → multiHitChance)
+src/domain/battle/Battle.ts (processAttack → processSingleHit 분리)
+src/domain/data/SkillTable.ts (Multi-Hit Mastery 값 3 → 0.5)
+src/presentation/screens/ChapterScreen.tsx (groupByHit, animateHitGroup 추가)
+src/__tests__/domain/Battle.test.ts (multiHitChance 테스트)
+docs/01_전투시스템.md (연타 설명 변경)
+docs/04_스킬시스템.md (연타 마스터리 효과 변경)
+docs/02_캐릭터성장시스템.md (해골 계승 연타 설명 변경)
+```
+
 ### 누적 현황
 - 테스트: 19개 파일, 142개 테스트 전부 통과
 - tsc 타입 체크 통과
-- 데이터 테이블 3개 신규, 하드코딩 제거 완료
