@@ -29,9 +29,10 @@ interface BattleArenaProps {
   isBoss: boolean;
   battleLabel?: string;
   activeEnemyIndex?: number;
+  speedMultiplier?: number;
 }
 
-export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries, turnCount, maxTurns, isBoss, battleLabel, activeEnemyIndex = 0 }: BattleArenaProps) {
+export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries, turnCount, maxTurns, isBoss, battleLabel, activeEnemyIndex = 0, speedMultiplier = 1 }: BattleArenaProps) {
   const [popups, setPopups] = useState<DamagePopup[]>([]);
 
   useEffect(() => {
@@ -71,9 +72,9 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
     }
 
     setPopups(newPopups);
-    const timer = setTimeout(() => setPopups([]), 600);
+    const timer = setTimeout(() => setPopups([]), 600 / speedMultiplier);
     return () => clearTimeout(timer);
-  }, [damageEntries, playerUnit.name, enemyUnits]);
+  }, [damageEntries, playerUnit.name, enemyUnits, speedMultiplier]);
 
   const playerHpPct = playerUnit.maxHp > 0 ? (playerUnit.currentHp / playerUnit.maxHp) * 100 : 0;
   const playerType = getCharacterType(playerUnit.name);
@@ -91,7 +92,7 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
   const spriteSize = enemyUnits.length > 1 ? 56 : 72;
 
   return (
-    <div className="battle-arena">
+    <div className="battle-arena" style={{ '--battle-speed': speedMultiplier } as React.CSSProperties}>
       <div className="ba-turn-counter">
         {battleLabel && <span className="ba-boss-badge">{battleLabel}</span>}
         <span>턴 {turnCount}/{maxTurns}</span>

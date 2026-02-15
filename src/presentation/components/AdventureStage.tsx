@@ -33,6 +33,7 @@ interface AdventureStageProps {
   activeEnemyIndex?: number;
   encounterType?: EncounterType | null;
   encounterOptionLabel?: string;
+  speedMultiplier?: number;
 }
 
 export function AdventureStage({
@@ -48,6 +49,7 @@ export function AdventureStage({
   activeEnemyIndex = 0,
   encounterType,
   encounterOptionLabel,
+  speedMultiplier = 1,
 }: AdventureStageProps) {
   if (isBattling && playerUnit && enemyUnits && enemyUnits.length > 0) {
     return (
@@ -62,6 +64,7 @@ export function AdventureStage({
           isBoss={isBoss}
           battleLabel={battleLabel}
           activeEnemyIndex={activeEnemyIndex}
+          speedMultiplier={speedMultiplier}
         />
       </div>
     );

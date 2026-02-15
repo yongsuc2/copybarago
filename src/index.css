@@ -251,7 +251,7 @@ body {
   flex-direction: column;
   align-items: center;
   position: relative;
-  transition: transform 0.3s ease;
+  transition: transform calc(0.3s / var(--battle-speed, 1)) ease;
 }
 
 .ba-move-right {
@@ -263,7 +263,7 @@ body {
 }
 
 .ba-hit {
-  animation: shake 0.3s ease-in-out;
+  animation: shake calc(0.3s / var(--battle-speed, 1)) ease-in-out;
 }
 
 .ba-vs {
@@ -291,7 +291,7 @@ body {
 
 .ba-hp-fill {
   height: 100%;
-  transition: width 0.4s ease;
+  transition: width calc(0.4s / var(--battle-speed, 1)) ease;
   border-radius: 4px;
 }
 .ba-hp-fill.player { background: #4caf50; }
@@ -314,7 +314,7 @@ body {
 .ba-damage-popup {
   font-weight: bold;
   font-size: 16px;
-  animation: popupFloat 0.8s ease-out forwards;
+  animation: popupFloat calc(0.8s / var(--battle-speed, 1)) ease-out forwards;
   white-space: nowrap;
 }
 .ba-damage-popup.damage { color: #ff5252; }
@@ -340,7 +340,7 @@ body {
 .ba-rage-fill {
   height: 100%;
   background: linear-gradient(90deg, #ff6b00, #ff0000);
-  transition: width 0.3s ease;
+  transition: width calc(0.3s / var(--battle-speed, 1)) ease;
   border-radius: 3px;
 }
 .ba-rage-label {
@@ -373,7 +373,7 @@ body {
 .ba-shield-fill {
   height: 100%;
   background: linear-gradient(90deg, #4da6ff, #2196f3);
-  transition: width 0.3s ease;
+  transition: width calc(0.3s / var(--battle-speed, 1)) ease;
   border-radius: 3px;
 }
 .ba-shield-label {

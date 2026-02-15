@@ -14,7 +14,7 @@ import { EncounterDataTable } from '../../domain/data/EncounterDataTable';
 import { SkillTable } from '../../domain/data/SkillTable';
 import { SkillGrade } from '../../domain/enums';
 import type { Skill } from '../../domain/entities/Skill';
-import { Package, Home, Swords, Zap, Star, BarChart3 } from 'lucide-react';
+import { Package, Home, Swords, Zap, Star, BarChart3, FastForward } from 'lucide-react';
 
 const MAX_BATTLE_TURNS = 15;
 
@@ -91,6 +91,9 @@ export function ChapterScreen() {
   const [showDamageGraph, setShowDamageGraph] = useState(false);
   const [damageSourcesSnapshot, setDamageSourcesSnapshot] = useState<DamageSource[]>([]);
   const damageMapRef = useRef<Map<string, DamageSource>>(new Map());
+
+  const [battleSpeed, setBattleSpeed] = useState<1 | 2>(1);
+  const battleSpeedRef = useRef<1 | 2>(1);
 
   const cancelledRef = useRef(false);
   const battleRef = useRef<Battle | null>(null);
@@ -352,8 +355,10 @@ export function ChapterScreen() {
       enemyNames,
     );
 
+    const speed = battleSpeedRef.current;
+
     setAttackPhase(`${side}-approach`);
-    await delay(PHASE_DURATION.approach);
+    await delay(PHASE_DURATION.approach / speed);
     if (cancelledRef.current) return newHps;
 
     setDamageEntries(hitGroup);
@@ -367,16 +372,16 @@ export function ChapterScreen() {
     setPlayerUnit(midPlayer);
     setEnemyUnits(midEnemies);
     setAttackPhase(`${side}-hit`);
-    await delay(PHASE_DURATION.hit);
+    await delay(PHASE_DURATION.hit / speed);
     if (cancelledRef.current) return newHps;
 
     setAttackPhase(`${side}-retreat`);
-    await delay(PHASE_DURATION.retreat);
+    await delay(PHASE_DURATION.retreat / speed);
     if (cancelledRef.current) return newHps;
 
     setDamageEntries([]);
     setAttackPhase('idle');
-    await delay(PHASE_DURATION.pause);
+    await delay(PHASE_DURATION.pause / speed);
 
     return newHps;
   }
@@ -458,7 +463,7 @@ export function ChapterScreen() {
     }
 
     if (playerEntries.length === 0 && enemyEntriesBySource.size === 0) {
-      await delay(PHASE_DURATION.pause);
+      await delay(PHASE_DURATION.pause / battleSpeedRef.current);
     }
 
     setPlayerUnit(cloneUnit(b.player));
@@ -683,6 +688,7 @@ export function ChapterScreen() {
             activeEnemyIndex={activeEnemyIndex}
             encounterType={encounter?.type}
             encounterOptionLabel={encounter?.options[0]?.label}
+            speedMultiplier={battleSpeed}
           />
 
           {isBattling && playerUnit ? (
@@ -696,6 +702,17 @@ export function ChapterScreen() {
                     def={playerUnit.getEffectiveDef()}
                   />
                 </div>
+                <button
+                  className={`btn-icon ${battleSpeed === 2 ? 'active' : ''}`}
+                  onClick={() => {
+                    const next = battleSpeed === 1 ? 2 : 1;
+                    setBattleSpeed(next);
+                    battleSpeedRef.current = next;
+                  }}
+                  title="배속"
+                >
+                  {battleSpeed === 2 ? <FastForward size={16} /> : <span style={{ fontSize: 12, fontWeight: 'bold' }}>1x</span>}
+                </button>
                 <button
                   className={`btn-icon ${showDamageGraph ? 'active' : ''}`}
                   onClick={() => setShowDamageGraph(v => !v)}
