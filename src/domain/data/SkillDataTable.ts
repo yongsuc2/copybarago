@@ -16,7 +16,7 @@ export const SkillDataTable = {
   lifesteal: { rate: 0.15 },
   regen: { healPerTurn: 10 },
   counter: { reflectRate: 0.3 },
-  iron_shield: { shieldRate: 0.15 },
+  iron_shield: { shieldRate: 0.1 },
   multi_hit_mastery: { chance: 0.25 },
   crit_mastery: { critBonus: 0.15 },
   rage_mastery: { powerBonus: 0.25 },

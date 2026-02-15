@@ -807,8 +807,9 @@ body {
   font-size: 13px;
   font-weight: bold;
   margin-bottom: 8px;
-  color: #e94560;
 }
+.dg-header.damage { color: #e94560; }
+.dg-header.heal { color: #69f0ae; }
 .dg-row {
   display: flex;
   align-items: center;
@@ -833,10 +834,11 @@ body {
 }
 .dg-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #e94560, #ff6b6b);
   border-radius: 3px;
   transition: width 0.3s ease;
 }
+.dg-bar-fill.damage { background: linear-gradient(90deg, #e94560, #ff6b6b); }
+.dg-bar-fill.heal { background: linear-gradient(90deg, #4caf50, #69f0ae); }
 .dg-value {
   display: flex;
   flex-direction: column;

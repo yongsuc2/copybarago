@@ -91,6 +91,8 @@ export function ChapterScreen() {
   const [showDamageGraph, setShowDamageGraph] = useState(false);
   const [damageSourcesSnapshot, setDamageSourcesSnapshot] = useState<DamageSource[]>([]);
   const damageMapRef = useRef<Map<string, DamageSource>>(new Map());
+  const [healSourcesSnapshot, setHealSourcesSnapshot] = useState<DamageSource[]>([]);
+  const healMapRef = useRef<Map<string, DamageSource>>(new Map());
 
   const [battleSpeed, setBattleSpeed] = useState<1 | 2>(1);
   const battleSpeedRef = useRef<1 | 2>(1);
@@ -144,6 +146,34 @@ export function ChapterScreen() {
       }
     }
     setDamageSourcesSnapshot([...map.values()]);
+
+    const hMap = healMapRef.current;
+    for (const entry of entries) {
+      const isHealType = entry.type === BattleLogType.LIFESTEAL
+        || entry.type === BattleLogType.HOT_HEAL
+        || entry.type === BattleLogType.REVIVE;
+      if (!isHealType || entry.target !== playerName) continue;
+
+      let key: string;
+      let icon: string;
+      if (entry.type === BattleLogType.LIFESTEAL) {
+        key = '흡혈';
+        icon = '🩸';
+      } else if (entry.type === BattleLogType.HOT_HEAL) {
+        key = '재생';
+        icon = '💚';
+      } else {
+        key = '부활';
+        icon = '✨';
+      }
+      const existing = hMap.get(key);
+      if (existing) {
+        existing.total += entry.value;
+      } else {
+        hMap.set(key, { label: key, icon, total: entry.value });
+      }
+    }
+    setHealSourcesSnapshot([...hMap.values()]);
   }
 
   const clearBattleState = useCallback(() => {
@@ -523,7 +553,9 @@ export function ChapterScreen() {
     cancelledRef.current = false;
     battleRef.current = b;
     damageMapRef.current = new Map();
+    healMapRef.current = new Map();
     setDamageSourcesSnapshot([]);
+    setHealSourcesSnapshot([]);
     setBattle(b);
     setPlayerUnit(cloneUnit(b.player));
     setEnemyUnits(b.enemies.map(e => cloneUnit(e)));
@@ -754,7 +786,12 @@ export function ChapterScreen() {
                   <BarChart3 size={18} />
                 </button>
               </div>
-              {showDamageGraph && <DamageGraph sources={damageSourcesSnapshot} />}
+              {showDamageGraph && (
+                <>
+                  <DamageGraph sources={damageSourcesSnapshot} />
+                  <DamageGraph sources={healSourcesSnapshot} title="회복 그래프" variant="heal" />
+                </>
+              )}
             </>
           ) : (
             <PlayerStatsBar
