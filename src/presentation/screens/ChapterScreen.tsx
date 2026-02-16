@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useGame } from '../GameContext';
-import { ChapterType, EncounterType, BattleState, SkillGrade } from '../../domain/enums';
+import { ChapterType, EncounterType, BattleState, SkillGrade, ResourceType } from '../../domain/enums';
 import type { Encounter } from '../../domain/chapter/Encounter';
 import { BattleUnit } from '../../domain/battle/BattleUnit';
 import { Battle } from '../../domain/battle/Battle';
@@ -233,8 +233,14 @@ export function ChapterScreen() {
       if (game.currentChapter && b.state === BattleState.VICTORY) {
         game.currentChapter.updateSessionHpAfterBattle(b.player.currentHp);
       }
-      game.currentChapter?.onBattleEnd(b.state);
-      setLog(prev => [...prev, `  전투: ${b.state} (${b.turnCount}턴)`]);
+      const goldEarned = game.currentChapter?.onBattleEnd(b.state) ?? 0;
+      if (goldEarned > 0) {
+        game.player.resources.add(ResourceType.GOLD, goldEarned);
+      }
+      setLog(prev => [
+        ...prev,
+        `  전투: ${b.state} (${b.turnCount}턴)${goldEarned > 0 ? ` +${goldEarned}G` : ''}`,
+      ]);
       setBattleResult(b.state);
 
       if (b.state === BattleState.DEFEAT) {

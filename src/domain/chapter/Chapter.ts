@@ -242,17 +242,21 @@ export class Chapter {
     return this.currentBattle;
   }
 
-  onBattleEnd(result: BattleState): void {
+  onBattleEnd(result: BattleState): number {
     this.currentBattle = null;
 
     if (result === BattleState.DEFEAT) {
       this.state = ChapterState.FAILED;
-      return;
+      return 0;
     }
 
     if (this.currentEncounter) {
       this.currentEncounter = null;
     }
+
+    const gold = BattleDataTable.combatGoldReward.base + BattleDataTable.combatGoldReward.perChapter * this.id;
+    this.sessionGold += gold;
+    return gold;
   }
 
   onBossDefeated(): void {

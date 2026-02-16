@@ -31,5 +31,10 @@ export const BattleDataTable = {
     scalingPerTowerFloor: 1.08,
   },
 
+  combatGoldReward: {
+    base: 10,
+    perChapter: 5,
+  },
+
   maxTurns: 100,
 } as const;
