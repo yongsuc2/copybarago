@@ -9,7 +9,7 @@ import { GameEvent, EventType } from '../domain/meta/GameEvent';
 import type { EventMission } from '../domain/meta/GameEvent';
 import {
   SlotType, EquipmentGrade, PetTier, PetGrade,
-  ArenaTier, DungeonType, HeritageRoute, ResourceType,
+  ArenaTier, DungeonType, HeritageRoute, ResourceType, WeaponSubType,
 } from '../domain/enums/index';
 
 interface EquipmentData {
@@ -19,9 +19,10 @@ interface EquipmentData {
   grade: EquipmentGrade;
   isS: boolean;
   level: number;
-  upgradeCount: number;
+  upgradeCount?: number;
   promoteCount: number;
   uniqueEffect: { description: string; statBonus: { hp: number; maxHp: number; atk: number; def: number; crit: number } } | null;
+  weaponSubType?: WeaponSubType | null;
 }
 
 interface PetData {
@@ -65,6 +66,8 @@ export interface SaveState {
     heritage: { route: HeritageRoute; level: number };
     resources: Record<string, number>;
     equipmentSlots: Record<string, (EquipmentData | null)[]>;
+    slotLevels?: Record<string, number[]>;
+    slotPromoteCounts?: Record<string, number[]>;
     inventory: EquipmentData[];
     activePetId: string | null;
     ownedPets: PetData[];
@@ -92,7 +95,6 @@ function serializeEquipment(eq: Equipment): EquipmentData {
     grade: eq.grade,
     isS: eq.isS,
     level: eq.level,
-    upgradeCount: eq.upgradeCount,
     promoteCount: eq.promoteCount,
     uniqueEffect: eq.uniqueEffect ? {
       description: eq.uniqueEffect.description,
@@ -104,7 +106,19 @@ function serializeEquipment(eq: Equipment): EquipmentData {
         crit: eq.uniqueEffect.statBonus.crit,
       },
     } : null,
+    weaponSubType: eq.weaponSubType,
   };
+}
+
+function migrateWeaponSubType(data: EquipmentData): WeaponSubType | null {
+  if (data.slot !== SlotType.WEAPON) return null;
+  if (data.weaponSubType) return data.weaponSubType;
+  const WEAPON_SUB_TYPES = [WeaponSubType.SWORD, WeaponSubType.STAFF, WeaponSubType.BOW];
+  let hash = 0;
+  for (let i = 0; i < data.id.length; i++) {
+    hash = ((hash << 5) - hash + data.id.charCodeAt(i)) | 0;
+  }
+  return WEAPON_SUB_TYPES[Math.abs(hash) % 3];
 }
 
 function deserializeEquipment(data: EquipmentData): Equipment {
@@ -115,9 +129,11 @@ function deserializeEquipment(data: EquipmentData): Equipment {
       statBonus: Stats.create(data.uniqueEffect.statBonus),
     };
   }
+  const weaponSubType = migrateWeaponSubType(data);
   return new Equipment(
     data.id, data.name, data.slot, data.grade, data.isS,
-    data.level, data.upgradeCount, data.promoteCount, uniqueEffect,
+    data.level, data.promoteCount, uniqueEffect,
+    weaponSubType,
   );
 }
 
@@ -180,8 +196,12 @@ export class SaveSerializer {
     const player = game.player;
 
     const equipmentSlots: Record<string, (EquipmentData | null)[]> = {};
+    const slotLevels: Record<string, number[]> = {};
+    const slotPromoteCounts: Record<string, number[]> = {};
     for (const [slotType, slot] of player.equipmentSlots.entries()) {
       equipmentSlots[slotType] = slot.equipped.map(eq => eq ? serializeEquipment(eq) : null);
+      slotLevels[slotType] = [...slot.slotLevels];
+      slotPromoteCounts[slotType] = [...slot.slotPromoteCounts];
     }
 
     const dungeons: Record<string, number> = {};
@@ -223,6 +243,8 @@ export class SaveSerializer {
         },
         resources: player.resources.toJSON(),
         equipmentSlots,
+        slotLevels,
+        slotPromoteCounts,
         inventory: player.inventory.map(serializeEquipment),
         activePetId: player.activePet?.id ?? null,
         ownedPets: player.ownedPets.map(serializePet),
@@ -273,6 +295,21 @@ export class SaveSerializer {
       for (let i = 0; i < equippedArr.length && i < slot.maxCount; i++) {
         const eqData = equippedArr[i];
         slot.equipped[i] = eqData ? deserializeEquipment(eqData) : null;
+      }
+      if (data.player.slotLevels?.[slotTypeStr]) {
+        const levels = data.player.slotLevels[slotTypeStr];
+        for (let i = 0; i < levels.length && i < slot.maxCount; i++) {
+          slot.slotLevels[i] = levels[i];
+        }
+      }
+      if (data.player.slotPromoteCounts?.[slotTypeStr]) {
+        const counts = data.player.slotPromoteCounts[slotTypeStr];
+        for (let i = 0; i < counts.length && i < slot.maxCount; i++) {
+          slot.slotPromoteCounts[i] = counts[i];
+        }
+      }
+      if (!data.player.slotLevels) {
+        slot.initFromEquipped();
       }
     }
 

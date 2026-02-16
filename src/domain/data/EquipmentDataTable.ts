@@ -1,4 +1,4 @@
-import { EquipmentGrade, SlotType } from '../enums';
+import { EquipmentGrade, SlotType, WeaponSubType } from '../enums';
 
 const GRADE_LABELS: Record<EquipmentGrade, string> = {
   [EquipmentGrade.COMMON]: '일반',
@@ -17,6 +17,12 @@ const SLOT_LABELS: Record<SlotType, string> = {
   [SlotType.SHOES]: '신발',
   [SlotType.GLOVES]: '장갑',
   [SlotType.HAT]: '모자',
+};
+
+const WEAPON_SUB_TYPE_LABELS: Record<WeaponSubType, string> = {
+  [WeaponSubType.SWORD]: '검',
+  [WeaponSubType.STAFF]: '지팡이',
+  [WeaponSubType.BOW]: '활',
 };
 
 const SELL_PRICES: Record<EquipmentGrade, number> = {
@@ -38,7 +44,11 @@ export const EquipmentDataTable = {
   getSellPrice(grade: EquipmentGrade): number {
     return SELL_PRICES[grade];
   },
+  getWeaponSubTypeLabel(subType: WeaponSubType): string {
+    return WEAPON_SUB_TYPE_LABELS[subType];
+  },
   gradeLabels: GRADE_LABELS,
   slotLabels: SLOT_LABELS,
+  weaponSubTypeLabels: WEAPON_SUB_TYPE_LABELS,
   sellPrices: SELL_PRICES,
 };

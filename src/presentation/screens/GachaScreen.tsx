@@ -68,7 +68,7 @@ export function GachaScreen() {
             <div className="card" key={i} style={{ padding: 8, margin: '4px 0', borderColor: r.isPity ? '#ffd700' : '#333' }}>
               {r.equipment ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <EquipmentIcon slot={r.equipment.slot} grade={r.equipment.grade} size={28} />
+                  <EquipmentIcon slot={r.equipment.slot} grade={r.equipment.grade} size={28} weaponSubType={r.equipment.weaponSubType} />
                   <div>
                     <span className={`grade-${r.equipment.grade.toLowerCase()}`}>
                       {r.equipment.isS && <span className="grade-s">[S] </span>}

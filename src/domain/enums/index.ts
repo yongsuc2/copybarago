@@ -56,6 +56,12 @@ export enum SlotType {
   HAT = 'HAT',
 }
 
+export enum WeaponSubType {
+  SWORD = 'SWORD',
+  STAFF = 'STAFF',
+  BOW = 'BOW',
+}
+
 export enum PetTier {
   S = 'S',
   A = 'A',
@@ -122,6 +128,7 @@ export enum EffectType {
   RAGE_POWER = 'RAGE_POWER',
   RAGE_BOOST = 'RAGE_BOOST',
   SHIELD = 'SHIELD',
+  AOE_DAMAGE = 'AOE_DAMAGE',
 }
 
 export enum TriggerCondition {

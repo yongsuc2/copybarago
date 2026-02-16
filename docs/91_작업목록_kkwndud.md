@@ -19,6 +19,9 @@
 | K-6 | 화면 기획서 작성 | 하 | 대기 | 미작성 화면별 상세 기획서 (docs/화면기획문서/) | 모험화면_기획서.md 참고 |
 | K-7 | UI 비주얼 개선 | 하 | 대기 | CSS 스타일 통일, 반응형, 색상/간격/폰트 다듬기 | index.css 참고 |
 | K-8 | 밸런스 데이터 시트 | 하 | 대기 | 챕터별 적 스탯, 비용 곡선, 보상 수치 정리 문서 | 기존 데이터 테이블 참고 |
+| K-9 | 장비 패시브 + 무기 종류 | 중 | 완료 | WeaponSubType(검/지팡이/활), EquipmentPassiveTable, 전투 연동, UI 패시브 표시 | EquipmentPassiveTable 참고 |
+| K-10 | 합성 시스템 간소화 | 중 | 완료 | upgradeCount 제거, 전 등급 3개 합성 통일, 합성 UI 아이콘 다이어그램 | Forge, EquipmentScreen 참고 |
+| K-11 | 강화 레벨 슬롯 귀속 | 중 | 완료 | 강화 레벨이 슬롯에 귀속, 장비 교체/해제 시 슬롯 레벨 유지 | EquipmentSlot, SaveSerializer 참고 |
 
 ---
 

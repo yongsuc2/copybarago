@@ -1,12 +1,13 @@
 import { Battle } from '../domain/battle/Battle';
 import { BattleUnit } from '../domain/battle/BattleUnit';
-import { BattleState } from '../domain/enums';
+import { BattleState, EffectType, PassiveType, StatType, StatusEffectType } from '../domain/enums';
 import { Stats } from '../domain/value-objects/Stats';
 import { Reward } from '../domain/value-objects/Reward';
 import { ResourceType } from '../domain/enums';
 import { Player } from '../domain/entities/Player';
 import type { ActiveSkill } from '../domain/entities/ActiveSkill';
-import type { PassiveSkill } from '../domain/entities/PassiveSkill';
+import { PassiveSkill } from '../domain/entities/PassiveSkill';
+import type { EquipmentPassiveDef } from '../domain/data/EquipmentPassiveTable';
 
 export interface BattleResult {
   state: BattleState;
@@ -16,9 +17,59 @@ export interface BattleResult {
 }
 
 export class BattleManager {
+  getEquipmentPassiveSkills(player: Player): PassiveSkill[] {
+    const skills: PassiveSkill[] = [];
+    for (const [, slot] of player.equipmentSlots.entries()) {
+      for (const eq of slot.equipped) {
+        if (!eq) continue;
+        const passive = eq.getPassive();
+        if (!passive) continue;
+        const converted = this.passiveToPassiveSkill(passive, eq.id);
+        if (converted) skills.push(converted);
+      }
+    }
+    return skills;
+  }
+
+  private passiveToPassiveSkill(passive: EquipmentPassiveDef, eqId: string): PassiveSkill | null {
+    const id = `eq_passive_${eqId}`;
+
+    switch (passive.effectType) {
+      case EffectType.BUFF: {
+        let stat: StatType | 'RAGE_POWER';
+        if (passive.statusEffectType === StatusEffectType.ATK_UP) stat = StatType.ATK;
+        else if (passive.statusEffectType === StatusEffectType.DEF_UP) stat = StatType.DEF;
+        else if (passive.statusEffectType === StatusEffectType.CRIT_UP) stat = StatType.CRIT;
+        else return null;
+        return new PassiveSkill(id, passive.description, passive.icon, 1, [], [], {
+          type: PassiveType.STAT_MODIFIER, stat, value: passive.value, isPercentage: true,
+        });
+      }
+      case EffectType.SHIELD:
+        return new PassiveSkill(id, passive.description, passive.icon, 1, [], [], {
+          type: PassiveType.SHIELD_ON_START, hpPercent: passive.value,
+        });
+      case EffectType.HOT:
+        return new PassiveSkill(id, passive.description, passive.icon, 1, [], [], {
+          type: PassiveType.REGEN, healPerTurn: passive.value,
+        });
+      case EffectType.MULTI_HIT:
+        return new PassiveSkill(id, passive.description, passive.icon, 1, [], [], {
+          type: PassiveType.MULTI_HIT, chance: passive.value,
+        });
+      case EffectType.RAGE_BOOST:
+        return new PassiveSkill(id, passive.description, passive.icon, 1, [], [], {
+          type: PassiveType.STAT_MODIFIER, stat: 'RAGE_POWER', value: passive.value, isPercentage: false,
+        });
+      default:
+        return null;
+    }
+  }
+
   createPlayerUnit(player: Player, activeSkills: ActiveSkill[], passiveSkills: PassiveSkill[]): BattleUnit {
     const stats = player.computeStats();
-    return new BattleUnit('Capybara', stats, [...activeSkills], [...passiveSkills], true);
+    const equipPassives = this.getEquipmentPassiveSkills(player);
+    return new BattleUnit('Capybara', stats, [...activeSkills], [...passiveSkills, ...equipPassives], true);
   }
 
   createBattle(playerUnit: BattleUnit, enemyUnit: BattleUnit, seed?: number): Battle {

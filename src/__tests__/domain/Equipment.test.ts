@@ -34,7 +34,7 @@ describe('Equipment', () => {
   });
 
   it('transfers level to another equipment', () => {
-    const old = new Equipment('w1', 'Old', SlotType.WEAPON, EquipmentGrade.COMMON, false, 15, 0, 1);
+    const old = new Equipment('w1', 'Old', SlotType.WEAPON, EquipmentGrade.COMMON, false, 15, 1);
     const newer = new Equipment('w2', 'New', SlotType.WEAPON, EquipmentGrade.RARE, false);
 
     old.transferLevelTo(newer);

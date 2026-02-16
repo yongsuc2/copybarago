@@ -25,3 +25,36 @@
 - EquipmentIcon SVG 컴포넌트 생성: 슬롯+등급별 색상/형태 차별화
 - 무기 아이콘: 등급에 따라 검(일반~우수) → 지팡이(희귀~에픽) → 활(전설~신화) 형태 변화
 - 장비 화면/뽑기 화면에 아이콘 적용, 뽑기 결과에 슬롯 한글 라벨 표시
+
+## 2026-02-16
+
+### 장비 등급별 패시브 능력 + 무기 종류(검/지팡이/활)
+- WeaponSubType enum(SWORD/STAFF/BOW) 추가, AOE_DAMAGE EffectType 추가
+- EquipmentPassiveTable 데이터 테이블 생성: 무기(검=ATK_UP, 지팡이=AOE_DAMAGE, 활=RAGE_BOOST) + 비무기 6종(방어구=SHIELD, 반지=CRIT_UP, 목걸이=ATK_UP, 신발=REGEN, 장갑=MULTI_HIT, 모자=DEF_UP) × 6등급
+- Equipment 엔티티에 weaponSubType 프로퍼티 + getPassive() 메서드 추가
+- TreasureChest: 무기 생성 시 랜덤 subType 배정, 장비 이름에 종류 반영
+- Forge: 같은 weaponSubType만 합성 가능, 결과에 subType 상속
+- SaveSerializer: weaponSubType 직렬화 + 기존 무기 id hash 기반 결정적 마이그레이션
+- BattleManager: getEquipmentPassiveSkills(player) 메서드 추가, 장비 패시브를 Skill 객체로 변환
+- Battle.ts: AOE_DAMAGE 처리 (주 타겟 외 나머지 적에게 ATK% 범위 피해)
+- ChapterScreen 4곳 + ContentScreen 2곳: BattleUnit 생성 시 장비 패시브 스킬 포함
+- EquipmentIcon: 무기 아이콘을 weaponSubType 기반으로 변경 (검/지팡이/활 형태)
+- EquipmentScreen: 슬롯탭 장비 클릭 → 패시브 능력 표시, 합성탭 장비 클릭 → 합성 정보 표시
+- DebugPanel: 디버그 장비 생성 시 무기에 랜덤 subType 배정
+- EquipmentDataTable: WEAPON_SUB_TYPE_LABELS(검/지팡이/활) 추가
+
+### 합성 시스템 간소화 + 합성 UI 아이콘화
+- upgradeCount(승급 시스템) 완전 제거: Equipment 엔티티, Forge, SaveSerializer, EquipmentScreen, 테스트
+- 에픽/전설 합성 수량 2개 → 3개로 통일 (모든 등급 3개 합성)
+- 합성 탭 아이콘 다이어그램: 보유 장비=실선 테두리 불투명, 부족=점선 테두리 반투명
+- 합성 결과/패시브 변화 미리보기 유지
+
+### 장비 강화 레벨 슬롯 귀속
+- 강화 레벨이 장비가 아닌 **슬롯에 귀속**되도록 변경
+- EquipmentSlot에 `slotLevels[]`, `slotPromoteCounts[]` 배열 추가
+- `equip()`: 새 장비에 슬롯 레벨 적용, 교체된 장비는 현재 레벨 유지한 채 보관함으로
+- `unequip()`: 해제된 장비 현재 레벨 유지한 채 보관함으로, 슬롯 레벨 유지
+- `syncLevel()`: 강화 후 슬롯 레벨 동기화
+- `initFromEquipped()`: 기존 세이브 호환 (slotLevels 없으면 장착 장비에서 추출)
+- SaveSerializer: slotLevels/slotPromoteCounts 직렬화/역직렬화 + 하위호환
+- EquipmentScreen: 강화 성공 후 `slot.syncLevel(index)` 호출

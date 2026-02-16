@@ -1,7 +1,9 @@
-import { EquipmentGrade, SlotType } from '../enums';
+import { EquipmentGrade, SlotType, WeaponSubType } from '../enums';
 import { Stats } from '../value-objects/Stats';
 import { Result } from '../value-objects/Result';
 import { EquipmentTable } from '../data/EquipmentTable';
+import { EquipmentPassiveTable } from '../data/EquipmentPassiveTable';
+import type { EquipmentPassiveDef } from '../data/EquipmentPassiveTable';
 
 export interface UniqueEffect {
   description: string;
@@ -16,10 +18,14 @@ export class Equipment {
     public grade: EquipmentGrade,
     public readonly isS: boolean,
     public level: number = 0,
-    public upgradeCount: number = 0,
     public promoteCount: number = 0,
     public readonly uniqueEffect: UniqueEffect | null = null,
+    public readonly weaponSubType: WeaponSubType | null = null,
   ) {}
+
+  getPassive(): EquipmentPassiveDef | null {
+    return EquipmentPassiveTable.getPassive(this.slot, this.grade, this.weaponSubType);
+  }
 
   getStats(): Stats {
     const baseStats = EquipmentTable.getBaseStats(this.slot, this.grade);

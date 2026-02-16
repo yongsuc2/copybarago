@@ -1,4 +1,4 @@
-import { EquipmentGrade, SlotType } from '../../domain/enums';
+import { EquipmentGrade, SlotType, WeaponSubType } from '../../domain/enums';
 
 const GRADE_COLORS: Record<EquipmentGrade, string> = {
   [EquipmentGrade.COMMON]: '#aaa',
@@ -9,33 +9,31 @@ const GRADE_COLORS: Record<EquipmentGrade, string> = {
   [EquipmentGrade.MYTHIC]: '#e94560',
 };
 
-const GRADE_INDEX: Record<EquipmentGrade, number> = {
-  [EquipmentGrade.COMMON]: 0,
-  [EquipmentGrade.UNCOMMON]: 1,
-  [EquipmentGrade.RARE]: 2,
-  [EquipmentGrade.EPIC]: 3,
-  [EquipmentGrade.LEGENDARY]: 4,
-  [EquipmentGrade.MYTHIC]: 5,
-};
-
-function weaponSvg(color: string, grade: EquipmentGrade): string {
-  const gi = GRADE_INDEX[grade];
-  if (gi >= 4) {
-    return `<line x1="50" y1="12" x2="50" y2="70" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
-            <path d="M38 18 L50 12 L62 18" stroke="${color}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            <path d="M35 24 L50 16 L65 24" stroke="${color}" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
-            <line x1="38" y1="50" x2="62" y2="50" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
-            <circle cx="50" cy="46" r="3" fill="${color}" opacity="0.8"/>`;
-  }
-  if (gi >= 2) {
-    return `<line x1="50" y1="14" x2="50" y2="72" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
-            <circle cx="50" cy="14" r="6" fill="none" stroke="${color}" stroke-width="2.5"/>
-            <circle cx="50" cy="14" r="2" fill="${color}"/>
-            <line x1="38" y1="52" x2="62" y2="52" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`;
-  }
+function swordSvg(color: string): string {
   return `<path d="M50 14 L56 32 L50 70 L44 32 Z" fill="${color}" opacity="0.9"/>
           <line x1="38" y1="52" x2="62" y2="52" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
           <circle cx="50" cy="52" r="2.5" fill="${color}"/>`;
+}
+
+function staffSvg(color: string): string {
+  return `<line x1="50" y1="14" x2="50" y2="72" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="50" cy="14" r="6" fill="none" stroke="${color}" stroke-width="2.5"/>
+          <circle cx="50" cy="14" r="2" fill="${color}"/>
+          <line x1="38" y1="52" x2="62" y2="52" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`;
+}
+
+function bowSvg(color: string): string {
+  return `<line x1="50" y1="12" x2="50" y2="70" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+          <path d="M38 18 L50 12 L62 18" stroke="${color}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M35 24 L50 16 L65 24" stroke="${color}" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
+          <line x1="38" y1="50" x2="62" y2="50" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="50" cy="46" r="3" fill="${color}" opacity="0.8"/>`;
+}
+
+function weaponSvg(color: string, _grade: EquipmentGrade, weaponSubType?: WeaponSubType | null): string {
+  if (weaponSubType === WeaponSubType.STAFF) return staffSvg(color);
+  if (weaponSubType === WeaponSubType.BOW) return bowSvg(color);
+  return swordSvg(color);
 }
 
 function armorSvg(color: string): string {
@@ -78,25 +76,26 @@ function hatSvg(color: string): string {
           <circle cx="50" cy="28" r="3" fill="${color}"/>`;
 }
 
-const SLOT_SVG_MAP: Record<SlotType, (color: string, grade: EquipmentGrade) => string> = {
-  [SlotType.WEAPON]: weaponSvg,
-  [SlotType.ARMOR]: (c) => armorSvg(c),
-  [SlotType.RING]: (c) => ringSvg(c),
-  [SlotType.NECKLACE]: (c) => necklaceSvg(c),
-  [SlotType.SHOES]: (c) => shoesSvg(c),
-  [SlotType.GLOVES]: (c) => glovesSvg(c),
-  [SlotType.HAT]: (c) => hatSvg(c),
-};
-
 interface EquipmentIconProps {
   slot: SlotType;
   grade?: EquipmentGrade;
   size?: number;
+  weaponSubType?: WeaponSubType | null;
 }
 
-export function EquipmentIcon({ slot, grade = EquipmentGrade.COMMON, size = 36 }: EquipmentIconProps) {
+export function EquipmentIcon({ slot, grade = EquipmentGrade.COMMON, size = 36, weaponSubType }: EquipmentIconProps) {
   const color = GRADE_COLORS[grade];
-  const svgContent = SLOT_SVG_MAP[slot](color, grade);
+  let svgContent: string;
+
+  switch (slot) {
+    case SlotType.WEAPON: svgContent = weaponSvg(color, grade, weaponSubType); break;
+    case SlotType.ARMOR: svgContent = armorSvg(color); break;
+    case SlotType.RING: svgContent = ringSvg(color); break;
+    case SlotType.NECKLACE: svgContent = necklaceSvg(color); break;
+    case SlotType.SHOES: svgContent = shoesSvg(color); break;
+    case SlotType.GLOVES: svgContent = glovesSvg(color); break;
+    case SlotType.HAT: svgContent = hatSvg(color); break;
+  }
 
   return (
     <svg

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useGame } from '../GameContext';
-import { EquipmentGrade, ResourceType, SlotType } from '../../domain/enums';
+import { EquipmentGrade, ResourceType, SlotType, WeaponSubType } from '../../domain/enums';
 import { Equipment } from '../../domain/entities/Equipment';
 import { EquipmentDataTable } from '../../domain/data/EquipmentDataTable';
 
@@ -44,12 +44,19 @@ export function DebugPanel() {
 
   function createEquipment() {
     const slot = SLOTS[Math.floor(Math.random() * SLOTS.length)];
+    const weaponSubTypes = [WeaponSubType.SWORD, WeaponSubType.STAFF, WeaponSubType.BOW];
+    const subType = slot === SlotType.WEAPON ? weaponSubTypes[Math.floor(Math.random() * 3)] : null;
+    const slotLabel = slot === SlotType.WEAPON && subType
+      ? EquipmentDataTable.getWeaponSubTypeLabel(subType)
+      : EquipmentDataTable.getSlotLabel(slot);
     const eq = new Equipment(
       `debug_${Date.now()}_${Math.floor(Math.random() * 9999)}`,
-      `${GRADE_LABELS[selectedGrade]} ${slot}`,
+      `${GRADE_LABELS[selectedGrade]} ${slotLabel}`,
       slot,
       selectedGrade,
       false,
+      0, 0, null,
+      subType,
     );
     game.player.addToInventory(eq);
     game.saveGame();

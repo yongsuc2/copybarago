@@ -64,8 +64,8 @@ const MERGE_COUNT: Record<EquipmentGrade, number> = {
   [EquipmentGrade.COMMON]: 3,
   [EquipmentGrade.UNCOMMON]: 3,
   [EquipmentGrade.RARE]: 3,
-  [EquipmentGrade.EPIC]: 2,
-  [EquipmentGrade.LEGENDARY]: 2,
+  [EquipmentGrade.EPIC]: 3,
+  [EquipmentGrade.LEGENDARY]: 3,
   [EquipmentGrade.MYTHIC]: 0,
 };
 

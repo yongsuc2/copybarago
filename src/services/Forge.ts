@@ -1,5 +1,5 @@
 import { Equipment } from '../domain/entities/Equipment';
-import { EquipmentGrade } from '../domain/enums';
+import { EquipmentGrade, SlotType } from '../domain/enums';
 import { Result } from '../domain/value-objects/Result';
 import { EquipmentTable } from '../domain/data/EquipmentTable';
 
@@ -9,8 +9,9 @@ export class Forge {
 
     const firstGrade = equipments[0].grade;
     const firstSlot = equipments[0].slot;
+    const firstSubType = equipments[0].weaponSubType;
 
-    if (!equipments.every(e => e.grade === firstGrade && e.slot === firstSlot)) {
+    if (!equipments.every(e => e.grade === firstGrade && e.slot === firstSlot && e.weaponSubType === firstSubType)) {
       return false;
     }
 
@@ -35,30 +36,16 @@ export class Forge {
       return Result.fail('S-grade equipment cannot be used as merge material');
     }
 
-    const isEpicOrAbove = EquipmentTable.getGradeIndex(source.grade) >= EquipmentTable.getGradeIndex(EquipmentGrade.EPIC);
-
-    let resultGrade = nextGrade;
-    let upgradeCount = 0;
-
-    if (isEpicOrAbove) {
-      upgradeCount = Math.min((source.upgradeCount || 0) + 1, 4);
-      if (upgradeCount >= 4) {
-        resultGrade = nextGrade;
-        upgradeCount = 0;
-      } else {
-        resultGrade = source.grade;
-      }
-    }
-
     const resultEquipment = new Equipment(
       `merged_${Date.now()}`,
-      `${resultGrade} ${source.slot}`,
+      `${nextGrade} ${source.slot}`,
       source.slot,
-      resultGrade,
+      nextGrade,
       false,
       source.level,
-      upgradeCount,
       source.promoteCount,
+      null,
+      source.weaponSubType,
     );
 
     return Result.ok({ result: resultEquipment });
@@ -70,14 +57,11 @@ export class Forge {
 
   findMergeCandidates(inventory: Equipment[]): Equipment[][] {
     const groups = new Map<string, Equipment[]>();
-    const epicIndex = EquipmentTable.getGradeIndex(EquipmentGrade.EPIC);
 
     for (const eq of inventory) {
       if (eq.isS) continue;
-      const isEpicPlus = EquipmentTable.getGradeIndex(eq.grade) >= epicIndex;
-      const key = isEpicPlus
-        ? `${eq.slot}_${eq.grade}_${eq.upgradeCount}`
-        : `${eq.slot}_${eq.grade}`;
+      const subKey = eq.slot === SlotType.WEAPON ? `_${eq.weaponSubType}` : '';
+      const key = `${eq.slot}${subKey}_${eq.grade}`;
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key)!.push(eq);
     }

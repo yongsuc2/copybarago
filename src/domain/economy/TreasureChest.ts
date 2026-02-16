@@ -1,6 +1,7 @@
-import { ChestType, EquipmentGrade, ResourceType, SlotType } from '../enums';
+import { ChestType, EquipmentGrade, ResourceType, SlotType, WeaponSubType } from '../enums';
 import { Equipment } from '../entities/Equipment';
 import { SeededRandom } from '../../infrastructure/SeededRandom';
+import { EquipmentDataTable } from '../data/EquipmentDataTable';
 
 interface ChestConfig {
   type: ChestType;
@@ -58,6 +59,7 @@ const CHEST_CONFIGS: Record<ChestType, ChestConfig> = {
 };
 
 const SLOTS = [SlotType.WEAPON, SlotType.ARMOR, SlotType.RING, SlotType.NECKLACE, SlotType.SHOES, SlotType.GLOVES, SlotType.HAT];
+const WEAPON_SUB_TYPES = [WeaponSubType.SWORD, WeaponSubType.STAFF, WeaponSubType.BOW];
 const S_RATE = 0.02;
 
 export interface PullResult {
@@ -107,13 +109,19 @@ export class TreasureChest {
 
     const slot = rng.pick(SLOTS);
     const isS = grade === EquipmentGrade.EPIC && rng.chance(S_RATE);
+    const subType = slot === SlotType.WEAPON ? rng.pick(WEAPON_SUB_TYPES) : null;
+    const name = slot === SlotType.WEAPON && subType
+      ? `${EquipmentDataTable.getGradeLabel(grade)} ${EquipmentDataTable.getWeaponSubTypeLabel(subType)}`
+      : `${EquipmentDataTable.getGradeLabel(grade)} ${EquipmentDataTable.getSlotLabel(slot)}`;
 
     const equipment = new Equipment(
       `chest_${Date.now()}_${rng.nextInt(0, 9999)}`,
-      `${grade} ${slot}`,
+      name,
       slot,
       grade,
       isS,
+      0, 0, null,
+      subType,
     );
 
     return { equipment, resources: [], isPity: false };
@@ -129,12 +137,18 @@ export class TreasureChest {
 
   private createPityResult(rng: SeededRandom): PullResult {
     const slot = rng.pick(SLOTS);
+    const subType = slot === SlotType.WEAPON ? rng.pick(WEAPON_SUB_TYPES) : null;
+    const slotLabel = slot === SlotType.WEAPON && subType
+      ? EquipmentDataTable.getWeaponSubTypeLabel(subType)
+      : EquipmentDataTable.getSlotLabel(slot);
     const equipment = new Equipment(
       `pity_${Date.now()}`,
-      `S-Epic ${slot}`,
+      `S-에픽 ${slotLabel}`,
       slot,
       EquipmentGrade.EPIC,
       true,
+      0, 0, null,
+      subType,
     );
     return { equipment, resources: [], isPity: true };
   }
