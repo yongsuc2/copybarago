@@ -23,8 +23,8 @@ const WEIGHTS: Record<ChapterType, EncounterWeight[]> = {
   [ChapterType.SIXTY_DAY]: [
     { type: EncounterType.COMBAT, weight: 40 },
     { type: EncounterType.ANGEL, weight: 25 },
-    { type: EncounterType.DEMON, weight: 15 },
-    { type: EncounterType.CHANCE, weight: 20 },
+    { type: EncounterType.DEMON, weight: 10 },
+    { type: EncounterType.CHANCE, weight: 25 },
   ],
   [ChapterType.THIRTY_DAY]: [
     { type: EncounterType.COMBAT, weight: 40 },
@@ -56,16 +56,13 @@ const DEMON = {
 };
 
 const CHANCE = {
-  boxGoldMin: 100,
-  boxGoldMax: 300,
-  boxLabel: '상자 열기',
-  boxDescription: '골드 획득',
   springHealPercent: 0.15,
   springLabel: '치유의 샘',
   springDescription: '최대 체력의 15% 회복',
-  blessingGold: 200,
+  blessingGoldBase: 50,
+  blessingGoldPerChapter: 100,
   blessingLabel: '축복',
-  blessingDescription: '골드 200 획득',
+  blessingDescription: '챕터에 따른 랜덤 골드 획득',
 };
 
 const JUNGBAK_ROULETTE = {

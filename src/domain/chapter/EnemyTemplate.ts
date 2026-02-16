@@ -3,6 +3,7 @@ import { ActiveSkill } from '../entities/ActiveSkill';
 import { PassiveSkill } from '../entities/PassiveSkill';
 import { BattleUnit } from '../battle/BattleUnit';
 import { EnemyTable, type EnemyTemplateData } from '../data/EnemyTable';
+import { BattleDataTable } from '../data/BattleDataTable';
 import { ActiveSkillRegistry } from '../data/ActiveSkillRegistry';
 import { PassiveSkillRegistry } from '../data/PassiveSkillRegistry';
 
@@ -37,8 +38,12 @@ export class EnemyTemplate {
     return EnemyTemplate.fromData(data);
   }
 
-  createInstance(chapterLevel: number, statMultiplier: number = 1.0): BattleUnit {
+  createInstance(chapterLevel: number, statMultiplier: number = 1.0, dayProgress: number = 0): BattleUnit {
     let scaledStats = EnemyTable.getScaledStats(this.baseStats, chapterLevel);
+    if (dayProgress > 0) {
+      const dayBonus = 1 + dayProgress * BattleDataTable.enemy.dayProgressMaxBonus;
+      scaledStats = scaledStats.multiply(dayBonus);
+    }
     if (statMultiplier !== 1.0) {
       scaledStats = scaledStats.multiply(statMultiplier);
     }

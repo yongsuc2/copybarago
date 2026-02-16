@@ -70,7 +70,7 @@ export class EncounterGenerator {
     this.rng = new SeededRandom(seed);
   }
 
-  generate(chapterType: ChapterType, _day: number, ownedSkills: SessionSkill[]): Encounter {
+  generate(chapterType: ChapterType, _day: number, ownedSkills: SessionSkill[], chapterId: number = 1): Encounter {
     const weights = EncounterDataTable.getWeights(chapterType);
     const type = this.rng.weightedPick(
       weights.map(w => ({ item: w.type, weight: w.weight }))
@@ -80,7 +80,7 @@ export class EncounterGenerator {
       case EncounterType.ANGEL: return this.createAngelEncounter(ownedSkills);
       case EncounterType.DEMON: return this.createDemonEncounter(ownedSkills);
       case EncounterType.COMBAT: return this.createCombatEncounter();
-      case EncounterType.CHANCE: return this.createChanceEncounter();
+      case EncounterType.CHANCE: return this.createChanceEncounter(ownedSkills, chapterId);
       default: return this.createCombatEncounter();
     }
   }
@@ -110,7 +110,7 @@ export class EncounterGenerator {
   }
 
   private createAngelEncounter(ownedSkills: SessionSkill[]): Encounter {
-    const skills = this.getRandomSkills(2, ownedSkills, 2);
+    const skills = this.getRandomSkills(3, ownedSkills, 2);
     const d = EncounterDataTable.angel;
 
     const options: EncounterOption[] = [];
@@ -125,15 +125,6 @@ export class EncounterGenerator {
         reward: skillReward([skill]),
       });
     }
-
-    options.push({
-      label: d.healLabel,
-      description: d.healDescription,
-      hpCostPercent: 0,
-      goldCost: 0,
-      successRate: 1.0,
-      reward: healReward(d.healPercent),
-    });
 
     return new Encounter(EncounterType.ANGEL, options);
   }
@@ -192,22 +183,24 @@ export class EncounterGenerator {
     return new Encounter(EncounterType.COMBAT, options);
   }
 
-  private createChanceEncounter(): Encounter {
+  private createChanceEncounter(ownedSkills: SessionSkill[], chapterId: number): Encounter {
     const roll = this.rng.nextInt(0, 2);
     const d = EncounterDataTable.chance;
     const options: EncounterOption[] = [];
 
     switch (roll) {
       case 0: {
-        const goldAmount = d.boxGoldMin + this.rng.nextInt(0, d.boxGoldMax - d.boxGoldMin);
-        options.push({
-          label: d.boxLabel,
-          description: d.boxDescription,
-          hpCostPercent: 0,
-          goldCost: 0,
-          successRate: 1.0,
-          reward: resourceReward(ResourceType.GOLD, goldAmount),
-        });
+        const skills = this.getRandomSkills(3, ownedSkills);
+        for (const skill of skills) {
+          options.push({
+            label: `${skill.icon} ${skill.name}`,
+            description: skill.description,
+            hpCostPercent: 0,
+            goldCost: 0,
+            successRate: 1.0,
+            reward: skillReward([skill]),
+          });
+        }
         break;
       }
       case 1:
@@ -220,16 +213,18 @@ export class EncounterGenerator {
           reward: healReward(d.springHealPercent),
         });
         break;
-      case 2:
+      case 2: {
+        const goldAmount = d.blessingGoldBase + this.rng.nextInt(0, d.blessingGoldPerChapter * chapterId);
         options.push({
           label: d.blessingLabel,
-          description: d.blessingDescription,
+          description: `골드 ${goldAmount} 획득`,
           hpCostPercent: 0,
           goldCost: 0,
           successRate: 1.0,
-          reward: resourceReward(ResourceType.GOLD, d.blessingGold),
+          reward: resourceReward(ResourceType.GOLD, goldAmount),
         });
         break;
+      }
     }
 
     return new Encounter(EncounterType.CHANCE, options);

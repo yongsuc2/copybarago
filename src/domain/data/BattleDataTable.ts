@@ -26,6 +26,7 @@ export const BattleDataTable = {
     dualStatMultiplier: 0.7,
     scalingPerChapter: 1.12,
     scalingPerTowerFloor: 1.08,
+    dayProgressMaxBonus: 0.8,
   },
 
   combatGoldReward: {

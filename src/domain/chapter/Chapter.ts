@@ -113,7 +113,7 @@ export class Chapter {
     }
 
     this.currentEncounter = this.encounterGenerator.generate(
-      this.type, this.currentDay, this.sessionSkills
+      this.type, this.currentDay, this.sessionSkills, this.id
     );
 
     return this.currentEncounter;
@@ -188,6 +188,7 @@ export class Chapter {
       return null;
     }
 
+    const dayProgress = this.getProgress();
     const pool = EnemyTable.getChapterEnemyPool();
     const idx1 = this.rng.nextInt(0, pool.length - 1);
     const id1 = pool[idx1];
@@ -200,14 +201,14 @@ export class Chapter {
       const idx2 = this.rng.nextInt(0, remaining.length - 1);
       const template2 = EnemyTemplate.fromId(remaining[idx2]);
       if (template2) {
-        const e1 = template1.createInstance(this.id, BattleDataTable.enemy.dualStatMultiplier);
-        const e2 = template2.createInstance(this.id, BattleDataTable.enemy.dualStatMultiplier);
+        const e1 = template1.createInstance(this.id, BattleDataTable.enemy.dualStatMultiplier, dayProgress);
+        const e2 = template2.createInstance(this.id, BattleDataTable.enemy.dualStatMultiplier, dayProgress);
         this.currentBattle = new Battle(playerUnit, [e1, e2], this.rng.nextInt(0, 999999));
         return this.currentBattle;
       }
     }
 
-    const enemy = template1.createInstance(this.id);
+    const enemy = template1.createInstance(this.id, 1.0, dayProgress);
     this.currentBattle = new Battle(playerUnit, enemy, this.rng.nextInt(0, 999999));
     return this.currentBattle;
   }
