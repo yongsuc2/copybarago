@@ -243,8 +243,7 @@ describe('PassiveSkillRegistry', () => {
   });
 
   it('all stat modifier passives have correct types', () => {
-    const statMods = ['crit_mastery', 'rage_mastery', 'hp_proficiency', 'atk_proficiency',
-      'def_proficiency', 'crit_proficiency', 'defense_ultimate', 'valor_ultimate', 'super_atk'];
+    const statMods = ['crit_mastery', 'rage_mastery', 'atk_proficiency', 'def_proficiency'];
     for (const id of statMods) {
       const skill = PassiveSkillRegistry.getById(id, 1);
       expect(skill).toBeDefined();

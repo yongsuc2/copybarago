@@ -30,10 +30,10 @@ export const PassiveSkillTierData = {
     4: { chance: 0.6 },
   },
   crit_mastery: {
-    1: { value: 0.15 },
-    2: { value: 0.25 },
-    3: { value: 0.35 },
-    4: { value: 0.5 },
+    1: { value: 0.12 },
+    2: { value: 0.2 },
+    3: { value: 0.3 },
+    4: { value: 0.42 },
   },
   rage_mastery: {
     1: { value: 0.25 },
@@ -41,47 +41,17 @@ export const PassiveSkillTierData = {
     3: { value: 0.55 },
     4: { value: 0.75 },
   },
-  hp_proficiency: {
-    1: { value: 0.1 },
-    2: { value: 0.18 },
-    3: { value: 0.28 },
-    4: { value: 0.4 },
-  },
   atk_proficiency: {
-    1: { value: 0.1 },
-    2: { value: 0.18 },
-    3: { value: 0.28 },
-    4: { value: 0.4 },
+    1: { value: 0.15 },
+    2: { value: 0.25 },
+    3: { value: 0.4 },
+    4: { value: 0.6 },
   },
   def_proficiency: {
-    1: { value: 0.1 },
-    2: { value: 0.18 },
-    3: { value: 0.28 },
-    4: { value: 0.4 },
-  },
-  crit_proficiency: {
-    1: { value: 0.1 },
-    2: { value: 0.18 },
-    3: { value: 0.28 },
-    4: { value: 0.4 },
-  },
-  defense_ultimate: {
-    1: { value: 0.5 },
-    2: { value: 0.7 },
-    3: { value: 0.9 },
-    4: { value: 1.2 },
-  },
-  valor_ultimate: {
-    1: { value: 0.5 },
-    2: { value: 0.7 },
-    3: { value: 0.9 },
-    4: { value: 1.2 },
-  },
-  super_atk: {
-    1: { value: 0.8 },
-    2: { value: 1.1 },
-    3: { value: 1.4 },
-    4: { value: 1.8 },
+    1: { value: 0.15 },
+    2: { value: 0.25 },
+    3: { value: 0.4 },
+    4: { value: 0.6 },
   },
   revive: {
     1: { hpPercent: 0.3 },
@@ -90,7 +60,7 @@ export const PassiveSkillTierData = {
     4: { hpPercent: 0.75 },
   },
   angel_power: {
-    4: { value: 1.0 },
+    4: { value: 0.3 },
   },
 } as const;
 

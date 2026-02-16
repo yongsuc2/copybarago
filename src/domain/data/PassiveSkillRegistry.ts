@@ -91,14 +91,6 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
     buildDescription: (t) => `분노 공격 데미지 +${pct(td('rage_mastery', t).value)}`,
   },
   {
-    id: 'hp_proficiency', name: 'HP 숙련', icon: '❤️',
-    tags: [], heritageSynergy: [],
-    buildEffect: (t) => ({
-      type: PassiveType.STAT_MODIFIER, stat: StatType.DEF, value: td('hp_proficiency', t).value, isPercentage: true,
-    }),
-    buildDescription: (t) => `방어력 +${pct(td('hp_proficiency', t).value)}`,
-  },
-  {
     id: 'atk_proficiency', name: 'ATK 숙련', icon: '🗡️',
     tags: [], heritageSynergy: [],
     buildEffect: (t) => ({
@@ -115,38 +107,6 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
     buildDescription: (t) => `방어력 +${pct(td('def_proficiency', t).value)}`,
   },
   {
-    id: 'crit_proficiency', name: 'CRIT 숙련', icon: '👁️',
-    tags: [], heritageSynergy: [],
-    buildEffect: (t) => ({
-      type: PassiveType.STAT_MODIFIER, stat: StatType.CRIT, value: td('crit_proficiency', t).value, isPercentage: false,
-    }),
-    buildDescription: (t) => `치명타 확률 +${pct(td('crit_proficiency', t).value)}`,
-  },
-  {
-    id: 'defense_ultimate', name: '방어 끝판왕', icon: '🏰',
-    tags: [], heritageSynergy: [],
-    buildEffect: (t) => ({
-      type: PassiveType.STAT_MODIFIER, stat: StatType.DEF, value: td('defense_ultimate', t).value, isPercentage: true,
-    }),
-    buildDescription: (t) => `방어력 +${pct(td('defense_ultimate', t).value)}`,
-  },
-  {
-    id: 'valor_ultimate', name: '용맹 끝판왕', icon: '👑',
-    tags: [], heritageSynergy: [],
-    buildEffect: (t) => ({
-      type: PassiveType.STAT_MODIFIER, stat: StatType.ATK, value: td('valor_ultimate', t).value, isPercentage: true,
-    }),
-    buildDescription: (t) => `공격력 +${pct(td('valor_ultimate', t).value)}`,
-  },
-  {
-    id: 'super_atk', name: '슈퍼 공격력', icon: '💥',
-    tags: [], heritageSynergy: [],
-    buildEffect: (t) => ({
-      type: PassiveType.STAT_MODIFIER, stat: StatType.ATK, value: td('super_atk', t).value, isPercentage: true,
-    }),
-    buildDescription: (t) => `공격력 +${pct(td('super_atk', t).value)}`,
-  },
-  {
     id: 'revive', name: '부활', icon: '✨',
     tags: [], heritageSynergy: [],
     buildEffect: (t) => ({
@@ -160,7 +120,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
     buildEffect: (t) => ({
       type: PassiveType.STAT_MODIFIER, stat: StatType.ATK, value: (td('angel_power', t) ?? td('angel_power', 4)).value, isPercentage: true,
     }),
-    buildDescription: () => '공격력 +100%',
+    buildDescription: () => '공격력 +30%',
   },
 ];
 
