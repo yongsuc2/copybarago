@@ -90,6 +90,15 @@ export function PetScreen() {
                   <span>공격력 +{pet.getGlobalBonus().atk}</span>
                   <span>체력 +{pet.getGlobalBonus().maxHp}</span>
                 </div>
+                <div style={{ marginTop: 4 }}>
+                  <div className="stat-row" style={{ fontSize: 11, color: '#aaa' }}>
+                    <span>EXP {pet.exp} / {pet.getExpToNextLevel()}</span>
+                    <span>먹이 {Math.ceil((pet.getExpToNextLevel() - pet.exp) / 10)}개 → 레벨업</span>
+                  </div>
+                  <div className="progress-bar" style={{ height: 4, marginTop: 2 }}>
+                    <div className="progress-fill" style={{ width: `${(pet.exp / pet.getExpToNextLevel()) * 100}%` }} />
+                  </div>
+                </div>
               </div>
             </div>
             {abilityDesc && (
