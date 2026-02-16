@@ -8,7 +8,7 @@ import {
 
 export interface StatModifierEffect {
   type: PassiveType.STAT_MODIFIER;
-  stat: StatType | 'RAGE_POWER';
+  stat: StatType | 'RAGE_POWER' | 'MAGIC_COEFFICIENT';
   value: number;
   isPercentage: boolean;
 }

@@ -1,5 +1,5 @@
 import { useGame } from '../GameContext';
-import { Home, Swords, TrendingUp, Shield, PawPrint, LayoutGrid, Gift, ListTodo, Settings } from 'lucide-react';
+import { Home, Swords, TrendingUp, Shield, PawPrint, LayoutGrid, Gift, ListTodo, CalendarDays, Settings } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 const NAV_ITEMS: { screen: string; label: string; icon: LucideIcon }[] = [
@@ -11,6 +11,7 @@ const NAV_ITEMS: { screen: string; label: string; icon: LucideIcon }[] = [
   { screen: 'content', label: '콘텐츠', icon: LayoutGrid },
   { screen: 'gacha', label: '뽑기', icon: Gift },
   { screen: 'quest', label: '퀘스트', icon: ListTodo },
+  { screen: 'event', label: '이벤트', icon: CalendarDays },
   { screen: 'settings', label: '설정', icon: Settings },
 ];
 

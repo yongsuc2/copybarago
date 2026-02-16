@@ -328,7 +328,10 @@ export function ChapterScreen() {
       const stats = game.player.computeStats();
       const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
       const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
-      const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), [...game.currentChapter.getSessionPassiveSkills(), ...equipPassives], true);
+      const petAbility = game.battleManager.getPetAbilitySkill(game.player);
+      const allPassives = [...game.currentChapter.getSessionPassiveSkills(), ...equipPassives];
+      if (petAbility) allPassives.push(petAbility);
+      const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), allPassives, true);
       const b = game.currentChapter.createCombatBattle(pu);
       if (b) {
         setBattleType('normal');
@@ -602,7 +605,8 @@ export function ChapterScreen() {
 
     const stats = game.player.computeStats();
     const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
-    const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), game.currentChapter.getSessionPassiveSkills(), true);
+    const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
+    const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), [...game.currentChapter.getSessionPassiveSkills(), ...equipPassives], true);
     const b = game.currentChapter.createEliteBattle(pu);
     if (!b) return;
 
@@ -615,7 +619,8 @@ export function ChapterScreen() {
 
     const stats = game.player.computeStats();
     const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
-    const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), game.currentChapter.getSessionPassiveSkills(), true);
+    const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
+    const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), [...game.currentChapter.getSessionPassiveSkills(), ...equipPassives], true);
     const b = game.currentChapter.createMidBossBattle(pu);
     if (!b) return;
 
@@ -628,7 +633,8 @@ export function ChapterScreen() {
 
     const stats = game.player.computeStats();
     const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
-    const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), game.currentChapter.getSessionPassiveSkills(), true);
+    const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
+    const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), [...game.currentChapter.getSessionPassiveSkills(), ...equipPassives], true);
     const b = game.currentChapter.createBossBattle(pu);
     if (!b) return;
 

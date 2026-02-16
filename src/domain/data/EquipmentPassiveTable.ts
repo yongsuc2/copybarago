@@ -30,12 +30,12 @@ const WEAPON_PASSIVES: WeaponPassiveEntry[] = [
   { subType: WeaponSubType.SWORD, grade: EquipmentGrade.LEGENDARY, passive: { effectType: EffectType.BUFF, statusEffectType: StatusEffectType.ATK_UP, value: 0.20, description: `공격력 ${pct(0.20)} 증가`, icon: '⚔️' } },
   { subType: WeaponSubType.SWORD, grade: EquipmentGrade.MYTHIC, passive: { effectType: EffectType.BUFF, statusEffectType: StatusEffectType.ATK_UP, value: 0.25, description: `공격력 ${pct(0.25)} 증가`, icon: '⚔️' } },
 
-  { subType: WeaponSubType.STAFF, grade: EquipmentGrade.COMMON, passive: { effectType: EffectType.AOE_DAMAGE, value: 0.05, description: `공격 시 ATK의 ${pct(0.05)} 범위 피해`, icon: '🪄' } },
-  { subType: WeaponSubType.STAFF, grade: EquipmentGrade.UNCOMMON, passive: { effectType: EffectType.AOE_DAMAGE, value: 0.10, description: `공격 시 ATK의 ${pct(0.10)} 범위 피해`, icon: '🪄' } },
-  { subType: WeaponSubType.STAFF, grade: EquipmentGrade.RARE, passive: { effectType: EffectType.AOE_DAMAGE, value: 0.15, description: `공격 시 ATK의 ${pct(0.15)} 범위 피해`, icon: '🪄' } },
-  { subType: WeaponSubType.STAFF, grade: EquipmentGrade.EPIC, passive: { effectType: EffectType.AOE_DAMAGE, value: 0.20, description: `공격 시 ATK의 ${pct(0.20)} 범위 피해`, icon: '🪄' } },
-  { subType: WeaponSubType.STAFF, grade: EquipmentGrade.LEGENDARY, passive: { effectType: EffectType.AOE_DAMAGE, value: 0.28, description: `공격 시 ATK의 ${pct(0.28)} 범위 피해`, icon: '🪄' } },
-  { subType: WeaponSubType.STAFF, grade: EquipmentGrade.MYTHIC, passive: { effectType: EffectType.AOE_DAMAGE, value: 0.35, description: `공격 시 ATK의 ${pct(0.35)} 범위 피해`, icon: '🪄' } },
+  { subType: WeaponSubType.STAFF, grade: EquipmentGrade.COMMON, passive: { effectType: EffectType.MAGIC_BOOST, value: 0.05, description: `마법 스킬 계수 +${pct(0.05)}`, icon: '🪄' } },
+  { subType: WeaponSubType.STAFF, grade: EquipmentGrade.UNCOMMON, passive: { effectType: EffectType.MAGIC_BOOST, value: 0.10, description: `마법 스킬 계수 +${pct(0.10)}`, icon: '🪄' } },
+  { subType: WeaponSubType.STAFF, grade: EquipmentGrade.RARE, passive: { effectType: EffectType.MAGIC_BOOST, value: 0.15, description: `마법 스킬 계수 +${pct(0.15)}`, icon: '🪄' } },
+  { subType: WeaponSubType.STAFF, grade: EquipmentGrade.EPIC, passive: { effectType: EffectType.MAGIC_BOOST, value: 0.20, description: `마법 스킬 계수 +${pct(0.20)}`, icon: '🪄' } },
+  { subType: WeaponSubType.STAFF, grade: EquipmentGrade.LEGENDARY, passive: { effectType: EffectType.MAGIC_BOOST, value: 0.28, description: `마법 스킬 계수 +${pct(0.28)}`, icon: '🪄' } },
+  { subType: WeaponSubType.STAFF, grade: EquipmentGrade.MYTHIC, passive: { effectType: EffectType.MAGIC_BOOST, value: 0.35, description: `마법 스킬 계수 +${pct(0.35)}`, icon: '🪄' } },
 
   { subType: WeaponSubType.BOW, grade: EquipmentGrade.COMMON, passive: { effectType: EffectType.RAGE_BOOST, value: 3, description: `분노 추가 충전 +3`, icon: '🏹' } },
   { subType: WeaponSubType.BOW, grade: EquipmentGrade.UNCOMMON, passive: { effectType: EffectType.RAGE_BOOST, value: 5, description: `분노 추가 충전 +5`, icon: '🏹' } },

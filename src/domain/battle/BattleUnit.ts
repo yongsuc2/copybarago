@@ -89,6 +89,8 @@ export class BattleUnit implements SkillExecutionUnit {
           this.baseCrit = Math.min(1.0, this.baseCrit + value);
         } else if (stat === 'RAGE_POWER') {
           this.ragePowerMultiplier += value;
+        } else if (stat === 'MAGIC_COEFFICIENT') {
+          this.magicCoefficient += value;
         }
         break;
       }

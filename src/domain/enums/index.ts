@@ -129,6 +129,7 @@ export enum EffectType {
   RAGE_BOOST = 'RAGE_BOOST',
   SHIELD = 'SHIELD',
   AOE_DAMAGE = 'AOE_DAMAGE',
+  MAGIC_BOOST = 'MAGIC_BOOST',
 }
 
 export enum TriggerCondition {

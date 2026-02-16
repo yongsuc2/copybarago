@@ -58,3 +58,31 @@
 - `initFromEquipped()`: 기존 세이브 호환 (slotLevels 없으면 장착 장비에서 추출)
 - SaveSerializer: slotLevels/slotPromoteCounts 직렬화/역직렬화 + 하위호환
 - EquipmentScreen: 강화 성공 후 `slot.syncLevel(index)` 호출
+
+### 지팡이 패시브 MAGIC_BOOST로 변경
+- 지팡이 패시브를 AOE_DAMAGE → MAGIC_BOOST(마법 스킬 계수 증가)로 변경
+- EffectType.MAGIC_BOOST enum 추가
+- PassiveSkill StatModifierEffect에 'MAGIC_COEFFICIENT' stat 타입 추가
+- BattleUnit.applyPassiveSkill에서 MAGIC_COEFFICIENT 처리 (base 0.5에 가산)
+- BattleManager.passiveToPassiveSkill에 MAGIC_BOOST 변환 추가
+
+### 7일 출석체크 이벤트 시스템 (K-4)
+- AttendanceDataTable: 7일 보상 데이터 테이블 (보석/에픽펫/장비뽑기/골드/장비석/펫알+사료/보석200)
+- AttendanceSystem: 출석 상태 관리 (checkedDays, cycleStartDate, lastCheckDate, canCheckIn, resetCycle)
+- GameManager: claimAttendance() 메서드 (RESOURCE/PET/EQUIPMENT_GACHA 보상 분기 처리), checkDailyReset에 사이클 리셋 연동
+- SaveSerializer: attendance 상태 직렬화/역직렬화 + 기존 세이브 하위호환
+- EventScreen: 출석체크 탭 UI (4열 그리드, 수령됨/수령가능/잠금 상태, 보상 결과 표시)
+- NavBar: CalendarDays 아이콘으로 이벤트 탭 추가
+- App.tsx: event 라우트 추가
+
+### 디버그 패널 출석 Day+1
+- DebugPanel에 "출석 Day+1" 버튼 추가 (lastCheckDate 초기화로 canCheckIn 활성화)
+- 7일 완료 시 자동 resetCycle() 호출
+
+### 펫 형상(PetIcon SVG) + 특수능력
+- PetIcon SVG 컴포넌트: 18종 펫별 고유 형태, 티어별 색상 (S=금, A=보라, B=초록)
+- PetTable에 ability 필드 추가: 펫별 고유 전투 패시브 (방어막/흡혈/공격력/방어력/연타/재생/반격/부활/치명타)
+- 등급별 능력 스케일: COMMON=1x → IMMORTAL=5x (gradeScale 가산)
+- BattleManager.getPetAbilitySkill(): 활성 펫 능력을 PassiveSkill로 변환
+- ChapterScreen 4곳 + ContentScreen 2곳 + BattleManager.createPlayerUnit: 펫 능력 전투 적용
+- PetScreen: PetIcon + 특수능력 설명 표시, 출전 중 상태 표시

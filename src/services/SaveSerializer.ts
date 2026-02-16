@@ -85,6 +85,11 @@ export interface SaveState {
   collection: string[];
   dailyReset: { lastResetDate: string };
   events: EventData[];
+  attendance?: {
+    checkedDays: boolean[];
+    cycleStartDate: string;
+    lastCheckDate: string;
+  };
 }
 
 function serializeEquipment(eq: Equipment): EquipmentData {
@@ -272,6 +277,11 @@ export class SaveSerializer {
       collection: collectionIds,
       dailyReset: { lastResetDate: game.dailyReset.getLastResetDate() },
       events,
+      attendance: {
+        checkedDays: [...game.attendance.checkedDays],
+        cycleStartDate: game.attendance.cycleStartDate,
+        lastCheckDate: game.attendance.lastCheckDate,
+      },
     };
   }
 
@@ -374,5 +384,11 @@ export class SaveSerializer {
         eventData.startTime, eventData.endTime, missions,
       );
     });
+
+    if (data.attendance) {
+      game.attendance.checkedDays = [...data.attendance.checkedDays];
+      game.attendance.cycleStartDate = data.attendance.cycleStartDate;
+      game.attendance.lastCheckDate = data.attendance.lastCheckDate;
+    }
   }
 }

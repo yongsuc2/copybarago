@@ -8,6 +8,8 @@ import { Player } from '../domain/entities/Player';
 import type { ActiveSkill } from '../domain/entities/ActiveSkill';
 import { PassiveSkill } from '../domain/entities/PassiveSkill';
 import type { EquipmentPassiveDef } from '../domain/data/EquipmentPassiveTable';
+import { PetTable } from '../domain/data/PetTable';
+import type { PetAbilityDef } from '../domain/data/PetTable';
 
 export interface BattleResult {
   state: BattleState;
@@ -61,6 +63,58 @@ export class BattleManager {
         return new PassiveSkill(id, passive.description, passive.icon, 1, [], [], {
           type: PassiveType.STAT_MODIFIER, stat: 'RAGE_POWER', value: passive.value, isPercentage: false,
         });
+      case EffectType.MAGIC_BOOST:
+        return new PassiveSkill(id, passive.description, passive.icon, 1, [], [], {
+          type: PassiveType.STAT_MODIFIER, stat: 'MAGIC_COEFFICIENT', value: passive.value, isPercentage: false,
+        });
+      default:
+        return null;
+    }
+  }
+
+  getPetAbilitySkill(player: Player): PassiveSkill | null {
+    const pet = player.activePet;
+    if (!pet) return null;
+    const template = PetTable.getTemplate(pet.id.replace(/^attendance_pet_.*/, ''));
+    const templateByName = template ?? PetTable.getAllTemplates().find(t => t.name === pet.name);
+    if (!templateByName) return null;
+
+    const ab = templateByName.ability;
+    const val = PetTable.getAbilityValue(ab, pet.grade);
+    const desc = PetTable.getAbilityDescription(templateByName.id, pet.grade);
+    return this.abilityToPassiveSkill(ab, val, `pet_ability_${pet.id}`, desc);
+  }
+
+  private abilityToPassiveSkill(ab: PetAbilityDef, value: number, id: string, desc: string): PassiveSkill | null {
+    switch (ab.passiveType) {
+      case PassiveType.STAT_MODIFIER:
+        return new PassiveSkill(id, desc, '', 1, [], [], {
+          type: PassiveType.STAT_MODIFIER, stat: ab.stat!, value, isPercentage: ab.isPercentage,
+        });
+      case PassiveType.COUNTER:
+        return new PassiveSkill(id, desc, '', 1, [], [], {
+          type: PassiveType.COUNTER, triggerChance: value,
+        });
+      case PassiveType.LIFESTEAL:
+        return new PassiveSkill(id, desc, '', 1, [], [], {
+          type: PassiveType.LIFESTEAL, rate: value,
+        });
+      case PassiveType.SHIELD_ON_START:
+        return new PassiveSkill(id, desc, '', 1, [], [], {
+          type: PassiveType.SHIELD_ON_START, hpPercent: value,
+        });
+      case PassiveType.REVIVE:
+        return new PassiveSkill(id, desc, '', 1, [], [], {
+          type: PassiveType.REVIVE, hpPercent: value, maxUses: 1,
+        });
+      case PassiveType.REGEN:
+        return new PassiveSkill(id, desc, '', 1, [], [], {
+          type: PassiveType.REGEN, healPerTurn: value,
+        });
+      case PassiveType.MULTI_HIT:
+        return new PassiveSkill(id, desc, '', 1, [], [], {
+          type: PassiveType.MULTI_HIT, chance: value,
+        });
       default:
         return null;
     }
@@ -69,7 +123,10 @@ export class BattleManager {
   createPlayerUnit(player: Player, activeSkills: ActiveSkill[], passiveSkills: PassiveSkill[]): BattleUnit {
     const stats = player.computeStats();
     const equipPassives = this.getEquipmentPassiveSkills(player);
-    return new BattleUnit('Capybara', stats, [...activeSkills], [...passiveSkills, ...equipPassives], true);
+    const petAbility = this.getPetAbilitySkill(player);
+    const allPassives = [...passiveSkills, ...equipPassives];
+    if (petAbility) allPassives.push(petAbility);
+    return new BattleUnit('Capybara', stats, [...activeSkills], allPassives, true);
   }
 
   createBattle(playerUnit: BattleUnit, enemyUnit: BattleUnit, seed?: number): Battle {

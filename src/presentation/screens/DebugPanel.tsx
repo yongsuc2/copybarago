@@ -88,6 +88,15 @@ export function DebugPanel() {
     refresh();
   }
 
+  function advanceAttendanceDay() {
+    if (game.attendance.isComplete()) {
+      game.attendance.resetCycle();
+    }
+    game.attendance.lastCheckDate = '';
+    game.saveGame();
+    refresh();
+  }
+
   return (
     <div className="debug-panel">
       <h3 style={{ margin: '0 0 12px', color: '#f5a623' }}>디버그 패널</h3>
@@ -149,9 +158,12 @@ export function DebugPanel() {
       </div>
 
       <div className="debug-section">
-        <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>퀘스트</div>
+        <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>퀘스트 / 이벤트</div>
         <div className="debug-row">
           <button className="debug-btn" onClick={completeAllQuests}>모든 퀘스트 완료</button>
+          <button className="debug-btn" onClick={advanceAttendanceDay}>
+            출석 Day+1 ({game.attendance.checkedDays.filter(d => d).length}/7)
+          </button>
         </div>
       </div>
 

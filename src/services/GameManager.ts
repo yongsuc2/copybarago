@@ -23,6 +23,11 @@ import { Result } from '../domain/value-objects/Result';
 import { EventBus } from '../infrastructure/EventBus';
 import { SeededRandom } from '../infrastructure/SeededRandom';
 import { ChapterType, ChestType, DungeonType, ResourceType } from '../domain/enums';
+import { AttendanceSystem } from '../domain/meta/AttendanceSystem';
+import { AttendanceDataTable } from '../domain/data/AttendanceDataTable';
+import { Pet } from '../domain/entities/Pet';
+import { PetTable } from '../domain/data/PetTable';
+import { PetGrade } from '../domain/enums';
 import { SaveManager } from '../domain/meta/SaveManager';
 import { SaveSerializer } from './SaveSerializer';
 
@@ -50,6 +55,8 @@ export class GameManager {
   equipmentManager: EquipmentManager;
   petManager: PetManager;
   resourceAllocator: ResourceAllocator;
+
+  attendance: AttendanceSystem;
 
   eventBus: EventBus;
   rng: SeededRandom;
@@ -79,6 +86,8 @@ export class GameManager {
     this.equipmentManager = new EquipmentManager();
     this.petManager = new PetManager();
     this.resourceAllocator = new ResourceAllocator();
+
+    this.attendance = new AttendanceSystem();
 
     this.eventBus = new EventBus();
     this.rng = new SeededRandom(Date.now());
@@ -159,6 +168,47 @@ export class GameManager {
     return this.chapterTreasure.claim(milestone, this.player);
   }
 
+  claimAttendance(): { day: number; pet?: Pet; equipment?: import('../domain/entities/Equipment').Equipment } | null {
+    if (!this.attendance.canCheckIn()) return null;
+    const day = this.attendance.checkIn();
+    if (day < 1) return null;
+
+    const rewardDef = AttendanceDataTable.getReward(day);
+    if (!rewardDef) return null;
+
+    let pet: Pet | undefined;
+    let equipment: import('../domain/entities/Equipment').Equipment | undefined;
+
+    if (rewardDef.type === 'RESOURCE' && rewardDef.resources) {
+      for (const r of rewardDef.resources) {
+        this.player.resources.add(r.type, r.amount);
+      }
+    } else if (rewardDef.type === 'PET') {
+      const template = PetTable.getRandomTemplate(this.rng);
+      pet = new Pet(
+        `attendance_pet_${Date.now()}_${this.rng.nextInt(0, 9999)}`,
+        template.name,
+        template.tier,
+        rewardDef.petGrade ?? PetGrade.EPIC,
+        1,
+        template.basePassiveBonus,
+      );
+      this.player.ownedPets.push(pet);
+    } else if (rewardDef.type === 'EQUIPMENT_GACHA') {
+      const pullResult = this.goldChest.pull(this.rng);
+      if (pullResult.equipment) {
+        this.player.addToInventory(pullResult.equipment);
+        equipment = pullResult.equipment;
+      }
+      for (const r of pullResult.resources) {
+        this.player.resources.add(r.type, r.amount);
+      }
+    }
+
+    this.saveGame();
+    return { day, pet, equipment };
+  }
+
   checkDailyReset(): void {
     if (this.dailyReset.needsReset()) {
       this.dailyReset.performReset(this.player.resources, this.dungeonManager, this.arena);
@@ -166,6 +216,9 @@ export class GameManager {
       this.eventManager.createDailyQuests();
       if (!this.eventManager.hasActiveWeeklyQuest()) {
         this.eventManager.createWeeklyQuests();
+      }
+      if (this.attendance.isComplete()) {
+        this.attendance.resetCycle();
       }
     }
   }

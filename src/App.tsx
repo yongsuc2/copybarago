@@ -9,6 +9,7 @@ import { PetScreen } from './presentation/screens/PetScreen';
 import { ContentScreen } from './presentation/screens/ContentScreen';
 import { GachaScreen } from './presentation/screens/GachaScreen';
 import { QuestScreen } from './presentation/screens/QuestScreen';
+import { EventScreen } from './presentation/screens/EventScreen';
 import { ChapterTreasureScreen } from './presentation/screens/ChapterTreasureScreen';
 import { SettingsScreen } from './presentation/screens/SettingsScreen';
 
@@ -24,6 +25,7 @@ function ScreenRouter() {
     case 'content': return <ContentScreen />;
     case 'gacha': return <GachaScreen />;
     case 'quest': return <QuestScreen />;
+    case 'event': return <EventScreen />;
     case 'chapter-treasure': return <ChapterTreasureScreen />;
     case 'settings': return <SettingsScreen />;
     default: return <MainScreen />;

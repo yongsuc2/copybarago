@@ -14,7 +14,7 @@
 | K-1 | 전승 화면 + 연동 | 중 | 대기 | HeritageScreen: 4개 계승 루트 탭, 레벨/패시브 표시, 강화. NavBar/App.tsx 추가 | TalentScreen 참고 |
 | K-2 | 장비 합성 화면 + 연동 | 중 | 대기 | ForgeScreen: 인벤토리에서 재료 선택, 미리보기, 합성 실행. GameManager 메서드 추가 | EquipmentScreen 보관함 탭 참고 |
 | K-3 | 소장품 도감 시스템 | 하 | 대기 | CollectionScreen: 도감 목록, 보너스 표시, 수령. Collection 도메인 이미 구현됨 | PetScreen 참고 |
-| K-4 | 이벤트 화면 | 하 | 대기 | EventScreen: 진행 중 이벤트, 미션 진행도, 보상 수령 | QuestScreen 참고 |
+| K-4 | 이벤트 화면 | 하 | 완료 | EventScreen: 7일 출석체크 이벤트 (AttendanceSystem + AttendanceDataTable) | QuestScreen 참고 |
 | K-5 | 지하감옥 개선 | 중 | 대기 | CatacombDungeon 연속 전투 UI. 기존 전투 로직 활용하여 5연전+보스 구현 | ChapterScreen 전투 참고 |
 | K-6 | 화면 기획서 작성 | 하 | 대기 | 미작성 화면별 상세 기획서 (docs/화면기획문서/) | 모험화면_기획서.md 참고 |
 | K-7 | UI 비주얼 개선 | 하 | 대기 | CSS 스타일 통일, 반응형, 색상/간격/폰트 다듬기 | index.css 참고 |
