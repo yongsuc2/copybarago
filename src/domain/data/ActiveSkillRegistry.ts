@@ -146,10 +146,16 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     tags: [SkillTag.FLAME, SkillTag.MAGIC],
     heritageSynergy: [],
     buildTrigger: () => trigger(everyNTurns(1)),
-    buildEffects: (t) => [
-      { type: SkillEffectType.ATTACK, attackType: AttackType.MAGIC, coefficient: td('flame_summon', t).coefficient },
-    ],
-    buildDescription: (t) => `화염 마법 공격 (계수 ${td('flame_summon', t).coefficient})`,
+    buildEffects: (t) => {
+      const d = td('flame_summon', t);
+      return [
+        { type: SkillEffectType.ATTACK, attackType: AttackType.MAGIC, coefficient: d.coefficient, duration: d.duration },
+      ];
+    },
+    buildDescription: (t) => {
+      const d = td('flame_summon', t);
+      return `화염 마법 도트 (계수 ${d.coefficient}, ${d.duration}턴)`;
+    },
   },
 
   {

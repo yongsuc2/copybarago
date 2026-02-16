@@ -49,10 +49,10 @@ export const ActiveSkillTierData = {
     4: { coefficient: 0.18, duration: 6 },
   },
   flame_summon: {
-    1: { coefficient: 0.18 },
-    2: { coefficient: 0.28 },
-    3: { coefficient: 0.4 },
-    4: { coefficient: 0.58 },
+    1: { coefficient: 0.08, duration: 4 },
+    2: { coefficient: 0.12, duration: 4 },
+    3: { coefficient: 0.17, duration: 5 },
+    4: { coefficient: 0.24, duration: 5 },
   },
 
   shuriken_summon: {

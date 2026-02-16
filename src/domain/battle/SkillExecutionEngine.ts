@@ -134,11 +134,11 @@ export class SkillExecutionEngine {
             damage: dealt, isCrit, healAmount: 0, rageChange: 0, debuffApplied: false,
           });
 
-          if (effect.attackType === AttackType.FIXED && effect.duration && effect.duration > 0) {
+          if (effect.duration && effect.duration > 0) {
             const dotDamage = Math.floor(source.getEffectiveAtk() * effect.coefficient);
-            target.addStatusEffect(new StatusEffect(
-              StatusEffectType.POISON, effect.duration, dotDamage,
-            ));
+            const dotType = effect.attackType === AttackType.MAGIC
+              ? StatusEffectType.BURN : StatusEffectType.POISON;
+            target.addStatusEffect(new StatusEffect(dotType, effect.duration, dotDamage));
           }
           break;
         }
