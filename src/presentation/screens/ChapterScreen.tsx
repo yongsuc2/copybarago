@@ -343,6 +343,10 @@ export function ChapterScreen() {
         if (result.hpChange !== 0) {
           setLog(prev => [...prev, `  체력 변화: ${result.hpChange > 0 ? '+' : ''}${result.hpChange}`]);
         }
+        for (const r of result.reward.resources) {
+          game.player.resources.add(r.type, r.amount);
+          setLog(prev => [...prev, `  보상: +${r.amount} ${r.type}`]);
+        }
       }
       refresh();
       setTimeout(() => advanceDay(), 300);
@@ -669,6 +673,10 @@ export function ChapterScreen() {
       }
       if (result.hpChange !== 0) {
         setLog(prev => [...prev, `  체력 변화: ${result.hpChange > 0 ? '+' : ''}${result.hpChange}`]);
+      }
+      for (const r of result.reward.resources) {
+        game.player.resources.add(r.type, r.amount);
+        setLog(prev => [...prev, `  보상: +${r.amount} ${r.type}`]);
       }
     }
 
