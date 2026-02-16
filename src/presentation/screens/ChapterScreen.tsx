@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useGame } from '../GameContext';
-import { ChapterType, EncounterType, BattleState } from '../../domain/enums';
+import { ChapterType, EncounterType, BattleState, SkillGrade } from '../../domain/enums';
 import type { Encounter } from '../../domain/chapter/Encounter';
 import { BattleUnit } from '../../domain/battle/BattleUnit';
 import { Battle } from '../../domain/battle/Battle';
