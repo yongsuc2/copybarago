@@ -1,9 +1,9 @@
 import { StatType, TalentGrade } from '../enums';
 
 const STAT_PER_LEVEL: Record<StatType, number> = {
-  [StatType.HP]: 20,
-  [StatType.ATK]: 5,
-  [StatType.DEF]: 3,
+  [StatType.HP]: 15,
+  [StatType.ATK]: 3,
+  [StatType.DEF]: 2,
   [StatType.CRIT]: 0,
 };
 
