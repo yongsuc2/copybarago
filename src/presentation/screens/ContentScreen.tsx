@@ -22,7 +22,7 @@ export function ContentScreen() {
   function challengeTower() {
     const tokens = game.player.resources.challengeTokens;
     const stats = game.player.computeStats();
-    const playerUnit = new BattleUnit('Capybara', stats, [], true);
+    const playerUnit = new BattleUnit('Capybara', stats, [], [], true);
     const result = game.tower.challenge(playerUnit, tokens);
     if (result.isFail()) { showMsg(result.message); return; }
 
@@ -57,7 +57,7 @@ export function ContentScreen() {
 
   function fightArena() {
     const stats = game.player.computeStats();
-    const playerUnit = new BattleUnit('Capybara', stats, [], true);
+    const playerUnit = new BattleUnit('Capybara', stats, [], [], true);
     const result = game.arena.fight(playerUnit, game.player.resources.arenaTickets, game.rng);
     if (result.isFail()) { showMsg(result.message); return; }
     game.player.resources.spend(ResourceType.ARENA_TICKET, 1);

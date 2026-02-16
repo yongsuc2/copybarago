@@ -25,7 +25,7 @@ describe('Arena', () => {
 
   it('consumes entry on fight', () => {
     const arena = new Arena();
-    const player = new BattleUnit('Player', Stats.create({ hp: 500, maxHp: 500, atk: 100, def: 20 }), [], true);
+    const player = new BattleUnit('Player', Stats.create({ hp: 500, maxHp: 500, atk: 100, def: 20 }), [], [], true);
     const rng = new SeededRandom(42);
 
     arena.fight(player, 1, rng);
@@ -34,7 +34,7 @@ describe('Arena', () => {
 
   it('respects daily entry limit', () => {
     const arena = new Arena();
-    const player = new BattleUnit('Player', Stats.create({ hp: 500, maxHp: 500, atk: 100, def: 20 }), [], true);
+    const player = new BattleUnit('Player', Stats.create({ hp: 500, maxHp: 500, atk: 100, def: 20 }), [], [], true);
     const rng = new SeededRandom(42);
 
     for (let i = 0; i < 5; i++) {
@@ -48,7 +48,7 @@ describe('Arena', () => {
 
   it('resets entries on daily reset', () => {
     const arena = new Arena();
-    const player = new BattleUnit('Player', Stats.create({ hp: 500, maxHp: 500, atk: 100, def: 20 }), [], true);
+    const player = new BattleUnit('Player', Stats.create({ hp: 500, maxHp: 500, atk: 100, def: 20 }), [], [], true);
     const rng = new SeededRandom(42);
 
     arena.fight(player, 1, rng);
@@ -58,7 +58,7 @@ describe('Arena', () => {
 
   it('returns battle results', () => {
     const arena = new Arena();
-    const player = new BattleUnit('Player', Stats.create({ hp: 500, maxHp: 500, atk: 100, def: 20 }), [], true);
+    const player = new BattleUnit('Player', Stats.create({ hp: 500, maxHp: 500, atk: 100, def: 20 }), [], [], true);
     const rng = new SeededRandom(42);
 
     const result = arena.fight(player, 1, rng);

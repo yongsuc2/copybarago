@@ -50,7 +50,7 @@ export class Arena {
       const atk = rng.nextInt(range.minAtk, range.maxAtk);
       const hp = rng.nextInt(range.minHp, range.maxHp);
       const stats = Stats.create({ hp, maxHp: hp, atk, def: range.def, crit: 0.05 });
-      opponents.push(new BattleUnit(`Opponent ${i + 1}`, stats, [], false));
+      opponents.push(new BattleUnit(`Opponent ${i + 1}`, stats, [], [], false));
     }
 
     return opponents;
@@ -76,6 +76,7 @@ export class Arena {
           hp: playerUnit.maxHp, maxHp: playerUnit.maxHp,
           atk: playerUnit.baseAtk, def: playerUnit.baseDef, crit: playerUnit.baseCrit,
         }),
+        [],
         [],
         true,
       );

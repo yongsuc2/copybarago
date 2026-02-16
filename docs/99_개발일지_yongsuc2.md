@@ -272,3 +272,98 @@ docs/화면기획문서/모험화면_기획서.md (복수 적 UI, 방어막 바)
 ### 누적 현황
 - 테스트: 19개 파일, 142개 테스트 전부 통과
 - tsc 타입 체크 통과
+
+---
+
+## 2026-02-16 (Day 5 - 오전)
+
+### 완료 작업
+- **스킬 티어/업그레이드 시스템 구현**
+  - 모든 스킬 패밀리에 4단계 티어 도입 (tier 1=일반 → tier 2=전설 → tier 3=신화 → tier 4=불멸)
+  - Skill 엔티티: `grade` 파라미터를 `tier: number`로 교체, `grade`는 getter로 파생
+  - SkillDataTable: 26개 패밀리 × 4티어 밸런스 수치 정의, getSkillDescription(id, tier) 시그니처 변경
+  - SkillTable: 패밀리 정의 배열 + tier 루프로 104개 Skill 인스턴스 생성, getNextTierSkill/getTier1Skills/isSpecialSkill 메서드 추가
+  - EncounterGenerator: 스킬 풀을 "새 스킬(tier 1) + 업그레이드(현재 tier+1)" 혼합으로 재구성
+  - 천사 인카운터: tier 1~2만 제공, 악마/중박 룰렛: 전체, 대박 룰렛/금상자: tier 3(신화급)
+  - Chapter.resolveEncounter: 동일 패밀리 보유 시 교체(업그레이드), 미보유 시 추가
+  - ChapterScreen 금상자: tier 3 풀 생성 시 보유 스킬 tier 확인, 교체/추가 분기
+  - angel_power/demon_power: 예외 — 단일 티어 4(불멸), 대박 룰렛에서만 획득
+  - 스킬 이름 티어 접미사: tier 2+=`II`, `III`, `IV`
+
+### 수정된 파일
+```
+src/domain/entities/Skill.ts (tier 프로퍼티, grade getter)
+src/domain/data/SkillDataTable.ts (4티어 밸런스 수치 구조)
+src/domain/data/SkillTable.ts (패밀리 기반 스킬 생성)
+src/domain/chapter/EncounterGenerator.ts (buildSkillPool, 티어 인식 스킬 풀)
+src/domain/chapter/Chapter.ts (스킬 교체 로직, sessionSkills 전달)
+src/presentation/screens/ChapterScreen.tsx (금상자 티어 인식)
+src/__tests__/domain/Battle.test.ts (Skill constructor 시그니처 업데이트)
+docs/04_스킬시스템.md (티어 시스템 설명 추가)
+```
+
+### 누적 현황
+- 테스트: 19개 파일, 142개 테스트 전부 통과
+- tsc 타입 체크 통과
+
+---
+
+## 2026-02-16 (Day 5 - 오후)
+
+### 완료 작업
+- **스킬 시스템 전면 재설계 구현** (Y-9)
+  - 기존 단일 Skill/SkillTable/SkillDataTable → 완전히 새로운 아키텍처
+  - **계층 구조**: BUILTIN/UPPER/LOWER/LOWEST 4단계, 역방향 연쇄 금지
+  - **CompoundTrigger**: 3개 AND 조건 (When + Probability + Special)
+  - **공격 타입**: PHYSICAL/MAGIC/FIXED 분리, 각각 다른 DEF 감소율
+  - **스킬 효과**: ATTACK/TRIGGER_SKILL/INJECT_EFFECT/HEAL_HP/ADD_RAGE/CONSUME_RAGE/DEBUFF 7종
+  - **INJECT_EFFECT**: 장착 시점에 타겟 스킬의 resolvedEffects에 효과 주입
+  - **패시브 분리**: PassiveSkill + PassiveEffect union type (8종 PassiveType)
+  - **SkillExecutionEngine**: 재귀적 스킬 체인 실행, MAX_SKILL_CHAIN_DEPTH=3
+  - **SkillValidator**: 계층 검증 규칙 5종
+  - **데이터**: ActiveSkillTierData(14 패밀리 × 4티어) + PassiveSkillTierData(17 패밀리 × 4티어)
+  - **레지스트리**: ActiveSkillRegistry(27 패밀리) + PassiveSkillRegistry(17 패밀리)
+  - 전투 시스템(BattleUnit, Battle) 전면 리팩터
+  - 연관 파일 전체 동시 수정 (Chapter, Encounter, EncounterGenerator, EnemyTemplate, BattleManager, Arena, ContentScreen, ChapterScreen)
+  - 기존 테스트 전면 업데이트 + 신규 테스트 2개 파일 추가
+
+### 생성된 파일
+```
+src/domain/entities/ActiveSkill.ts
+src/domain/entities/PassiveSkill.ts
+src/domain/data/ActiveSkillTierData.ts
+src/domain/data/PassiveSkillTierData.ts
+src/domain/data/ActiveSkillRegistry.ts
+src/domain/data/PassiveSkillRegistry.ts
+src/domain/battle/SkillExecutionEngine.ts
+src/domain/battle/SkillValidator.ts
+src/__tests__/domain/SkillSystem.test.ts
+src/__tests__/domain/SkillExecutionEngine.test.ts
+```
+
+### 수정된 파일
+```
+src/domain/enums/index.ts (SkillHierarchy, AttackType, SkillEffectType, SpecialConditionType, SkillTag, PassiveType, HeritageRoute 추가)
+src/domain/battle/BattleUnit.ts (ActiveSkill/PassiveSkill 기반 전면 재작성)
+src/domain/battle/Battle.ts (SkillExecutionEngine 기반 전면 재작성)
+src/domain/battle/BattleLog.ts (HEAL 중복 제거)
+src/domain/data/BattleDataTable.ts (magicDefenseReduction, baseMagicCoefficient 추가)
+src/domain/data/EnemyTable.ts (스킬 ID 매핑 업데이트)
+src/domain/chapter/EnemyTemplate.ts (ActiveSkillRegistry/PassiveSkillRegistry 참조)
+src/domain/chapter/Encounter.ts (SessionSkill 타입 적용)
+src/domain/chapter/EncounterGenerator.ts (신규 레지스트리 기반 재작성)
+src/domain/chapter/Chapter.ts (SessionSkill, getSessionActiveSkills/getSessionPassiveSkills)
+src/domain/content/Arena.ts (BattleUnit 5인자 생성자)
+src/services/BattleManager.ts (ActiveSkill/PassiveSkill 인자 분리)
+src/presentation/screens/ChapterScreen.tsx (신규 레지스트리, SessionSkill, 5인자 BattleUnit)
+src/presentation/screens/ContentScreen.tsx (5인자 BattleUnit)
+src/__tests__/domain/Battle.test.ts (신규 스킬 타입 기반 전면 재작성)
+src/__tests__/content/Arena.test.ts (5인자 BattleUnit)
+src/__tests__/content/Tower.test.ts (5인자 BattleUnit)
+src/__tests__/domain/Chapter.test.ts (5인자 BattleUnit)
+docs/04_스킬시스템.md (전면 재작성)
+```
+
+### 누적 현황
+- 테스트: 21개 파일, 180개 테스트 전부 통과
+- tsc 타입 체크 통과

@@ -2,9 +2,10 @@ import { ChapterType, EncounterType, BattleState } from '../enums';
 import { Encounter, type EncounterResult } from './Encounter';
 import { EncounterGenerator } from './EncounterGenerator';
 import { EnemyTemplate } from './EnemyTemplate';
-import { BattleUnit } from '../battle/BattleUnit';
+import { BattleUnit, type SessionSkill, isActiveSkill } from '../battle/BattleUnit';
 import { Battle } from '../battle/Battle';
-import { Skill } from '../entities/Skill';
+import { ActiveSkillRegistry } from '../data/ActiveSkillRegistry';
+import type { ActiveSkill } from '../entities/ActiveSkill';
 import { Reward } from '../value-objects/Reward';
 import { EnemyTable } from '../data/EnemyTable';
 import { EncounterDataTable } from '../data/EncounterDataTable';
@@ -23,7 +24,7 @@ export interface ChapterSessionState {
   currentDay: number;
   totalDays: number;
   state: ChapterState;
-  sessionSkills: Skill[];
+  sessionSkills: SessionSkill[];
   currentEncounter: Encounter | null;
   currentBattle: Battle | null;
   totalReward: Reward;
@@ -37,7 +38,7 @@ export class Chapter {
   totalDays: number;
   currentDay: number;
   state: ChapterState;
-  sessionSkills: Skill[];
+  sessionSkills: SessionSkill[];
   currentEncounter: Encounter | null;
   currentBattle: Battle | null;
   totalReward: Reward;
@@ -97,23 +98,22 @@ export class Chapter {
       return null;
     }
 
-    const existingIds = this.sessionSkills.map(s => s.id);
     const threshold = EncounterDataTable.counterThreshold;
 
     if (this.daebakCount >= threshold.daebak) {
       this.daebakCount = 0;
-      this.currentEncounter = this.encounterGenerator.generateDaebakRoulette(existingIds);
+      this.currentEncounter = this.encounterGenerator.generateDaebakRoulette(this.sessionSkills);
       return this.currentEncounter;
     }
 
     if (this.jungbakCount >= threshold.jungbak) {
       this.jungbakCount = 0;
-      this.currentEncounter = this.encounterGenerator.generateJungbakRoulette(existingIds);
+      this.currentEncounter = this.encounterGenerator.generateJungbakRoulette(this.sessionSkills);
       return this.currentEncounter;
     }
 
     this.currentEncounter = this.encounterGenerator.generate(
-      this.type, this.currentDay, existingIds
+      this.type, this.currentDay, this.sessionSkills
     );
 
     return this.currentEncounter;
@@ -138,7 +138,12 @@ export class Chapter {
     );
 
     for (const skill of result.skillsGained) {
-      this.sessionSkills.push(skill);
+      const existingIdx = this.sessionSkills.findIndex(s => s.id === skill.id);
+      if (existingIdx >= 0) {
+        this.sessionSkills[existingIdx] = skill;
+      } else {
+        this.sessionSkills.push(skill);
+      }
     }
 
     this.sessionGold += result.goldChange;
@@ -162,6 +167,20 @@ export class Chapter {
 
   updateSessionHpAfterBattle(remainingHp: number): void {
     this.sessionCurrentHp = Math.max(0, Math.min(remainingHp, this.sessionMaxHp));
+  }
+
+  getSessionActiveSkills(): ActiveSkill[] {
+    const builtins = ActiveSkillRegistry.getBuiltinSkills();
+    const lowerLowest = ActiveSkillRegistry.getAll().filter(
+      s => (s.hierarchy === 'LOWER' || s.hierarchy === 'LOWEST') && s.tier === 1
+    );
+
+    const userActives = this.sessionSkills.filter(isActiveSkill);
+    return [...builtins, ...userActives, ...lowerLowest];
+  }
+
+  getSessionPassiveSkills(): import('../entities/PassiveSkill').PassiveSkill[] {
+    return this.sessionSkills.filter(s => !isActiveSkill(s)) as import('../entities/PassiveSkill').PassiveSkill[];
   }
 
   createCombatBattle(playerUnit: BattleUnit): Battle | null {

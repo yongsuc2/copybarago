@@ -1,6 +1,8 @@
 export const BattleDataTable = {
   damage: {
     defenseReduction: 0.5,
+    magicDefenseReduction: 0.3,
+    baseMagicCoefficient: 0.5,
     varianceMin: 0.9,
     varianceMax: 1.1,
     critMultiplier: 1.5,

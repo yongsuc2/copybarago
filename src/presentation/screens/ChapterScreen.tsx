@@ -11,9 +11,9 @@ import { AdventureStage } from '../components/AdventureStage';
 import { PlayerStatsBar } from '../components/PlayerStatsBar';
 import { DamageGraph, type DamageSource } from '../components/DamageGraph';
 import { EncounterDataTable } from '../../domain/data/EncounterDataTable';
-import { SkillTable } from '../../domain/data/SkillTable';
-import { SkillGrade } from '../../domain/enums';
-import type { Skill } from '../../domain/entities/Skill';
+import { ActiveSkillRegistry } from '../../domain/data/ActiveSkillRegistry';
+import { PassiveSkillRegistry } from '../../domain/data/PassiveSkillRegistry';
+import type { SessionSkill } from '../../domain/battle/BattleUnit';
 import { Package, Home, Swords, Zap, Star, BarChart3, FastForward } from 'lucide-react';
 
 const MAX_BATTLE_TURNS = 15;
@@ -91,7 +91,7 @@ export function ChapterScreen() {
   const [isBattling, setIsBattling] = useState(false);
   const [isBossFight, setIsBossFight] = useState(false);
   const [battleType, setBattleType] = useState<'normal' | 'elite' | 'midBoss' | 'boss'>('normal');
-  const [eliteReward, setEliteReward] = useState<Skill[] | null>(null);
+  const [eliteReward, setEliteReward] = useState<SessionSkill[] | null>(null);
   const [chapterResult, setChapterResult] = useState<{ type: 'victory' | 'defeat'; chapterId: number; gold: number } | null>(null);
   const [activeEnemyIndex, setActiveEnemyIndex] = useState(0);
 
@@ -259,10 +259,16 @@ export function ChapterScreen() {
           refresh();
         }, 1500);
       } else if (battleType === 'elite' || battleType === 'midBoss') {
-        const existingIds = game.currentChapter?.getSessionSkillIds() ?? [];
-        const mythicSkills = SkillTable.getSkillsByGrade(SkillGrade.MYTHIC)
-          .filter(s => !existingIds.includes(s.id));
-        const shuffled = [...mythicSkills].sort(() => Math.random() - 0.5);
+        const ownedSkills = game.currentChapter?.sessionSkills ?? [];
+        const ownedMap = new Map(ownedSkills.map(s => [s.id, s.tier]));
+        const tier3Pool: SessionSkill[] = [
+          ...ActiveSkillRegistry.getAll().filter(s => s.tier === 3 && !ActiveSkillRegistry.isSpecialSkill(s.id)),
+          ...PassiveSkillRegistry.getAll().filter(s => s.tier === 3 && !PassiveSkillRegistry.isSpecialSkill(s.id)),
+        ].filter(s => {
+          const owned = ownedMap.get(s.id);
+          return !owned || owned < s.tier;
+        });
+        const shuffled = [...tier3Pool].sort(() => Math.random() - 0.5);
         const choices = shuffled.slice(0, 3);
 
         setTimeout(() => {
@@ -311,7 +317,7 @@ export function ChapterScreen() {
     if (enc?.type === EncounterType.COMBAT) {
       const stats = game.player.computeStats();
       const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
-      const pu = new BattleUnit('Capybara', battleStats, [...game.currentChapter.sessionSkills], true);
+      const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), game.currentChapter.getSessionPassiveSkills(), true);
       const b = game.currentChapter.createCombatBattle(pu);
       if (b) {
         setBattleType('normal');
@@ -581,7 +587,7 @@ export function ChapterScreen() {
 
     const stats = game.player.computeStats();
     const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
-    const pu = new BattleUnit('Capybara', battleStats, [...game.currentChapter.sessionSkills], true);
+    const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), game.currentChapter.getSessionPassiveSkills(), true);
     const b = game.currentChapter.createEliteBattle(pu);
     if (!b) return;
 
@@ -594,7 +600,7 @@ export function ChapterScreen() {
 
     const stats = game.player.computeStats();
     const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
-    const pu = new BattleUnit('Capybara', battleStats, [...game.currentChapter.sessionSkills], true);
+    const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), game.currentChapter.getSessionPassiveSkills(), true);
     const b = game.currentChapter.createMidBossBattle(pu);
     if (!b) return;
 
@@ -607,7 +613,7 @@ export function ChapterScreen() {
 
     const stats = game.player.computeStats();
     const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
-    const pu = new BattleUnit('Capybara', battleStats, [...game.currentChapter.sessionSkills], true);
+    const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), game.currentChapter.getSessionPassiveSkills(), true);
     const b = game.currentChapter.createBossBattle(pu);
     if (!b) return;
 
@@ -856,7 +862,12 @@ export function ChapterScreen() {
                   className="golden-chest-option"
                   onClick={() => {
                     if (game.currentChapter) {
-                      game.currentChapter.sessionSkills.push(skill);
+                      const existingIdx = game.currentChapter.sessionSkills.findIndex(s => s.id === skill.id);
+                      if (existingIdx >= 0) {
+                        game.currentChapter.sessionSkills[existingIdx] = skill;
+                      } else {
+                        game.currentChapter.sessionSkills.push(skill);
+                      }
                       setLog(prev => [...prev, `  금상자: ${skill.icon} ${skill.name} 획득`]);
                     }
                     setEliteReward(null);

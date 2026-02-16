@@ -1,7 +1,8 @@
-import { BattleState, EffectType, TriggerCondition } from '../enums';
+import { BattleState, SkillHierarchy } from '../enums';
 import { BattleUnit } from './BattleUnit';
 import { BattleLog, type BattleLogEntry, BattleLogType } from './BattleLog';
-import { StatusEffect } from './StatusEffect';
+import { SkillExecutionEngine, type SkillDamageResult } from './SkillExecutionEngine';
+import type { ActiveSkill } from '../entities/ActiveSkill';
 import { SeededRandom } from '../../infrastructure/SeededRandom';
 import { BattleDataTable } from '../data/BattleDataTable';
 
@@ -21,6 +22,7 @@ export class Battle {
   state: BattleState;
   log: BattleLog;
   private rng: SeededRandom;
+  private engine: SkillExecutionEngine;
 
   constructor(player: BattleUnit, enemies: BattleUnit | BattleUnit[], seed: number = Date.now()) {
     this.player = player;
@@ -29,6 +31,9 @@ export class Battle {
     this.state = BattleState.IN_PROGRESS;
     this.log = new BattleLog();
     this.rng = new SeededRandom(seed);
+    this.engine = new SkillExecutionEngine(this.rng);
+
+    this.engine.resolveInjections(this.player.activeSkills);
   }
 
   get enemy(): BattleUnit {
@@ -52,23 +57,15 @@ export class Battle {
       message: `Turn ${this.turnCount}`,
     });
 
-    for (const enemy of this.enemies) {
-      if (!enemy.isAlive()) continue;
-      this.processTurnStartSkills(this.player, enemy);
-      if (this.checkDeath()) return this.buildTurnResult();
-      this.processTurnStartSkills(enemy, this.player);
-      if (this.checkDeath()) return this.buildTurnResult();
-    }
-
     const target = this.getFirstAliveEnemy();
     if (target && this.player.isAlive()) {
-      this.processAttack(this.player, target);
+      this.processPlayerTurn(this.player, target);
       if (this.checkDeath()) return this.buildTurnResult();
     }
 
     for (const enemy of this.enemies) {
       if (!enemy.isAlive() || !this.player.isAlive()) continue;
-      this.processAttack(enemy, this.player);
+      this.processEnemyTurn(enemy, this.player);
       if (this.checkDeath()) return this.buildTurnResult();
     }
 
@@ -83,46 +80,87 @@ export class Battle {
     return this.buildTurnResult();
   }
 
-  private processAttack(attacker: BattleUnit, defender: BattleUnit): void {
-    this.processSingleHit(attacker, defender);
+  private processPlayerTurn(player: BattleUnit, target: BattleUnit): void {
+    const builtins = player.getBuiltinSkills();
+    const ilban = builtins.find(s => s.id === 'ilban_attack');
+    const bunno = builtins.find(s => s.id === 'bunno_attack');
 
-    if (defender.isAlive() && attacker.multiHitChance > 0 && this.rng.chance(attacker.multiHitChance)) {
-      this.processSingleHit(attacker, defender);
+    let mainSkill: ActiveSkill | undefined;
+    let isBunno = false;
+
+    if (bunno && this.engine.evaluateTrigger(bunno.trigger, this.turnCount, player)) {
+      mainSkill = bunno;
+      isBunno = true;
+    } else {
+      mainSkill = ilban;
     }
 
-    this.processOnAttackDebuffs(attacker, defender);
+    if (!target.isAlive()) return;
 
-    if (defender.isAlive() && attacker.ragePerAttack > 0) {
-      attacker.rage += attacker.ragePerAttack + attacker.bonusRagePerAttack;
-      if (attacker.rage >= attacker.maxRage) {
-        attacker.rage = 0;
-        this.processRageAttack(attacker, defender);
+    if (!mainSkill) {
+      this.processBasicAttack(player, target);
+      return;
+    }
+
+    const allSkills = player.getAllSkillsForEngine();
+    const mainResults = this.engine.executeSkillEffects(mainSkill, player, target, allSkills);
+
+    if (isBunno) {
+      for (const r of mainResults) {
+        if (r.damage > 0) {
+          r.damage = Math.floor(r.damage * player.ragePowerMultiplier);
+        }
       }
+    }
+
+    this.logSkillResults(mainResults, player, target, isBunno);
+    this.applyLifesteal(player, mainResults);
+
+    if (target.isAlive() && player.multiHitChance > 0 && this.rng.chance(player.multiHitChance)) {
+      const multiResults = this.engine.executeSkillEffects(mainSkill, player, target, allSkills);
+      if (isBunno) {
+        for (const r of multiResults) {
+          if (r.damage > 0) {
+            r.damage = Math.floor(r.damage * player.ragePowerMultiplier);
+          }
+        }
+      }
+      this.logSkillResults(multiResults, player, target, isBunno);
+      this.applyLifesteal(player, multiResults);
+    }
+
+    if (!target.isAlive()) return;
+
+    for (const skill of player.activeSkills) {
+      if (!target.isAlive()) break;
+      if (skill.hierarchy === SkillHierarchy.BUILTIN) continue;
+      if (skill.hierarchy !== SkillHierarchy.UPPER) continue;
+
+      if (this.engine.evaluateTrigger(skill.trigger, this.turnCount, player, mainSkill.id)) {
+        const upperResults = this.engine.executeSkillEffects(skill, player, target, allSkills);
+        this.logSkillResults(upperResults, player, target, false);
+        this.applyLifesteal(player, upperResults);
+      }
+    }
+
+    if (target.isAlive() && target.counterTriggerChance > 0 && this.rng.chance(target.counterTriggerChance)) {
+      this.processCounter(target, player);
     }
   }
 
-  private processSingleHit(attacker: BattleUnit, defender: BattleUnit): void {
-    if (!defender.isAlive()) return;
-
-    const baseDamage = this.calculateDamage(attacker, defender);
+  private processBasicAttack(attacker: BattleUnit, target: BattleUnit): void {
+    const baseDamage = this.calculateBaseDamage(attacker, target);
     const isCrit = this.rng.chance(attacker.getEffectiveCrit());
     const finalDamage = isCrit ? Math.floor(baseDamage * BattleDataTable.damage.critMultiplier) : baseDamage;
 
-    const dealt = defender.takeDamage(finalDamage);
+    const dealt = target.takeDamage(finalDamage);
 
-    if (isCrit) {
-      this.log.add({
-        turn: this.turnCount, type: BattleLogType.CRIT,
-        source: attacker.name, target: defender.name, value: dealt,
-        message: `${attacker.name} CRIT ${defender.name} for ${dealt}`,
-      });
-    } else {
-      this.log.add({
-        turn: this.turnCount, type: BattleLogType.ATTACK,
-        source: attacker.name, target: defender.name, value: dealt,
-        message: `${attacker.name} attacks ${defender.name} for ${dealt}`,
-      });
-    }
+    this.log.add({
+      turn: this.turnCount,
+      type: isCrit ? BattleLogType.CRIT : BattleLogType.ATTACK,
+      source: attacker.name, target: target.name, value: dealt,
+      message: `${attacker.name} ${isCrit ? 'CRIT' : 'attacks'} ${target.name} for ${dealt}`,
+    });
 
     if (attacker.lifestealRate > 0 && dealt > 0) {
       const healAmount = Math.floor(dealt * attacker.lifestealRate);
@@ -136,117 +174,149 @@ export class Battle {
       }
     }
 
-    this.processOnAttackSkills(attacker, defender);
-
-    if (defender.isAlive() && defender.counterRate > 0 && this.rng.chance(BattleDataTable.counter.triggerChance)) {
-      this.processCounter(defender, attacker);
+    if (attacker.multiHitChance > 0 && target.isAlive() && this.rng.chance(attacker.multiHitChance)) {
+      const extraDamage = this.calculateBaseDamage(attacker, target);
+      const extraDealt = target.takeDamage(extraDamage);
+      this.log.add({
+        turn: this.turnCount, type: BattleLogType.ATTACK,
+        source: attacker.name, target: target.name, value: extraDealt,
+        message: `${attacker.name} multi-hit ${target.name} for ${extraDealt}`,
+      });
     }
   }
 
-  private processOnAttackSkills(attacker: BattleUnit, defender: BattleUnit): void {
-    const skills = attacker.getSkillsByTrigger(TriggerCondition.ON_ATTACK);
-    for (const skill of skills) {
-      if (!defender.isAlive()) break;
+  private processEnemyTurn(enemy: BattleUnit, target: BattleUnit): void {
+    if (!target.isAlive()) return;
 
-      if (skill.effect.type === EffectType.DAMAGE) {
-        const skillDamage = Math.floor(skill.effect.value + attacker.getEffectiveAtk() * BattleDataTable.skill.onAttackAtkRatio);
-        const dealt = defender.takeDamage(skillDamage);
-        this.log.add({
-          turn: this.turnCount, type: BattleLogType.SKILL_DAMAGE,
-          source: attacker.name, target: defender.name, value: dealt,
-          skillName: skill.name, skillIcon: skill.icon,
-          message: `${attacker.name}'s ${skill.name} deals ${dealt}`,
-        });
-      }
-    }
-  }
+    const baseDamage = this.calculateBaseDamage(enemy, target);
+    const isCrit = this.rng.chance(enemy.getEffectiveCrit());
+    const finalDamage = isCrit ? Math.floor(baseDamage * BattleDataTable.damage.critMultiplier) : baseDamage;
 
-  private processRageAttack(attacker: BattleUnit, defender: BattleUnit): void {
-    if (!defender.isAlive()) return;
+    const dealt = target.takeDamage(finalDamage);
 
-    const rageDamage = Math.floor(attacker.getEffectiveAtk() * BattleDataTable.rage.attackMultiplier * attacker.rageDamageMultiplier);
-    const dealt = defender.takeDamage(rageDamage);
     this.log.add({
-      turn: this.turnCount, type: BattleLogType.RAGE_ATTACK,
-      source: attacker.name, target: defender.name, value: dealt,
-      skillName: '분노 공격', skillIcon: '💢',
-      message: `${attacker.name} RAGE ATTACK ${defender.name} for ${dealt}`,
+      turn: this.turnCount,
+      type: isCrit ? BattleLogType.CRIT : BattleLogType.ATTACK,
+      source: enemy.name, target: target.name, value: dealt,
+      message: `${enemy.name} ${isCrit ? 'CRIT' : 'attacks'} ${target.name} for ${dealt}`,
     });
 
-    this.processOnRageSkills(attacker, defender);
+    if (enemy.lifestealRate > 0 && dealt > 0) {
+      const healAmount = Math.floor(dealt * enemy.lifestealRate);
+      const healed = enemy.heal(healAmount);
+      if (healed > 0) {
+        this.log.add({
+          turn: this.turnCount, type: BattleLogType.LIFESTEAL,
+          source: enemy.name, target: enemy.name, value: healed,
+          message: `${enemy.name} heals ${healed} from lifesteal`,
+        });
+      }
+    }
+
+    if (enemy.multiHitChance > 0 && target.isAlive() && this.rng.chance(enemy.multiHitChance)) {
+      const extraDamage = this.calculateBaseDamage(enemy, target);
+      const extraDealt = target.takeDamage(extraDamage);
+      this.log.add({
+        turn: this.turnCount, type: BattleLogType.ATTACK,
+        source: enemy.name, target: target.name, value: extraDealt,
+        message: `${enemy.name} multi-hit ${target.name} for ${extraDealt}`,
+      });
+    }
+
+    for (const skill of enemy.activeSkills) {
+      if (!target.isAlive()) break;
+      if (this.engine.evaluateTrigger(skill.trigger, this.turnCount, enemy)) {
+        const results = this.engine.executeSkillEffects(skill, enemy, target, enemy.activeSkills);
+        this.logSkillResults(results, enemy, target, false);
+      }
+    }
+
+    if (enemy.isPlayer) return;
+
+    if (enemy.rage < enemy.maxRage) {
+      enemy.rage = Math.min(enemy.rage + BattleDataTable.rage.playerRagePerAttack, enemy.maxRage);
+      if (enemy.rage >= enemy.maxRage) {
+        enemy.rage = 0;
+        const rageDamage = Math.floor(enemy.getEffectiveAtk() * BattleDataTable.rage.attackMultiplier);
+        const rageDealt = target.takeDamage(rageDamage);
+        this.log.add({
+          turn: this.turnCount, type: BattleLogType.RAGE_ATTACK,
+          source: enemy.name, target: target.name, value: rageDealt,
+          skillName: '분노 공격', skillIcon: '💢',
+          message: `${enemy.name} RAGE ATTACK ${target.name} for ${rageDealt}`,
+        });
+      }
+    }
+
+    if (target.isAlive() && target.counterTriggerChance > 0 && this.rng.chance(target.counterTriggerChance)) {
+      this.processCounter(target, enemy);
+    }
   }
 
-  private processOnRageSkills(attacker: BattleUnit, defender: BattleUnit): void {
-    const skills = attacker.getSkillsByTrigger(TriggerCondition.ON_RAGE);
-    for (const skill of skills) {
-      if (!defender.isAlive()) break;
-
-      if (skill.effect.type === EffectType.DAMAGE) {
-        const skillDamage = Math.floor(skill.effect.value + attacker.getEffectiveAtk() * BattleDataTable.skill.onRageAtkRatio);
-        const dealt = defender.takeDamage(skillDamage);
+  private logSkillResults(results: SkillDamageResult[], source: BattleUnit, target: BattleUnit, isRage: boolean): void {
+    for (const r of results) {
+      if (r.damage > 0) {
+        if (isRage && r.skillName === '분노 공격') {
+          this.log.add({
+            turn: this.turnCount, type: BattleLogType.RAGE_ATTACK,
+            source: source.name, target: target.name, value: r.damage,
+            skillName: r.skillName, skillIcon: r.skillIcon,
+            message: `${source.name} RAGE ATTACK ${target.name} for ${r.damage}`,
+          });
+        } else if (r.isCrit) {
+          this.log.add({
+            turn: this.turnCount, type: BattleLogType.CRIT,
+            source: source.name, target: target.name, value: r.damage,
+            skillName: r.skillName, skillIcon: r.skillIcon,
+            message: `${source.name}'s ${r.skillName} CRIT ${target.name} for ${r.damage}`,
+          });
+        } else {
+          this.log.add({
+            turn: this.turnCount,
+            type: r.skillName === '일반 공격' ? BattleLogType.ATTACK : BattleLogType.SKILL_DAMAGE,
+            source: source.name, target: target.name, value: r.damage,
+            skillName: r.skillName, skillIcon: r.skillIcon,
+            message: `${source.name}'s ${r.skillName} deals ${r.damage} to ${target.name}`,
+          });
+        }
+      }
+      if (r.healAmount > 0) {
         this.log.add({
-          turn: this.turnCount, type: BattleLogType.SKILL_DAMAGE,
-          source: attacker.name, target: defender.name, value: dealt,
-          skillName: skill.name, skillIcon: skill.icon,
-          message: `${attacker.name}'s ${skill.name} deals ${dealt}`,
+          turn: this.turnCount, type: BattleLogType.HEAL,
+          source: source.name, target: source.name, value: r.healAmount,
+          skillName: r.skillName, skillIcon: r.skillIcon,
+          message: `${source.name} heals ${r.healAmount}`,
+        });
+      }
+      if (r.debuffApplied) {
+        this.log.add({
+          turn: this.turnCount, type: BattleLogType.DEBUFF_APPLIED,
+          source: source.name, target: target.name, value: 0,
+          skillName: r.skillName, skillIcon: r.skillIcon,
+          message: `${source.name}'s ${r.skillName} debuffs ${target.name}`,
         });
       }
     }
   }
 
-  private processOnAttackDebuffs(attacker: BattleUnit, defender: BattleUnit): void {
-    const skills = attacker.getSkillsByTrigger(TriggerCondition.ON_ATTACK);
-    for (const skill of skills) {
-      if (skill.effect.type === EffectType.DOT && skill.effect.statusEffectType) {
-        defender.addStatusEffect(new StatusEffect(
-          skill.effect.statusEffectType,
-          skill.effect.duration,
-          skill.effect.value,
-        ));
-        this.log.add({
-          turn: this.turnCount, type: BattleLogType.DEBUFF_APPLIED,
-          source: attacker.name, target: defender.name, value: skill.effect.value,
-          skillName: skill.name, skillIcon: skill.icon,
-          message: `${attacker.name} applies ${skill.name} to ${defender.name}`,
-        });
-      }
-    }
-  }
+  private applyLifesteal(unit: BattleUnit, results: SkillDamageResult[]): void {
+    if (unit.lifestealRate <= 0) return;
+    const totalDamage = results.reduce((sum, r) => sum + r.damage, 0);
+    if (totalDamage <= 0) return;
 
-  private processTurnStartSkills(unit: BattleUnit, opponent: BattleUnit): void {
-    const skills = unit.getSkillsByTrigger(TriggerCondition.TURN_START);
-    for (const skill of skills) {
-      if (!opponent.isAlive()) break;
-
-      if (skill.effect.type === EffectType.DAMAGE) {
-        const skillDamage = Math.floor(skill.effect.value + unit.getEffectiveAtk() * BattleDataTable.skill.turnStartAtkRatio);
-        const dealt = opponent.takeDamage(skillDamage);
-        this.log.add({
-          turn: this.turnCount, type: BattleLogType.SKILL_DAMAGE,
-          source: unit.name, target: opponent.name, value: dealt,
-          skillName: skill.name, skillIcon: skill.icon,
-          message: `${unit.name}'s ${skill.name} deals ${dealt}`,
-        });
-      }
-
-      if (skill.effect.type === EffectType.DEBUFF && skill.effect.statusEffectType) {
-        opponent.addStatusEffect(new StatusEffect(
-          skill.effect.statusEffectType,
-          skill.effect.duration,
-          skill.effect.value,
-        ));
-        this.log.add({
-          turn: this.turnCount, type: BattleLogType.DEBUFF_APPLIED,
-          source: unit.name, target: opponent.name, value: skill.effect.value,
-          skillName: skill.name, skillIcon: skill.icon,
-          message: `${unit.name}'s ${skill.name} debuffs ${opponent.name}`,
-        });
-      }
+    const healAmount = Math.floor(totalDamage * unit.lifestealRate);
+    const healed = unit.heal(healAmount);
+    if (healed > 0) {
+      this.log.add({
+        turn: this.turnCount, type: BattleLogType.LIFESTEAL,
+        source: unit.name, target: unit.name, value: healed,
+        message: `${unit.name} heals ${healed} from lifesteal`,
+      });
     }
   }
 
   private processCounter(defender: BattleUnit, attacker: BattleUnit): void {
-    const counterDamage = Math.floor(this.calculateDamage(defender, attacker) * defender.counterRate);
+    const counterDamage = Math.floor(this.calculateBaseDamage(defender, attacker) * defender.counterDamageRate);
     const dealt = attacker.takeDamage(counterDamage);
     this.log.add({
       turn: this.turnCount, type: BattleLogType.COUNTER,
@@ -273,7 +343,7 @@ export class Battle {
     }
   }
 
-  private calculateDamage(attacker: BattleUnit, defender: BattleUnit): number {
+  private calculateBaseDamage(attacker: BattleUnit, defender: BattleUnit): number {
     const atk = attacker.getEffectiveAtk();
     const def = defender.getEffectiveDef();
     const raw = Math.max(1, atk - Math.floor(def * BattleDataTable.damage.defenseReduction));

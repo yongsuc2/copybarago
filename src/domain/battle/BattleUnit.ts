@@ -1,34 +1,50 @@
 import { Stats } from '../value-objects/Stats';
-import { Skill } from '../entities/Skill';
+import { ActiveSkill } from '../entities/ActiveSkill';
+import { PassiveSkill } from '../entities/PassiveSkill';
 import { StatusEffect } from './StatusEffect';
-import { StatusEffectType, EffectType, TriggerCondition } from '../enums';
+import { StatusEffectType, PassiveType, StatType, SkillHierarchy } from '../enums';
 import { BattleDataTable } from '../data/BattleDataTable';
+import type { SkillExecutionUnit } from './SkillExecutionEngine';
 
-export class BattleUnit {
+export type SessionSkill = ActiveSkill | PassiveSkill;
+
+export function isActiveSkill(skill: SessionSkill): skill is ActiveSkill {
+  return 'hierarchy' in skill;
+}
+
+export function isPassiveSkill(skill: SessionSkill): skill is PassiveSkill {
+  return !('hierarchy' in skill);
+}
+
+export class BattleUnit implements SkillExecutionUnit {
   currentHp: number;
   maxHp: number;
   baseAtk: number;
   baseDef: number;
   baseCrit: number;
-  activeSkills: Skill[];
+  activeSkills: ActiveSkill[];
+  passiveSkills: PassiveSkill[];
   statusEffects: StatusEffect[];
   isPlayer: boolean;
   name: string;
   reviveUsed: boolean;
+  reviveHpPercent: number;
   multiHitChance: number;
   lifestealRate: number;
-  counterRate: number;
+  counterDamageRate: number;
+  counterTriggerChance: number;
   rage: number;
   maxRage: number;
-  ragePerAttack: number;
-  bonusRagePerAttack: number;
-  rageDamageMultiplier: number;
+  magicCoefficient: number;
+  ragePowerMultiplier: number;
   shield: number;
+  usedOnceConditions: Set<string>;
 
   constructor(
     name: string,
     stats: Stats,
-    skills: Skill[] = [],
+    activeSkills: ActiveSkill[] = [],
+    passiveSkills: PassiveSkill[] = [],
     isPlayer: boolean = true,
   ) {
     this.name = name;
@@ -37,62 +53,68 @@ export class BattleUnit {
     this.baseAtk = stats.atk;
     this.baseDef = stats.def;
     this.baseCrit = stats.crit;
-    this.activeSkills = [...skills];
+    this.activeSkills = [...activeSkills];
+    this.passiveSkills = [...passiveSkills];
     this.statusEffects = [];
     this.isPlayer = isPlayer;
     this.reviveUsed = false;
+    this.reviveHpPercent = 0;
     this.multiHitChance = 0;
     this.lifestealRate = 0;
-    this.counterRate = 0;
+    this.counterDamageRate = 0;
+    this.counterTriggerChance = 0;
     this.rage = 0;
     this.maxRage = BattleDataTable.rage.maxRage;
-    this.ragePerAttack = isPlayer ? BattleDataTable.rage.playerRagePerAttack : 0;
-    this.bonusRagePerAttack = 0;
-    this.rageDamageMultiplier = 1.0;
+    this.magicCoefficient = BattleDataTable.damage.baseMagicCoefficient;
+    this.ragePowerMultiplier = 1.0;
     this.shield = 0;
+    this.usedOnceConditions = new Set();
 
     this.applyPassiveSkills();
   }
 
   private applyPassiveSkills(): void {
-    for (const skill of this.activeSkills) {
-      if (skill.triggerCondition !== TriggerCondition.PASSIVE) continue;
+    for (const skill of this.passiveSkills) {
+      this.applyPassiveSkill(skill);
+    }
+  }
 
-      switch (skill.effect.type) {
-        case EffectType.MULTI_HIT:
-          this.multiHitChance += skill.effect.value;
-          break;
-        case EffectType.LIFESTEAL:
-          this.lifestealRate += skill.effect.value;
-          break;
-        case EffectType.RAGE_POWER:
-          this.rageDamageMultiplier += skill.effect.value;
-          break;
-        case EffectType.RAGE_BOOST:
-          this.bonusRagePerAttack += skill.effect.value;
-          break;
-        case EffectType.SHIELD:
-          this.shield += Math.floor(this.maxHp * skill.effect.value);
-          break;
-        case EffectType.BUFF:
-          if (skill.effect.statusEffectType && skill.effect.duration > 0) {
-            this.addStatusEffect(new StatusEffect(
-              skill.effect.statusEffectType,
-              skill.effect.duration,
-              skill.effect.value,
-            ));
-          }
-          break;
-        case EffectType.HOT:
-          if (skill.effect.statusEffectType) {
-            this.addStatusEffect(new StatusEffect(
-              skill.effect.statusEffectType,
-              skill.effect.duration,
-              skill.effect.value,
-            ));
-          }
-          break;
+  private applyPassiveSkill(skill: PassiveSkill): void {
+    switch (skill.effect.type) {
+      case PassiveType.STAT_MODIFIER: {
+        const { stat, value, isPercentage } = skill.effect;
+        if (stat === StatType.ATK) {
+          this.baseAtk = isPercentage ? Math.floor(this.baseAtk * (1 + value)) : this.baseAtk + value;
+        } else if (stat === StatType.DEF) {
+          this.baseDef = isPercentage ? Math.floor(this.baseDef * (1 + value)) : this.baseDef + value;
+        } else if (stat === StatType.CRIT) {
+          this.baseCrit = Math.min(1.0, this.baseCrit + value);
+        } else if (stat === 'RAGE_POWER') {
+          this.ragePowerMultiplier += value;
+        }
+        break;
       }
+      case PassiveType.COUNTER:
+        this.counterTriggerChance = Math.max(this.counterTriggerChance, skill.effect.triggerChance);
+        this.counterDamageRate += skill.effect.damageRate;
+        break;
+      case PassiveType.LIFESTEAL:
+        this.lifestealRate += skill.effect.rate;
+        break;
+      case PassiveType.SHIELD_ON_START:
+        this.shield += Math.floor(this.maxHp * skill.effect.hpPercent);
+        break;
+      case PassiveType.REVIVE:
+        this.reviveHpPercent = skill.effect.hpPercent;
+        break;
+      case PassiveType.REGEN:
+        this.addStatusEffect(new StatusEffect(StatusEffectType.REGEN, 999, skill.effect.healPerTurn));
+        break;
+      case PassiveType.MULTI_HIT:
+        this.multiHitChance += skill.effect.chance;
+        break;
+      case PassiveType.SKILL_MODIFIER:
+        break;
     }
   }
 
@@ -158,19 +180,13 @@ export class BattleUnit {
   }
 
   canRevive(): boolean {
-    return !this.reviveUsed && this.hasSkillOfType(EffectType.REVIVE);
+    return !this.reviveUsed && this.reviveHpPercent > 0;
   }
 
   tryRevive(): boolean {
     if (!this.canRevive()) return false;
-
-    const reviveSkill = this.activeSkills.find(
-      s => s.effect.type === EffectType.REVIVE
-    );
-    if (!reviveSkill) return false;
-
     this.reviveUsed = true;
-    this.currentHp = Math.floor(this.maxHp * reviveSkill.effect.value);
+    this.currentHp = Math.floor(this.maxHp * this.reviveHpPercent);
     return true;
   }
 
@@ -201,60 +217,19 @@ export class BattleUnit {
     return { damage: totalDamage, heal: totalHeal };
   }
 
-  getSkillsByTrigger(trigger: TriggerCondition): Skill[] {
-    return this.activeSkills.filter(s => s.triggerCondition === trigger);
-  }
-
-  addSkill(skill: Skill): void {
-    this.activeSkills.push(skill);
-    if (skill.triggerCondition === TriggerCondition.PASSIVE) {
-      this.applyPassiveSkillSingle(skill);
-    }
-  }
-
-  private applyPassiveSkillSingle(skill: Skill): void {
-    switch (skill.effect.type) {
-      case EffectType.MULTI_HIT:
-        this.multiHitChance += skill.effect.value;
-        break;
-      case EffectType.LIFESTEAL:
-        this.lifestealRate += skill.effect.value;
-        break;
-      case EffectType.RAGE_POWER:
-        this.rageDamageMultiplier += skill.effect.value;
-        break;
-      case EffectType.RAGE_BOOST:
-        this.bonusRagePerAttack += skill.effect.value;
-        break;
-      case EffectType.SHIELD:
-        this.shield += Math.floor(this.maxHp * skill.effect.value);
-        break;
-      case EffectType.BUFF:
-        if (skill.effect.statusEffectType && skill.effect.duration > 0) {
-          this.addStatusEffect(new StatusEffect(
-            skill.effect.statusEffectType,
-            skill.effect.duration,
-            skill.effect.value,
-          ));
-        }
-        break;
-      case EffectType.HOT:
-        if (skill.effect.statusEffectType) {
-          this.addStatusEffect(new StatusEffect(
-            skill.effect.statusEffectType,
-            skill.effect.duration,
-            skill.effect.value,
-          ));
-        }
-        break;
-    }
-  }
-
-  hasSkillOfType(effectType: EffectType): boolean {
-    return this.activeSkills.some(s => s.effect.type === effectType);
-  }
-
   getHpPercent(): number {
     return this.maxHp > 0 ? this.currentHp / this.maxHp : 0;
+  }
+
+  getBuiltinSkills(): ActiveSkill[] {
+    return this.activeSkills.filter(s => s.hierarchy === SkillHierarchy.BUILTIN);
+  }
+
+  getUpperSkills(): ActiveSkill[] {
+    return this.activeSkills.filter(s => s.hierarchy === SkillHierarchy.UPPER);
+  }
+
+  getAllSkillsForEngine(): ActiveSkill[] {
+    return this.activeSkills;
   }
 }

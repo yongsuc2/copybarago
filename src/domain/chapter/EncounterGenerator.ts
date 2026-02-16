@@ -1,9 +1,11 @@
-import { EncounterType, ChapterType, ResourceType, SkillGrade } from '../enums';
+import { EncounterType, ChapterType, ResourceType } from '../enums';
 import { Encounter } from './Encounter';
 import type { EncounterOption, EncounterReward } from './Encounter';
 import { Reward } from '../value-objects/Reward';
-import { Skill } from '../entities/Skill';
-import { SkillTable } from '../data/SkillTable';
+import type { SessionSkill } from '../battle/BattleUnit';
+import { isActiveSkill } from '../battle/BattleUnit';
+import { ActiveSkillRegistry } from '../data/ActiveSkillRegistry';
+import { PassiveSkillRegistry } from '../data/PassiveSkillRegistry';
 import { EncounterDataTable } from '../data/EncounterDataTable';
 import { SeededRandom } from '../../infrastructure/SeededRandom';
 
@@ -11,7 +13,7 @@ function emptyReward(): EncounterReward {
   return { skills: [], healPercent: 0, reward: Reward.empty() };
 }
 
-function skillReward(skills: Skill[]): EncounterReward {
+function skillReward(skills: SessionSkill[]): EncounterReward {
   return { skills, healPercent: 0, reward: Reward.empty() };
 }
 
@@ -23,6 +25,44 @@ function resourceReward(type: ResourceType, amount: number): EncounterReward {
   return { skills: [], healPercent: 0, reward: Reward.fromResources({ type, amount }) };
 }
 
+function buildSkillPool(ownedSkills: SessionSkill[]): SessionSkill[] {
+  const ownedMap = new Map<string, number>();
+  for (const s of ownedSkills) {
+    ownedMap.set(s.id, s.tier);
+  }
+
+  const pool: SessionSkill[] = [];
+
+  for (const tier1 of ActiveSkillRegistry.getUpperTier1Skills()) {
+    if (!ownedMap.has(tier1.id)) {
+      pool.push(tier1);
+    }
+  }
+
+  for (const tier1 of PassiveSkillRegistry.getTier1Skills()) {
+    if (!ownedMap.has(tier1.id)) {
+      pool.push(tier1);
+    }
+  }
+
+  for (const [familyId, currentTier] of ownedMap) {
+    if (ActiveSkillRegistry.isSpecialSkill(familyId) || PassiveSkillRegistry.isSpecialSkill(familyId)) continue;
+    if (ActiveSkillRegistry.isBuiltinSkill(familyId)) continue;
+
+    const nextActive = ActiveSkillRegistry.getNextTier(familyId, currentTier);
+    if (nextActive) { pool.push(nextActive); continue; }
+
+    const nextPassive = PassiveSkillRegistry.getNextTier(familyId, currentTier);
+    if (nextPassive) { pool.push(nextPassive); }
+  }
+
+  return pool;
+}
+
+function isSpecialSkill(id: string): boolean {
+  return ActiveSkillRegistry.isSpecialSkill(id) || PassiveSkillRegistry.isSpecialSkill(id);
+}
+
 export class EncounterGenerator {
   private rng: SeededRandom;
 
@@ -30,45 +70,47 @@ export class EncounterGenerator {
     this.rng = new SeededRandom(seed);
   }
 
-  generate(chapterType: ChapterType, _day: number, existingSkillIds: string[]): Encounter {
+  generate(chapterType: ChapterType, _day: number, ownedSkills: SessionSkill[]): Encounter {
     const weights = EncounterDataTable.getWeights(chapterType);
     const type = this.rng.weightedPick(
       weights.map(w => ({ item: w.type, weight: w.weight }))
     );
 
     switch (type) {
-      case EncounterType.ANGEL: return this.createAngelEncounter(existingSkillIds);
-      case EncounterType.DEMON: return this.createDemonEncounter(existingSkillIds);
+      case EncounterType.ANGEL: return this.createAngelEncounter(ownedSkills);
+      case EncounterType.DEMON: return this.createDemonEncounter(ownedSkills);
       case EncounterType.COMBAT: return this.createCombatEncounter();
       case EncounterType.CHANCE: return this.createChanceEncounter();
       default: return this.createCombatEncounter();
     }
   }
 
-  generateJungbakRoulette(existingSkillIds: string[]): Encounter {
-    return this.createJungbakRouletteEncounter(existingSkillIds);
+  generateJungbakRoulette(ownedSkills: SessionSkill[]): Encounter {
+    return this.createJungbakRouletteEncounter(ownedSkills);
   }
 
-  generateDaebakRoulette(existingSkillIds: string[]): Encounter {
-    return this.createDaebakRouletteEncounter(existingSkillIds);
+  generateDaebakRoulette(ownedSkills: SessionSkill[]): Encounter {
+    return this.createDaebakRouletteEncounter(ownedSkills);
   }
 
-  private getRandomSkills(count: number, excludeIds: string[]): Skill[] {
-    const all = SkillTable.getAllSkills().filter(s => !excludeIds.includes(s.id));
-    const normalSkills = all.filter(s => s.grade === SkillGrade.NORMAL || s.grade === SkillGrade.LEGENDARY);
+  private getRandomSkills(count: number, ownedSkills: SessionSkill[], maxTier?: number): SessionSkill[] {
+    let pool = buildSkillPool(ownedSkills);
+    if (maxTier !== undefined) {
+      pool = pool.filter(s => s.tier <= maxTier);
+    }
 
-    const result: Skill[] = [];
-    const pool = [...normalSkills];
-    for (let i = 0; i < count && pool.length > 0; i++) {
-      const idx = this.rng.nextInt(0, pool.length - 1);
-      result.push(pool[idx]);
-      pool.splice(idx, 1);
+    const result: SessionSkill[] = [];
+    const candidates = [...pool];
+    for (let i = 0; i < count && candidates.length > 0; i++) {
+      const idx = this.rng.nextInt(0, candidates.length - 1);
+      result.push(candidates[idx]);
+      candidates.splice(idx, 1);
     }
     return result;
   }
 
-  private createAngelEncounter(existingSkillIds: string[]): Encounter {
-    const skills = this.getRandomSkills(2, existingSkillIds);
+  private createAngelEncounter(ownedSkills: SessionSkill[]): Encounter {
+    const skills = this.getRandomSkills(2, ownedSkills, 2);
     const d = EncounterDataTable.angel;
 
     const options: EncounterOption[] = [];
@@ -96,11 +138,9 @@ export class EncounterGenerator {
     return new Encounter(EncounterType.ANGEL, options);
   }
 
-  private createDemonEncounter(existingSkillIds: string[]): Encounter {
-    const allSkills = SkillTable.getAllSkills().filter(s => !existingSkillIds.includes(s.id));
-    const skill = allSkills.length > 0
-      ? allSkills[this.rng.nextInt(0, allSkills.length - 1)]
-      : null;
+  private createDemonEncounter(ownedSkills: SessionSkill[]): Encounter {
+    const skills = this.getRandomSkills(1, ownedSkills);
+    const skill = skills.length > 0 ? skills[0] : null;
     const d = EncounterDataTable.demon;
 
     const options: EncounterOption[] = [];
@@ -195,9 +235,9 @@ export class EncounterGenerator {
     return new Encounter(EncounterType.CHANCE, options);
   }
 
-  private createJungbakRouletteEncounter(existingSkillIds: string[]): Encounter {
+  private createJungbakRouletteEncounter(ownedSkills: SessionSkill[]): Encounter {
     const d = EncounterDataTable.jungbakRoulette;
-    const skills = this.getRandomSkills(1, existingSkillIds);
+    const skills = this.getRandomSkills(1, ownedSkills);
     const skill = skills.length > 0 ? skills[0] : null;
 
     const options: EncounterOption[] = [
@@ -234,14 +274,17 @@ export class EncounterGenerator {
     return new Encounter(EncounterType.JUNGBAK_ROULETTE, options);
   }
 
-  private createDaebakRouletteEncounter(existingSkillIds: string[]): Encounter {
-    const mythicSkills = SkillTable.getSkillsByGrade(SkillGrade.MYTHIC)
-      .filter(s => !existingSkillIds.includes(s.id));
+  private createDaebakRouletteEncounter(ownedSkills: SessionSkill[]): Encounter {
+    const ownedMap = new Map(ownedSkills.map(s => [s.id, s.tier]));
+
+    const pool = buildSkillPool(ownedSkills);
+    const mythicPool = pool.filter(s => s.tier === 3);
     const d = EncounterDataTable.daebakRoulette;
 
-    const mythicSkill = mythicSkills.length > 0 ? this.rng.pick(mythicSkills) : null;
-    const angelPower = !existingSkillIds.includes('angel_power') ? SkillTable.getSkillById('angel_power') : null;
-    const demonPower = !existingSkillIds.includes('demon_power') ? SkillTable.getSkillById('demon_power') : null;
+    const mythicSkill = mythicPool.length > 0 ? this.rng.pick(mythicPool) : null;
+
+    const angelPower = !ownedMap.has('angel_power') ? PassiveSkillRegistry.getById('angel_power', 4) : null;
+    const demonPower = !ownedMap.has('demon_power') ? ActiveSkillRegistry.getById('demon_power', 4) : null;
 
     const options: EncounterOption[] = [
       {

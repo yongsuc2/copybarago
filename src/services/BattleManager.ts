@@ -5,7 +5,8 @@ import { Stats } from '../domain/value-objects/Stats';
 import { Reward } from '../domain/value-objects/Reward';
 import { ResourceType } from '../domain/enums';
 import { Player } from '../domain/entities/Player';
-import { Skill } from '../domain/entities/Skill';
+import type { ActiveSkill } from '../domain/entities/ActiveSkill';
+import type { PassiveSkill } from '../domain/entities/PassiveSkill';
 
 export interface BattleResult {
   state: BattleState;
@@ -15,9 +16,9 @@ export interface BattleResult {
 }
 
 export class BattleManager {
-  createPlayerUnit(player: Player, sessionSkills: Skill[]): BattleUnit {
+  createPlayerUnit(player: Player, activeSkills: ActiveSkill[], passiveSkills: PassiveSkill[]): BattleUnit {
     const stats = player.computeStats();
-    return new BattleUnit('Capybara', stats, [...sessionSkills], true);
+    return new BattleUnit('Capybara', stats, [...activeSkills], [...passiveSkills], true);
   }
 
   createBattle(playerUnit: BattleUnit, enemyUnit: BattleUnit, seed?: number): Battle {

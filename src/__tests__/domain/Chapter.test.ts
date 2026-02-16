@@ -93,7 +93,7 @@ describe('Chapter', () => {
         const player = new BattleUnit(
           'Player',
           Stats.create({ hp: 200, maxHp: 200, atk: 30, def: 10 }),
-          [], true,
+          [], [], true,
         );
         const battle = chapter.createCombatBattle(player);
         if (battle) {

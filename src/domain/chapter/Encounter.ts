@@ -1,5 +1,5 @@
 import { EncounterType } from '../enums';
-import { Skill } from '../entities/Skill';
+import type { SessionSkill } from '../battle/BattleUnit';
 import { Reward } from '../value-objects/Reward';
 
 export interface EncounterOption {
@@ -12,7 +12,7 @@ export interface EncounterOption {
 }
 
 export interface EncounterReward {
-  skills: Skill[];
+  skills: SessionSkill[];
   healPercent: number;
   reward: Reward;
 }
@@ -20,7 +20,7 @@ export interface EncounterReward {
 export interface EncounterResult {
   chosen: EncounterOption;
   success: boolean;
-  skillsGained: Skill[];
+  skillsGained: SessionSkill[];
   hpChange: number;
   goldChange: number;
   reward: Reward;

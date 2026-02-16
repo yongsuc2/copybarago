@@ -166,3 +166,60 @@ export enum ResourceType {
   PET_EGG = 'PET_EGG',
   PET_FOOD = 'PET_FOOD',
 }
+
+export enum SkillHierarchy {
+  BUILTIN = 'BUILTIN',
+  UPPER = 'UPPER',
+  LOWER = 'LOWER',
+  LOWEST = 'LOWEST',
+}
+
+export enum AttackType {
+  PHYSICAL = 'PHYSICAL',
+  MAGIC = 'MAGIC',
+  FIXED = 'FIXED',
+}
+
+export enum SkillEffectType {
+  ATTACK = 'ATTACK',
+  TRIGGER_SKILL = 'TRIGGER_SKILL',
+  INJECT_EFFECT = 'INJECT_EFFECT',
+  HEAL_HP = 'HEAL_HP',
+  ADD_RAGE = 'ADD_RAGE',
+  CONSUME_RAGE = 'CONSUME_RAGE',
+  DEBUFF = 'DEBUFF',
+}
+
+export enum SpecialConditionType {
+  NONE = 'NONE',
+  RAGE_FULL = 'RAGE_FULL',
+  HP_BELOW = 'HP_BELOW',
+  HP_ABOVE = 'HP_ABOVE',
+  HP_BELOW_ONCE = 'HP_BELOW_ONCE',
+}
+
+export enum SkillTag {
+  SHURIKEN = 'SHURIKEN',
+  LIGHTNING = 'LIGHTNING',
+  RAGE = 'RAGE',
+  HP_RECOVERY = 'HP_RECOVERY',
+  POISON = 'POISON',
+  PHYSICAL = 'PHYSICAL',
+  MAGIC = 'MAGIC',
+  LANCE = 'LANCE',
+  SWORD_AURA = 'SWORD_AURA',
+  FLAME = 'FLAME',
+  DEBUFF = 'DEBUFF',
+  NORMAL_ATTACK = 'NORMAL_ATTACK',
+}
+
+export enum PassiveType {
+  STAT_MODIFIER = 'STAT_MODIFIER',
+  COUNTER = 'COUNTER',
+  LIFESTEAL = 'LIFESTEAL',
+  SHIELD_ON_START = 'SHIELD_ON_START',
+  REVIVE = 'REVIVE',
+  REGEN = 'REGEN',
+  MULTI_HIT = 'MULTI_HIT',
+  SKILL_MODIFIER = 'SKILL_MODIFIER',
+}

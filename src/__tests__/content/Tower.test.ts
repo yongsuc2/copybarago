@@ -13,7 +13,7 @@ describe('Tower', () => {
 
   it('creates a challenge battle', () => {
     const tower = new Tower();
-    const player = new BattleUnit('Player', Stats.create({ hp: 500, maxHp: 500, atk: 50, def: 10 }), [], true);
+    const player = new BattleUnit('Player', Stats.create({ hp: 500, maxHp: 500, atk: 50, def: 10 }), [], [], true);
     const result = tower.challenge(player, 1);
 
     expect(result.isOk()).toBe(true);
@@ -22,7 +22,7 @@ describe('Tower', () => {
 
   it('fails challenge without tokens', () => {
     const tower = new Tower();
-    const player = new BattleUnit('Player', Stats.create({ hp: 500, maxHp: 500, atk: 50, def: 10 }), [], true);
+    const player = new BattleUnit('Player', Stats.create({ hp: 500, maxHp: 500, atk: 50, def: 10 }), [], [], true);
     const result = tower.challenge(player, 0);
 
     expect(result.isFail()).toBe(true);
