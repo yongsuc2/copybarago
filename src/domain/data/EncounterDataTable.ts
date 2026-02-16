@@ -107,6 +107,13 @@ const FORCED_BATTLE_DAYS = {
   midBoss: 30,
 };
 
+const CHAPTER_CLEAR_REWARD = {
+  goldBase: 200,
+  goldPerChapter: 300,
+  gemsBase: 10,
+  gemsPerChapter: 5,
+};
+
 export const EncounterDataTable = {
   getTypeInfo(type: EncounterType): EncounterTypeInfo {
     return TYPE_INFO[type];
@@ -128,4 +135,11 @@ export const EncounterDataTable = {
   combat: COMBAT,
   counterThreshold: COUNTER_THRESHOLD,
   forcedBattleDays: FORCED_BATTLE_DAYS,
+  chapterClearReward: CHAPTER_CLEAR_REWARD,
+  getChapterClearGold(chapterId: number): number {
+    return CHAPTER_CLEAR_REWARD.goldBase + CHAPTER_CLEAR_REWARD.goldPerChapter * chapterId;
+  },
+  getChapterClearGems(chapterId: number): number {
+    return CHAPTER_CLEAR_REWARD.gemsBase + CHAPTER_CLEAR_REWARD.gemsPerChapter * chapterId;
+  },
 };

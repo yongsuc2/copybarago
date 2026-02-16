@@ -92,7 +92,7 @@ export function ChapterScreen() {
   const [isBossFight, setIsBossFight] = useState(false);
   const [battleType, setBattleType] = useState<'normal' | 'elite' | 'midBoss' | 'boss'>('normal');
   const [eliteReward, setEliteReward] = useState<SessionSkill[] | null>(null);
-  const [chapterResult, setChapterResult] = useState<{ type: 'victory' | 'defeat'; chapterId: number; gold: number } | null>(null);
+  const [chapterResult, setChapterResult] = useState<{ type: 'victory' | 'defeat'; chapterId: number; gold: number; gems?: number } | null>(null);
   const [activeEnemyIndex, setActiveEnemyIndex] = useState(0);
 
   const [showDamageGraph, setShowDamageGraph] = useState(false);
@@ -203,7 +203,10 @@ export function ChapterScreen() {
         if (game.currentChapter) {
           game.player.clearedChapterMax = Math.max(game.player.clearedChapterMax, game.currentChapter.id);
           game.travel.maxClearedChapter = game.player.clearedChapterMax;
-          game.player.resources.add('GOLD' as any, 500);
+          const clearGold = EncounterDataTable.getChapterClearGold(game.currentChapter.id);
+          const clearGems = EncounterDataTable.getChapterClearGems(game.currentChapter.id);
+          game.player.resources.add(ResourceType.GOLD, clearGold);
+          game.player.resources.add(ResourceType.GEMS, clearGems);
         }
         game.updateQuestProgress('daily_chapter');
         game.updateQuestProgress('weekly_chapter');
@@ -225,7 +228,8 @@ export function ChapterScreen() {
         setChapterResult({
           type: b.state === BattleState.VICTORY ? 'victory' : 'defeat',
           chapterId: chId,
-          gold: b.state === BattleState.VICTORY ? 500 : 0,
+          gold: b.state === BattleState.VICTORY ? EncounterDataTable.getChapterClearGold(chId) : 0,
+          gems: b.state === BattleState.VICTORY ? EncounterDataTable.getChapterClearGems(chId) : 0,
         });
         refresh();
       }, 1500);
@@ -914,9 +918,10 @@ export function ChapterScreen() {
             <div className="chapter-result-sub">
               챕터 {chapterResult.chapterId}
             </div>
-            {chapterResult.gold > 0 && (
+            {(chapterResult.gold > 0 || (chapterResult.gems ?? 0) > 0) && (
               <div className="chapter-result-reward">
-                <span style={{ color: '#ffd700' }}>+{chapterResult.gold} G</span>
+                {chapterResult.gold > 0 && <span style={{ color: '#ffd700' }}>+{chapterResult.gold} G</span>}
+                {(chapterResult.gems ?? 0) > 0 && <span style={{ color: '#e040fb', marginLeft: 8 }}>+{chapterResult.gems} 보석</span>}
               </div>
             )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16, width: '100%' }}>
