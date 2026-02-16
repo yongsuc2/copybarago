@@ -602,12 +602,7 @@ export function ChapterScreen() {
 
     const stats = game.player.computeStats();
     const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
-<<<<<<< Updated upstream
     const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), game.currentChapter.getSessionPassiveSkills(), true);
-=======
-    const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
-    const pu = new BattleUnit('Capybara', battleStats, [...game.currentChapter.sessionSkills, ...equipPassives], true);
->>>>>>> Stashed changes
     const b = game.currentChapter.createEliteBattle(pu);
     if (!b) return;
 
@@ -620,12 +615,7 @@ export function ChapterScreen() {
 
     const stats = game.player.computeStats();
     const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
-<<<<<<< Updated upstream
     const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), game.currentChapter.getSessionPassiveSkills(), true);
-=======
-    const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
-    const pu = new BattleUnit('Capybara', battleStats, [...game.currentChapter.sessionSkills, ...equipPassives], true);
->>>>>>> Stashed changes
     const b = game.currentChapter.createMidBossBattle(pu);
     if (!b) return;
 
@@ -638,12 +628,7 @@ export function ChapterScreen() {
 
     const stats = game.player.computeStats();
     const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
-<<<<<<< Updated upstream
     const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), game.currentChapter.getSessionPassiveSkills(), true);
-=======
-    const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
-    const pu = new BattleUnit('Capybara', battleStats, [...game.currentChapter.sessionSkills, ...equipPassives], true);
->>>>>>> Stashed changes
     const b = game.currentChapter.createBossBattle(pu);
     if (!b) return;
 
