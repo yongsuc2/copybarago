@@ -213,7 +213,9 @@ export class Battle {
       }
     }
 
-    if (enemy.multiHitChance > 0 && target.isAlive() && this.rng.chance(enemy.multiHitChance)) {
+    if (!target.isAlive()) return;
+
+    if (enemy.multiHitChance > 0 && this.rng.chance(enemy.multiHitChance)) {
       const extraDamage = this.calculateBaseDamage(enemy, target);
       const extraDealt = target.takeDamage(extraDamage);
       this.log.add({
@@ -221,6 +223,7 @@ export class Battle {
         source: enemy.name, target: target.name, value: extraDealt,
         message: `${enemy.name} multi-hit ${target.name} for ${extraDealt}`,
       });
+      if (!target.isAlive()) return;
     }
 
     for (const skill of enemy.activeSkills) {
@@ -231,6 +234,7 @@ export class Battle {
       }
     }
 
+    if (!target.isAlive()) return;
     if (enemy.isPlayer) return;
 
     if (enemy.rage < enemy.maxRage) {
