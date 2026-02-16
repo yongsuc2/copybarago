@@ -190,6 +190,21 @@ export class BattleUnit implements SkillExecutionUnit {
   }
 
   addStatusEffect(effect: StatusEffect): void {
+    if (effect.isDot()) {
+      if (effect.sourceSkillId) {
+        const existingIdx = this.statusEffects.findIndex(
+          e => e.isDot() && e.sourceSkillId === effect.sourceSkillId,
+        );
+        if (existingIdx >= 0) {
+          if (effect.value >= this.statusEffects[existingIdx].value) {
+            this.statusEffects[existingIdx] = effect;
+          }
+          return;
+        }
+      }
+      this.statusEffects.push(effect);
+      return;
+    }
     const existing = this.statusEffects.find(e => e.type === effect.type);
     if (existing) {
       existing.remainingTurns = Math.max(existing.remainingTurns, effect.remainingTurns);

@@ -2,8 +2,52 @@ import { useState, useEffect } from 'react';
 import type { BattleUnit } from '../../domain/battle/BattleUnit';
 import type { BattleLogEntry } from '../../domain/battle/BattleLog';
 import { BattleLogType } from '../../domain/battle/BattleLog';
+import { StatusEffectType } from '../../domain/enums';
 import { CharacterSprite, getCharacterType } from './CharacterSprite';
 import { formatNumber } from './PlayerStatsBar';
+
+const STATUS_ICON: Record<StatusEffectType, string> = {
+  [StatusEffectType.POISON]: '🧪',
+  [StatusEffectType.BURN]: '🔥',
+  [StatusEffectType.REGEN]: '💚',
+  [StatusEffectType.ATK_UP]: '⚔️',
+  [StatusEffectType.ATK_DOWN]: '⚔️',
+  [StatusEffectType.DEF_UP]: '🛡️',
+  [StatusEffectType.DEF_DOWN]: '🛡️',
+  [StatusEffectType.CRIT_UP]: '🎯',
+};
+
+const STATUS_CLASS: Record<StatusEffectType, string> = {
+  [StatusEffectType.POISON]: 'debuff',
+  [StatusEffectType.BURN]: 'debuff',
+  [StatusEffectType.REGEN]: 'buff',
+  [StatusEffectType.ATK_UP]: 'buff',
+  [StatusEffectType.ATK_DOWN]: 'debuff',
+  [StatusEffectType.DEF_UP]: 'buff',
+  [StatusEffectType.DEF_DOWN]: 'debuff',
+  [StatusEffectType.CRIT_UP]: 'buff',
+};
+
+interface StatusIconGroup {
+  type: StatusEffectType;
+  count: number;
+  maxTurns: number;
+}
+
+function groupStatusEffects(unit: BattleUnit): StatusIconGroup[] {
+  const map = new Map<StatusEffectType, { count: number; maxTurns: number }>();
+  for (const e of unit.statusEffects) {
+    if (e.remainingTurns <= 0) continue;
+    const existing = map.get(e.type);
+    if (existing) {
+      existing.count++;
+      existing.maxTurns = Math.max(existing.maxTurns, e.remainingTurns);
+    } else {
+      map.set(e.type, { count: 1, maxTurns: e.remainingTurns });
+    }
+  }
+  return Array.from(map.entries()).map(([type, { count, maxTurns }]) => ({ type, count, maxTurns }));
+}
 
 interface DamagePopup {
   id: number;
@@ -156,6 +200,17 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
               <span className="ba-rage-label">💢 {playerUnit.rage}/{playerUnit.maxRage}</span>
             </div>
           )}
+          {groupStatusEffects(playerUnit).length > 0 && (
+            <div className="ba-status-icons">
+              {groupStatusEffects(playerUnit).map(g => (
+                <span key={g.type} className={`ba-status-icon ${STATUS_CLASS[g.type]}`} title={`${g.type} ${g.maxTurns}턴`}>
+                  {STATUS_ICON[g.type]}
+                  {g.count > 1 && <span className="ba-status-stack">×{g.count}</span>}
+                  <span className="ba-status-turns">{g.maxTurns}</span>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {hasProjectile && isApproachPhase && (
@@ -230,6 +285,17 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
                       <div className="ba-rage-fill" style={{ width: `${(eu.rage / eu.maxRage) * 100}%` }} />
                     </div>
                     <span className="ba-rage-label">💢 {eu.rage}/{eu.maxRage}</span>
+                  </div>
+                )}
+                {groupStatusEffects(eu).length > 0 && (
+                  <div className="ba-status-icons">
+                    {groupStatusEffects(eu).map(g => (
+                      <span key={g.type} className={`ba-status-icon ${STATUS_CLASS[g.type]}`} title={`${g.type} ${g.maxTurns}턴`}>
+                        {STATUS_ICON[g.type]}
+                        {g.count > 1 && <span className="ba-status-stack">×{g.count}</span>}
+                        <span className="ba-status-turns">{g.maxTurns}</span>
+                      </span>
+                    ))}
                   </div>
                 )}
               </div>

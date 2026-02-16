@@ -419,6 +419,22 @@ src/__tests__/domain/Talent.test.ts (스탯 수치 반영)
 docs/01_전투시스템.md, docs/02_캐릭터성장시스템.md, docs/04_스킬시스템.md, docs/12_모험시스템.md
 ```
 
+- **상태 효과 아이콘 + DoT 중첩 규칙 구현** (Y-12)
+  - 캐릭터 HP바/분노바 아래 상태 효과 아이콘 표시 (버프=녹색, 디버프=빨간 테두리)
+  - 남은 턴 수 뱃지, DoT 중첩 수(×N) 표시
+  - DoT 중첩 규칙: 같은 스킬(sourceSkillId) → 상위 등급 덮어쓰기, 다른 스킬 → 공존
+  - StatusEffect에 sourceSkillId 추가, BattleUnit.addStatusEffect() 분기 로직
+
+### 수정된 파일
+```
+src/domain/battle/StatusEffect.ts (sourceSkillId 필드 추가)
+src/domain/battle/BattleUnit.ts (DoT 중첩 규칙: 같은 스킬 덮어쓰기, 다른 스킬 공존)
+src/domain/battle/SkillExecutionEngine.ts (DoT 생성 시 skill.id 전달)
+src/presentation/components/BattleArena.tsx (상태 효과 아이콘 렌더링)
+src/index.css (상태 아이콘 스타일)
+docs/01_전투시스템.md (상태 효과 아이콘, DoT 중첩 규칙)
+```
+
 ### 누적 현황
 - 테스트: 21개 파일, 222개 테스트 전부 통과
 - tsc 타입 체크 통과

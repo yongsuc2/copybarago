@@ -5,6 +5,7 @@ export class StatusEffect {
     public readonly type: StatusEffectType,
     public remainingTurns: number,
     public readonly value: number,
+    public readonly sourceSkillId?: string,
   ) {}
 
   tick(): void {

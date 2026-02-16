@@ -138,7 +138,7 @@ export class SkillExecutionEngine {
             const dotDamage = Math.floor(source.getEffectiveAtk() * effect.coefficient);
             const dotType = effect.attackType === AttackType.MAGIC
               ? StatusEffectType.BURN : StatusEffectType.POISON;
-            target.addStatusEffect(new StatusEffect(dotType, effect.duration, dotDamage));
+            target.addStatusEffect(new StatusEffect(dotType, effect.duration, dotDamage, skill.id));
           }
           break;
         }

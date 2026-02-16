@@ -543,6 +543,51 @@ body {
   100% { left: 15%; opacity: 1; transform: scale(1.2); }
 }
 
+.ba-status-icons {
+  display: flex;
+  gap: 3px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.ba-status-icon {
+  position: relative;
+  font-size: 14px;
+  line-height: 1;
+  padding: 1px 2px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid #555;
+}
+.ba-status-icon.buff {
+  border-color: #4caf50;
+}
+.ba-status-icon.debuff {
+  border-color: #e94560;
+}
+.ba-status-stack {
+  font-size: 8px;
+  color: #ffd740;
+  font-weight: bold;
+  margin-left: 1px;
+}
+.ba-status-turns {
+  position: absolute;
+  bottom: -4px;
+  right: -3px;
+  font-size: 7px;
+  font-weight: bold;
+  color: #fff;
+  background: #333;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
 .adventure-stage {
   min-height: 170px;
   background: #0d1b2a;
