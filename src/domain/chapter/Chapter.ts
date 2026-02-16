@@ -255,7 +255,8 @@ export class Chapter {
       this.currentEncounter = null;
     }
 
-    const gold = BattleDataTable.combatGoldReward.base + BattleDataTable.combatGoldReward.perChapter * this.id;
+    const r = BattleDataTable.combatGoldReward;
+    const gold = Math.floor(r.base + r.perChapter * this.id + r.perDay * this.currentDay);
     this.sessionGold += gold;
     return gold;
   }

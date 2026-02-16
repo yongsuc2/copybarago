@@ -244,6 +244,7 @@ body {
   align-items: center;
   justify-content: space-around;
   min-height: 140px;
+  position: relative;
 }
 
 .ba-character {
@@ -320,7 +321,15 @@ body {
 }
 .ba-damage-popup.damage { color: #ff5252; }
 .ba-damage-popup.heal { color: #69f0ae; }
-.ba-damage-popup.crit { color: #ffd740; font-size: 20px; }
+.ba-damage-popup.crit {
+  color: #ffd740;
+  font-size: 24px;
+  text-shadow: 0 0 8px rgba(255, 215, 64, 0.8), 0 0 16px rgba(255, 215, 64, 0.4);
+  animation: critPopup calc(0.8s / var(--battle-speed, 1)) ease-out forwards;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
 .ba-damage-popup.rage { color: #ff6b00; font-size: 20px; text-shadow: 0 0 6px rgba(255, 107, 0, 0.6); }
 
 .ba-rage-bar-wrap {
@@ -409,6 +418,47 @@ body {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-4px); }
   75% { transform: translateX(4px); }
+}
+
+@keyframes critPopup {
+  0% { opacity: 1; transform: translateY(0) scale(1.3); }
+  30% { transform: translateY(-5px) scale(1.0); }
+  100% { opacity: 0; transform: translateY(-25px) scale(1.0); }
+}
+
+.ba-crit-label {
+  font-size: 10px;
+  letter-spacing: 1px;
+  margin-right: 2px;
+}
+
+.ba-popup-icon {
+  font-size: 14px;
+  margin-right: 1px;
+}
+
+.ba-projectile {
+  position: absolute;
+  font-size: 28px;
+  z-index: 20;
+  pointer-events: none;
+  top: 45%;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+}
+.ba-projectile.fly-right {
+  animation: projectileFlyRight calc(0.35s / var(--battle-speed, 1)) ease-in forwards;
+}
+.ba-projectile.fly-left {
+  animation: projectileFlyLeft calc(0.35s / var(--battle-speed, 1)) ease-in forwards;
+}
+
+@keyframes projectileFlyRight {
+  0% { left: 15%; opacity: 1; transform: scale(1); }
+  100% { left: 72%; opacity: 1; transform: scale(1.2); }
+}
+@keyframes projectileFlyLeft {
+  0% { left: 72%; opacity: 1; transform: scale(1); }
+  100% { left: 15%; opacity: 1; transform: scale(1.2); }
 }
 
 .adventure-stage {

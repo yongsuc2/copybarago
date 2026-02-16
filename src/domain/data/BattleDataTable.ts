@@ -31,7 +31,8 @@ export const BattleDataTable = {
 
   combatGoldReward: {
     base: 10,
-    perChapter: 5,
+    perChapter: 2,
+    perDay: 0.5,
   },
 
   maxTurns: 100,

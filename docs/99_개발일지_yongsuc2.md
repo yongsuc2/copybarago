@@ -367,3 +367,58 @@ docs/04_스킬시스템.md (전면 재작성)
 ### 누적 현황
 - 테스트: 21개 파일, 180개 테스트 전부 통과
 - tsc 타입 체크 통과
+
+---
+
+## 2026-02-16 (Day 5 - 밸런스 + 비주얼)
+
+### 완료 작업
+- **패시브 스킬 밸런스 조정**
+  - 천사의 힘: ATK +100% → +30%
+  - 중복 패시브 병합: ATK%(atk_proficiency만 유지), DEF%(def_proficiency만 유지), CRIT(crit_mastery만 유지)
+  - 반격 메카닉 변경: 피해 반사 → 확률 기반 일반 공격 발동 (triggerChance 0.1~0.5)
+  - 연타 확률 하향: 0.1~0.35
+  - 기본 크리티컬 확률 5% → 0%
+
+- **인카운터 밸런스 조정**
+  - 천사: 체력 회복 제거, 스킬 3개 중 1개 선택으로 변경
+  - 악마 확률 15% → 10%, 우연 확률 20% → 25%
+  - 우연: 상자 → 스킬 3개 선택, 축복 → 챕터 기반 랜덤 골드
+  - 치유의 샘: 50% → 15%
+
+- **전투/경제 밸런스 조정**
+  - 전투 골드: 일수(perDay) 계수 추가, perChapter 5→2
+  - 챕터 클리어 보상: 데이터 테이블 분리, 챕터별 차등 골드+보석
+  - 일수 기반 몬스터 스케일링: 챕터 내 진행에 따라 최대 +80%
+  - 재능 스탯: HP 20→15, ATK 5→3, DEF 3→2
+
+- **스킬 비주얼 이펙트 구현**
+  - 스킬 투사체: skillIcon이 대상에게 날아가는 애니메이션 (캐릭터 이동 대신)
+  - 크리티컬 강화: 24px + CRIT! 라벨 + text-shadow 글로우 + scale 애니메이션
+  - 데미지 팝업에 스킬 아이콘 표시
+
+### 수정된 파일
+```
+src/domain/data/PassiveSkillTierData.ts (밸런스 조정, 5개 스킬 제거)
+src/domain/data/PassiveSkillRegistry.ts (병합, 반격 변경)
+src/domain/entities/PassiveSkill.ts (CounterEffect → triggerChance)
+src/domain/entities/Player.ts (기본 crit 0.05→0)
+src/domain/battle/BattleUnit.ts (counterDamageRate 제거)
+src/domain/battle/Battle.ts (반격→일반 공격, 사망 체크 3곳 추가)
+src/domain/data/BattleDataTable.ts (전투 골드 perDay, counter 제거, dayProgressMaxBonus)
+src/domain/data/EncounterDataTable.ts (샘 15%, 악마 10%, 우연 변경, 클리어 보상)
+src/domain/data/TalentTable.ts (HP 15, ATK 3, DEF 2)
+src/domain/chapter/EncounterGenerator.ts (천사 3스킬, 우연 변경, chapterId)
+src/domain/chapter/Chapter.ts (전투 골드 perDay, 일수 스케일링)
+src/domain/chapter/EnemyTemplate.ts (dayProgress 파라미터)
+src/presentation/components/BattleArena.tsx (투사체, CRIT!, 스킬 아이콘 팝업)
+src/presentation/screens/ChapterScreen.tsx (인카운터 보상, 클리어 보상)
+src/index.css (투사체 애니메이션, 크리티컬 강화 스타일)
+src/__tests__/domain/SkillSystem.test.ts (병합/반격 반영)
+src/__tests__/domain/Talent.test.ts (스탯 수치 반영)
+docs/01_전투시스템.md, docs/02_캐릭터성장시스템.md, docs/04_스킬시스템.md, docs/12_모험시스템.md
+```
+
+### 누적 현황
+- 테스트: 21개 파일, 222개 테스트 전부 통과
+- tsc 타입 체크 통과

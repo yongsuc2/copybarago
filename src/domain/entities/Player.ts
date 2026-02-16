@@ -17,7 +17,7 @@ const SELL_PRICES: Record<EquipmentGrade, number> = {
   [EquipmentGrade.MYTHIC]: 3000,
 };
 
-const BASE_STATS = Stats.create({ hp: 100, maxHp: 100, atk: 10, def: 5, crit: 0.05 });
+const BASE_STATS = Stats.create({ hp: 100, maxHp: 100, atk: 10, def: 5, crit: 0 });
 
 export class Player {
   talent: Talent;

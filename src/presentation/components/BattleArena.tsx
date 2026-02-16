@@ -13,6 +13,7 @@ interface DamagePopup {
   isRage: boolean;
   side: 'player' | 'enemy';
   enemyIndex: number;
+  skillIcon?: string;
 }
 
 let popupIdCounter = 0;
@@ -68,6 +69,7 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
         isRage: entry.type === BattleLogType.RAGE_ATTACK,
         side: targetIsPlayer ? 'player' : 'enemy',
         enemyIndex: eIdx,
+        skillIcon: entry.skillIcon,
       });
     }
 
@@ -81,15 +83,19 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
   const playerType = getCharacterType(playerUnit.name);
   const playerPopups = popups.filter(p => p.side === 'player');
 
-  const isPlayerApproach = attackPhase === 'player-approach' || attackPhase === 'player-hit';
-  const isEnemyApproach = attackPhase === 'enemy-approach' || attackPhase === 'enemy-hit';
-  const isPlayerHit = attackPhase === 'enemy-hit';
-  const isEnemyHit = attackPhase === 'player-hit';
-
   const skillEntry = damageEntries.find(e => e.type === BattleLogType.SKILL_DAMAGE && e.skillName);
   const counterEntry = damageEntries.find(e => e.type === BattleLogType.COUNTER);
   const attackerIsPlayer = attackPhase.startsWith('player-');
   const attackerIsEnemy = attackPhase.startsWith('enemy-');
+
+  const projectileEntry = damageEntries.find(e => e.type === BattleLogType.SKILL_DAMAGE && e.skillIcon);
+  const hasProjectile = !!projectileEntry;
+  const isApproachPhase = attackPhase === 'player-approach' || attackPhase === 'enemy-approach';
+
+  const isPlayerApproach = !hasProjectile && (attackPhase === 'player-approach' || attackPhase === 'player-hit');
+  const isEnemyApproach = !hasProjectile && (attackPhase === 'enemy-approach' || attackPhase === 'enemy-hit');
+  const isPlayerHit = attackPhase === 'enemy-hit';
+  const isEnemyHit = attackPhase === 'player-hit';
 
   const spriteSize = enemyUnits.length > 1 ? 56 : 72;
 
@@ -120,6 +126,8 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
                 key={p.id}
                 className={`ba-damage-popup ${p.isHeal ? 'heal' : 'damage'} ${p.isCrit ? 'crit' : ''} ${p.isRage ? 'rage' : ''}`}
               >
+                {p.isCrit && <span className="ba-crit-label">CRIT!</span>}
+                {p.skillIcon && <span className="ba-popup-icon">{p.skillIcon}</span>}
                 {p.isHeal ? '+' : '-'}{formatNumber(p.value)}
               </span>
             ))}
@@ -149,6 +157,15 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
             </div>
           )}
         </div>
+
+        {hasProjectile && isApproachPhase && (
+          <div
+            className={`ba-projectile ${attackerIsPlayer ? 'fly-right' : 'fly-left'}`}
+            key={`proj-${popupIdCounter}`}
+          >
+            {projectileEntry!.skillIcon}
+          </div>
+        )}
 
         <div className="ba-vs">대</div>
 
@@ -182,6 +199,8 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
                       key={p.id}
                       className={`ba-damage-popup ${p.isHeal ? 'heal' : 'damage'} ${p.isCrit ? 'crit' : ''} ${p.isRage ? 'rage' : ''}`}
                     >
+                      {p.isCrit && <span className="ba-crit-label">CRIT!</span>}
+                      {p.skillIcon && <span className="ba-popup-icon">{p.skillIcon}</span>}
                       {p.isHeal ? '+' : '-'}{formatNumber(p.value)}
                     </span>
                   ))}

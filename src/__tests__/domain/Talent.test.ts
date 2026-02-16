@@ -38,9 +38,9 @@ describe('Talent', () => {
     const talent = new Talent(5, 3, 2);
     const stats = talent.getStats();
 
-    expect(stats.atk).toBe(25);
-    expect(stats.maxHp).toBe(60);
-    expect(stats.def).toBe(6);
+    expect(stats.atk).toBe(15);
+    expect(stats.maxHp).toBe(45);
+    expect(stats.def).toBe(4);
   });
 
   it('reports next grade threshold', () => {
