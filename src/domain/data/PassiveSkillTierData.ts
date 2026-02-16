@@ -12,10 +12,10 @@ export const PassiveSkillTierData = {
     4: { healPerTurn: 42 },
   },
   counter: {
-    1: { damageRate: 0.3 },
-    2: { damageRate: 0.45 },
-    3: { damageRate: 0.6 },
-    4: { damageRate: 0.8 },
+    1: { triggerChance: 0.1 },
+    2: { triggerChance: 0.2 },
+    3: { triggerChance: 0.35 },
+    4: { triggerChance: 0.5 },
   },
   iron_shield: {
     1: { hpPercent: 0.1 },
@@ -24,10 +24,10 @@ export const PassiveSkillTierData = {
     4: { hpPercent: 0.4 },
   },
   multi_hit: {
-    1: { chance: 0.25 },
-    2: { chance: 0.35 },
-    3: { chance: 0.45 },
-    4: { chance: 0.6 },
+    1: { chance: 0.1 },
+    2: { chance: 0.15 },
+    3: { chance: 0.25 },
+    4: { chance: 0.35 },
   },
   crit_mastery: {
     1: { value: 0.12 },

@@ -31,7 +31,6 @@ export class BattleUnit implements SkillExecutionUnit {
   reviveHpPercent: number;
   multiHitChance: number;
   lifestealRate: number;
-  counterDamageRate: number;
   counterTriggerChance: number;
   rage: number;
   maxRage: number;
@@ -61,7 +60,6 @@ export class BattleUnit implements SkillExecutionUnit {
     this.reviveHpPercent = 0;
     this.multiHitChance = 0;
     this.lifestealRate = 0;
-    this.counterDamageRate = 0;
     this.counterTriggerChance = 0;
     this.rage = 0;
     this.maxRage = BattleDataTable.rage.maxRage;
@@ -96,7 +94,6 @@ export class BattleUnit implements SkillExecutionUnit {
       }
       case PassiveType.COUNTER:
         this.counterTriggerChance = Math.max(this.counterTriggerChance, skill.effect.triggerChance);
-        this.counterDamageRate += skill.effect.damageRate;
         break;
       case PassiveType.LIFESTEAL:
         this.lifestealRate += skill.effect.rate;

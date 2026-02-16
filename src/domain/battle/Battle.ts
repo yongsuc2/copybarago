@@ -316,8 +316,10 @@ export class Battle {
   }
 
   private processCounter(defender: BattleUnit, attacker: BattleUnit): void {
-    const counterDamage = Math.floor(this.calculateBaseDamage(defender, attacker) * defender.counterDamageRate);
-    const dealt = attacker.takeDamage(counterDamage);
+    const baseDamage = this.calculateBaseDamage(defender, attacker);
+    const isCrit = this.rng.chance(defender.getEffectiveCrit());
+    const finalDamage = isCrit ? Math.floor(baseDamage * BattleDataTable.damage.critMultiplier) : baseDamage;
+    const dealt = attacker.takeDamage(finalDamage);
     this.log.add({
       turn: this.turnCount, type: BattleLogType.COUNTER,
       source: defender.name, target: attacker.name, value: dealt,

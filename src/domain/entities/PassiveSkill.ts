@@ -15,7 +15,6 @@ export interface StatModifierEffect {
 
 export interface CounterEffect {
   type: PassiveType.COUNTER;
-  damageRate: number;
   triggerChance: number;
 }
 

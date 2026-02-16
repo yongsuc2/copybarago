@@ -14,9 +14,6 @@ export const BattleDataTable = {
     attackMultiplier: 1.2,
   },
 
-  counter: {
-    triggerChance: 0.5,
-  },
 
   skill: {
     onAttackAtkRatio: 0.3,

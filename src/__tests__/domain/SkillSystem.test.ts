@@ -232,7 +232,7 @@ describe('PassiveSkillRegistry', () => {
     const counter = PassiveSkillRegistry.getById('counter', 1)!;
     expect(counter.effect.type).toBe(PassiveType.COUNTER);
     if (counter.effect.type === PassiveType.COUNTER) {
-      expect(counter.effect.damageRate).toBe(0.3);
+      expect(counter.effect.triggerChance).toBe(0.1);
     }
   });
 

@@ -9,7 +9,6 @@ import {
   type PassiveEffect,
 } from '../entities/PassiveSkill';
 import { PassiveSkillTierData, getPassiveTierData } from './PassiveSkillTierData';
-import { BattleDataTable } from './BattleDataTable';
 
 type PSTD = typeof PassiveSkillTierData;
 
@@ -53,10 +52,9 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
     tags: [], heritageSynergy: [HeritageRoute.KNIGHT],
     buildEffect: (t) => ({
       type: PassiveType.COUNTER,
-      damageRate: td('counter', t).damageRate,
-      triggerChance: BattleDataTable.counter.triggerChance,
+      triggerChance: td('counter', t).triggerChance,
     }),
-    buildDescription: (t) => `피격 시 ${pct(td('counter', t).damageRate)} 데미지 반격`,
+    buildDescription: (t) => `피격 시 ${pct(td('counter', t).triggerChance)} 확률로 일반 공격 반격`,
   },
   {
     id: 'iron_shield', name: '방어막', icon: '🔰',
