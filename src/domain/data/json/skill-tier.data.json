@@ -1,0 +1,140 @@
+[
+  { "skill": "lightning", "tier": 1, "damage": 15 },
+  { "skill": "lightning", "tier": 2, "damage": 25 },
+  { "skill": "lightning", "tier": 3, "damage": 40 },
+  { "skill": "lightning", "tier": 4, "damage": 60 },
+
+  { "skill": "lance", "tier": 1, "damage": 12 },
+  { "skill": "lance", "tier": 2, "damage": 22 },
+  { "skill": "lance", "tier": 3, "damage": 36 },
+  { "skill": "lance", "tier": 4, "damage": 55 },
+
+  { "skill": "shuriken", "tier": 1, "damage": 10 },
+  { "skill": "shuriken", "tier": 2, "damage": 18 },
+  { "skill": "shuriken", "tier": 3, "damage": 30 },
+  { "skill": "shuriken", "tier": 4, "damage": 48 },
+
+  { "skill": "sword_aura", "tier": 1, "damage": 12 },
+  { "skill": "sword_aura", "tier": 2, "damage": 22 },
+  { "skill": "sword_aura", "tier": 3, "damage": 36 },
+  { "skill": "sword_aura", "tier": 4, "damage": 55 },
+
+  { "skill": "thunderstorm", "tier": 1, "damage": 40 },
+  { "skill": "thunderstorm", "tier": 2, "damage": 65 },
+  { "skill": "thunderstorm", "tier": 3, "damage": 95 },
+  { "skill": "thunderstorm", "tier": 4, "damage": 130 },
+
+  { "skill": "tyrant", "tier": 1, "damage": 35 },
+  { "skill": "tyrant", "tier": 2, "damage": 55 },
+  { "skill": "tyrant", "tier": 3, "damage": 80 },
+  { "skill": "tyrant", "tier": 4, "damage": 115 },
+
+  { "skill": "rage_lightning", "tier": 1, "damage": 30 },
+  { "skill": "rage_lightning", "tier": 2, "damage": 50 },
+  { "skill": "rage_lightning", "tier": 3, "damage": 75 },
+  { "skill": "rage_lightning", "tier": 4, "damage": 110 },
+
+  { "skill": "rage_lance", "tier": 1, "damage": 35 },
+  { "skill": "rage_lance", "tier": 2, "damage": 55 },
+  { "skill": "rage_lance", "tier": 3, "damage": 80 },
+  { "skill": "rage_lance", "tier": 4, "damage": 115 },
+
+  { "skill": "rage_flame_wave", "tier": 1, "damage": 25 },
+  { "skill": "rage_flame_wave", "tier": 2, "damage": 42 },
+  { "skill": "rage_flame_wave", "tier": 3, "damage": 65 },
+  { "skill": "rage_flame_wave", "tier": 4, "damage": 95 },
+
+  { "skill": "poison_weapon", "tier": 1, "damagePerTurn": 8, "duration": 3 },
+  { "skill": "poison_weapon", "tier": 2, "damagePerTurn": 12, "duration": 4 },
+  { "skill": "poison_weapon", "tier": 3, "damagePerTurn": 18, "duration": 5 },
+  { "skill": "poison_weapon", "tier": 4, "damagePerTurn": 25, "duration": 6 },
+
+  { "skill": "lifesteal", "tier": 1, "rate": 0.15 },
+  { "skill": "lifesteal", "tier": 2, "rate": 0.22 },
+  { "skill": "lifesteal", "tier": 3, "rate": 0.30 },
+  { "skill": "lifesteal", "tier": 4, "rate": 0.40 },
+
+  { "skill": "regen", "tier": 1, "healPerTurn": 10 },
+  { "skill": "regen", "tier": 2, "healPerTurn": 18 },
+  { "skill": "regen", "tier": 3, "healPerTurn": 28 },
+  { "skill": "regen", "tier": 4, "healPerTurn": 42 },
+
+  { "skill": "counter", "tier": 1, "reflectRate": 0.3 },
+  { "skill": "counter", "tier": 2, "reflectRate": 0.45 },
+  { "skill": "counter", "tier": 3, "reflectRate": 0.6 },
+  { "skill": "counter", "tier": 4, "reflectRate": 0.8 },
+
+  { "skill": "iron_shield", "tier": 1, "shieldRate": 0.1 },
+  { "skill": "iron_shield", "tier": 2, "shieldRate": 0.18 },
+  { "skill": "iron_shield", "tier": 3, "shieldRate": 0.28 },
+  { "skill": "iron_shield", "tier": 4, "shieldRate": 0.4 },
+
+  { "skill": "multi_hit_mastery", "tier": 1, "chance": 0.25 },
+  { "skill": "multi_hit_mastery", "tier": 2, "chance": 0.35 },
+  { "skill": "multi_hit_mastery", "tier": 3, "chance": 0.45 },
+  { "skill": "multi_hit_mastery", "tier": 4, "chance": 0.6 },
+
+  { "skill": "crit_mastery", "tier": 1, "critBonus": 0.15 },
+  { "skill": "crit_mastery", "tier": 2, "critBonus": 0.25 },
+  { "skill": "crit_mastery", "tier": 3, "critBonus": 0.35 },
+  { "skill": "crit_mastery", "tier": 4, "critBonus": 0.5 },
+
+  { "skill": "rage_mastery", "tier": 1, "powerBonus": 0.25 },
+  { "skill": "rage_mastery", "tier": 2, "powerBonus": 0.4 },
+  { "skill": "rage_mastery", "tier": 3, "powerBonus": 0.55 },
+  { "skill": "rage_mastery", "tier": 4, "powerBonus": 0.75 },
+
+  { "skill": "complete_rage_mastery", "tier": 1, "bonusRagePerAttack": 25 },
+  { "skill": "complete_rage_mastery", "tier": 2, "bonusRagePerAttack": 40 },
+  { "skill": "complete_rage_mastery", "tier": 3, "bonusRagePerAttack": 55 },
+  { "skill": "complete_rage_mastery", "tier": 4, "bonusRagePerAttack": 75 },
+
+  { "skill": "shrink_magic", "tier": 1, "reduction": 0.2, "duration": 3 },
+  { "skill": "shrink_magic", "tier": 2, "reduction": 0.3, "duration": 3 },
+  { "skill": "shrink_magic", "tier": 3, "reduction": 0.4, "duration": 4 },
+  { "skill": "shrink_magic", "tier": 4, "reduction": 0.5, "duration": 5 },
+
+  { "skill": "hp_proficiency", "tier": 1, "bonus": 0.1 },
+  { "skill": "hp_proficiency", "tier": 2, "bonus": 0.18 },
+  { "skill": "hp_proficiency", "tier": 3, "bonus": 0.28 },
+  { "skill": "hp_proficiency", "tier": 4, "bonus": 0.4 },
+
+  { "skill": "atk_proficiency", "tier": 1, "bonus": 0.1 },
+  { "skill": "atk_proficiency", "tier": 2, "bonus": 0.18 },
+  { "skill": "atk_proficiency", "tier": 3, "bonus": 0.28 },
+  { "skill": "atk_proficiency", "tier": 4, "bonus": 0.4 },
+
+  { "skill": "def_proficiency", "tier": 1, "bonus": 0.1 },
+  { "skill": "def_proficiency", "tier": 2, "bonus": 0.18 },
+  { "skill": "def_proficiency", "tier": 3, "bonus": 0.28 },
+  { "skill": "def_proficiency", "tier": 4, "bonus": 0.4 },
+
+  { "skill": "crit_proficiency", "tier": 1, "bonus": 0.1 },
+  { "skill": "crit_proficiency", "tier": 2, "bonus": 0.18 },
+  { "skill": "crit_proficiency", "tier": 3, "bonus": 0.28 },
+  { "skill": "crit_proficiency", "tier": 4, "bonus": 0.4 },
+
+  { "skill": "defense_ultimate", "tier": 1, "bonus": 0.5 },
+  { "skill": "defense_ultimate", "tier": 2, "bonus": 0.7 },
+  { "skill": "defense_ultimate", "tier": 3, "bonus": 0.9 },
+  { "skill": "defense_ultimate", "tier": 4, "bonus": 1.2 },
+
+  { "skill": "valor_ultimate", "tier": 1, "bonus": 0.5 },
+  { "skill": "valor_ultimate", "tier": 2, "bonus": 0.7 },
+  { "skill": "valor_ultimate", "tier": 3, "bonus": 0.9 },
+  { "skill": "valor_ultimate", "tier": 4, "bonus": 1.2 },
+
+  { "skill": "super_atk", "tier": 1, "bonus": 0.8 },
+  { "skill": "super_atk", "tier": 2, "bonus": 1.1 },
+  { "skill": "super_atk", "tier": 3, "bonus": 1.4 },
+  { "skill": "super_atk", "tier": 4, "bonus": 1.8 },
+
+  { "skill": "revive", "tier": 1, "hpPercent": 0.3 },
+  { "skill": "revive", "tier": 2, "hpPercent": 0.4 },
+  { "skill": "revive", "tier": 3, "hpPercent": 0.55 },
+  { "skill": "revive", "tier": 4, "hpPercent": 0.75 },
+
+  { "skill": "angel_power", "tier": 4, "bonus": 1.0 },
+
+  { "skill": "demon_power", "tier": 4, "damage": 60 }
+]

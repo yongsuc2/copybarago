@@ -1,0 +1,67 @@
+{
+  "weaponPassives": [
+    { "subType": "SWORD", "grade": "COMMON", "effectType": "BUFF", "statusEffectType": "ATK_UP", "value": 0.03, "icon": "⚔️" },
+    { "subType": "SWORD", "grade": "UNCOMMON", "effectType": "BUFF", "statusEffectType": "ATK_UP", "value": 0.06, "icon": "⚔️" },
+    { "subType": "SWORD", "grade": "RARE", "effectType": "BUFF", "statusEffectType": "ATK_UP", "value": 0.10, "icon": "⚔️" },
+    { "subType": "SWORD", "grade": "EPIC", "effectType": "BUFF", "statusEffectType": "ATK_UP", "value": 0.15, "icon": "⚔️" },
+    { "subType": "SWORD", "grade": "LEGENDARY", "effectType": "BUFF", "statusEffectType": "ATK_UP", "value": 0.20, "icon": "⚔️" },
+    { "subType": "SWORD", "grade": "MYTHIC", "effectType": "BUFF", "statusEffectType": "ATK_UP", "value": 0.25, "icon": "⚔️" },
+
+    { "subType": "STAFF", "grade": "COMMON", "effectType": "MAGIC_BOOST", "value": 0.05, "icon": "🪄" },
+    { "subType": "STAFF", "grade": "UNCOMMON", "effectType": "MAGIC_BOOST", "value": 0.10, "icon": "🪄" },
+    { "subType": "STAFF", "grade": "RARE", "effectType": "MAGIC_BOOST", "value": 0.15, "icon": "🪄" },
+    { "subType": "STAFF", "grade": "EPIC", "effectType": "MAGIC_BOOST", "value": 0.20, "icon": "🪄" },
+    { "subType": "STAFF", "grade": "LEGENDARY", "effectType": "MAGIC_BOOST", "value": 0.28, "icon": "🪄" },
+    { "subType": "STAFF", "grade": "MYTHIC", "effectType": "MAGIC_BOOST", "value": 0.35, "icon": "🪄" },
+
+    { "subType": "BOW", "grade": "COMMON", "effectType": "RAGE_BOOST", "value": 3, "icon": "🏹" },
+    { "subType": "BOW", "grade": "UNCOMMON", "effectType": "RAGE_BOOST", "value": 5, "icon": "🏹" },
+    { "subType": "BOW", "grade": "RARE", "effectType": "RAGE_BOOST", "value": 10, "icon": "🏹" },
+    { "subType": "BOW", "grade": "EPIC", "effectType": "RAGE_BOOST", "value": 15, "icon": "🏹" },
+    { "subType": "BOW", "grade": "LEGENDARY", "effectType": "RAGE_BOOST", "value": 20, "icon": "🏹" },
+    { "subType": "BOW", "grade": "MYTHIC", "effectType": "RAGE_BOOST", "value": 25, "icon": "🏹" }
+  ],
+  "slotPassives": [
+    { "slot": "ARMOR", "grade": "COMMON", "effectType": "SHIELD", "value": 0.03, "icon": "🛡️" },
+    { "slot": "ARMOR", "grade": "UNCOMMON", "effectType": "SHIELD", "value": 0.06, "icon": "🛡️" },
+    { "slot": "ARMOR", "grade": "RARE", "effectType": "SHIELD", "value": 0.10, "icon": "🛡️" },
+    { "slot": "ARMOR", "grade": "EPIC", "effectType": "SHIELD", "value": 0.15, "icon": "🛡️" },
+    { "slot": "ARMOR", "grade": "LEGENDARY", "effectType": "SHIELD", "value": 0.20, "icon": "🛡️" },
+    { "slot": "ARMOR", "grade": "MYTHIC", "effectType": "SHIELD", "value": 0.25, "icon": "🛡️" },
+
+    { "slot": "RING", "grade": "COMMON", "effectType": "BUFF", "statusEffectType": "CRIT_UP", "value": 0.02, "icon": "💍" },
+    { "slot": "RING", "grade": "UNCOMMON", "effectType": "BUFF", "statusEffectType": "CRIT_UP", "value": 0.04, "icon": "💍" },
+    { "slot": "RING", "grade": "RARE", "effectType": "BUFF", "statusEffectType": "CRIT_UP", "value": 0.08, "icon": "💍" },
+    { "slot": "RING", "grade": "EPIC", "effectType": "BUFF", "statusEffectType": "CRIT_UP", "value": 0.12, "icon": "💍" },
+    { "slot": "RING", "grade": "LEGENDARY", "effectType": "BUFF", "statusEffectType": "CRIT_UP", "value": 0.15, "icon": "💍" },
+    { "slot": "RING", "grade": "MYTHIC", "effectType": "BUFF", "statusEffectType": "CRIT_UP", "value": 0.18, "icon": "💍" },
+
+    { "slot": "NECKLACE", "grade": "COMMON", "effectType": "BUFF", "statusEffectType": "ATK_UP", "value": 0.02, "icon": "📿" },
+    { "slot": "NECKLACE", "grade": "UNCOMMON", "effectType": "BUFF", "statusEffectType": "ATK_UP", "value": 0.04, "icon": "📿" },
+    { "slot": "NECKLACE", "grade": "RARE", "effectType": "BUFF", "statusEffectType": "ATK_UP", "value": 0.08, "icon": "📿" },
+    { "slot": "NECKLACE", "grade": "EPIC", "effectType": "BUFF", "statusEffectType": "ATK_UP", "value": 0.12, "icon": "📿" },
+    { "slot": "NECKLACE", "grade": "LEGENDARY", "effectType": "BUFF", "statusEffectType": "ATK_UP", "value": 0.15, "icon": "📿" },
+    { "slot": "NECKLACE", "grade": "MYTHIC", "effectType": "BUFF", "statusEffectType": "ATK_UP", "value": 0.18, "icon": "📿" },
+
+    { "slot": "SHOES", "grade": "COMMON", "effectType": "HOT", "statusEffectType": "REGEN", "value": 3, "icon": "👟" },
+    { "slot": "SHOES", "grade": "UNCOMMON", "effectType": "HOT", "statusEffectType": "REGEN", "value": 8, "icon": "👟" },
+    { "slot": "SHOES", "grade": "RARE", "effectType": "HOT", "statusEffectType": "REGEN", "value": 18, "icon": "👟" },
+    { "slot": "SHOES", "grade": "EPIC", "effectType": "HOT", "statusEffectType": "REGEN", "value": 30, "icon": "👟" },
+    { "slot": "SHOES", "grade": "LEGENDARY", "effectType": "HOT", "statusEffectType": "REGEN", "value": 45, "icon": "👟" },
+    { "slot": "SHOES", "grade": "MYTHIC", "effectType": "HOT", "statusEffectType": "REGEN", "value": 60, "icon": "👟" },
+
+    { "slot": "GLOVES", "grade": "COMMON", "effectType": "MULTI_HIT", "value": 0.03, "icon": "🧤" },
+    { "slot": "GLOVES", "grade": "UNCOMMON", "effectType": "MULTI_HIT", "value": 0.06, "icon": "🧤" },
+    { "slot": "GLOVES", "grade": "RARE", "effectType": "MULTI_HIT", "value": 0.10, "icon": "🧤" },
+    { "slot": "GLOVES", "grade": "EPIC", "effectType": "MULTI_HIT", "value": 0.15, "icon": "🧤" },
+    { "slot": "GLOVES", "grade": "LEGENDARY", "effectType": "MULTI_HIT", "value": 0.20, "icon": "🧤" },
+    { "slot": "GLOVES", "grade": "MYTHIC", "effectType": "MULTI_HIT", "value": 0.25, "icon": "🧤" },
+
+    { "slot": "HAT", "grade": "COMMON", "effectType": "BUFF", "statusEffectType": "DEF_UP", "value": 0.03, "icon": "🎩" },
+    { "slot": "HAT", "grade": "UNCOMMON", "effectType": "BUFF", "statusEffectType": "DEF_UP", "value": 0.06, "icon": "🎩" },
+    { "slot": "HAT", "grade": "RARE", "effectType": "BUFF", "statusEffectType": "DEF_UP", "value": 0.10, "icon": "🎩" },
+    { "slot": "HAT", "grade": "EPIC", "effectType": "BUFF", "statusEffectType": "DEF_UP", "value": 0.15, "icon": "🎩" },
+    { "slot": "HAT", "grade": "LEGENDARY", "effectType": "BUFF", "statusEffectType": "DEF_UP", "value": 0.20, "icon": "🎩" },
+    { "slot": "HAT", "grade": "MYTHIC", "effectType": "BUFF", "statusEffectType": "DEF_UP", "value": 0.25, "icon": "🎩" }
+  ]
+}

@@ -1,5 +1,6 @@
 import { Stats } from '../value-objects/Stats';
 import { BattleDataTable } from './BattleDataTable';
+import data from './json/enemy.data.json';
 
 export interface EnemyTemplateData {
   id: string;
@@ -10,31 +11,25 @@ export interface EnemyTemplateData {
   ragePerAttack?: number;
 }
 
-const BASE_ENEMY_STATS = Stats.create({ hp: 80, maxHp: 80, atk: 8, def: 3 });
-const BASE_ELITE_STATS = Stats.create({ hp: 260, maxHp: 260, atk: 24, def: 9 });
-const BASE_BOSS_STATS = Stats.create({ hp: 600, maxHp: 600, atk: 32, def: 14 });
+const BASE_ENEMY_STATS = Stats.create(data.baseStats.enemy);
+const BASE_ELITE_STATS = Stats.create(data.baseStats.elite);
+const BASE_BOSS_STATS = Stats.create(data.baseStats.boss);
 
 const SCALING_PER_CHAPTER = BattleDataTable.enemy.scalingPerChapter;
 const TOWER_SCALING_PER_FLOOR = BattleDataTable.enemy.scalingPerTowerFloor;
 
-const ENEMY_TEMPLATES: EnemyTemplateData[] = [
-  { id: 'slime', name: 'Slime', baseStats: Stats.create({ hp: 60, maxHp: 60, atk: 6, def: 2 }), skillIds: [], isBoss: false, ragePerAttack: 25 },
-  { id: 'goblin', name: 'Goblin', baseStats: Stats.create({ hp: 80, maxHp: 80, atk: 10, def: 3 }), skillIds: [], isBoss: false, ragePerAttack: 25 },
-  { id: 'skeleton', name: 'Skeleton', baseStats: Stats.create({ hp: 100, maxHp: 100, atk: 12, def: 5 }), skillIds: ['poison_inject'], isBoss: false, ragePerAttack: 25 },
-  { id: 'orc', name: 'Orc', baseStats: Stats.create({ hp: 140, maxHp: 140, atk: 16, def: 7 }), skillIds: ['multi_hit'], isBoss: false, ragePerAttack: 25 },
-  { id: 'dark_knight', name: 'Dark Knight', baseStats: Stats.create({ hp: 200, maxHp: 200, atk: 20, def: 10 }), skillIds: ['counter', 'iron_shield'], isBoss: false, ragePerAttack: 25 },
+const ENEMY_TEMPLATES: EnemyTemplateData[] = data.templates.map(t => ({
+  id: t.id,
+  name: t.name,
+  baseStats: Stats.create({ hp: t.hp, maxHp: t.hp, atk: t.atk, def: t.def, crit: t.crit }),
+  skillIds: t.skillIds,
+  isBoss: t.isBoss,
+  ragePerAttack: t.ragePerAttack,
+}));
 
-  { id: 'elite_wolf', name: 'Alpha Wolf', baseStats: BASE_ELITE_STATS, skillIds: ['multi_hit', 'counter', 'lifesteal'], isBoss: false, ragePerAttack: 25 },
-  { id: 'elite_mage', name: 'Dark Mage', baseStats: Stats.create({ hp: 220, maxHp: 220, atk: 28, def: 6 }), skillIds: ['lightning_summon', 'flame_summon'], isBoss: false, ragePerAttack: 25 },
-
-  { id: 'boss_dragon', name: 'Ancient Dragon', baseStats: Stats.create({ hp: 750, maxHp: 750, atk: 34, def: 15 }), skillIds: ['lightning_summon', 'flame_summon', 'iron_shield'], isBoss: true, ragePerAttack: 25 },
-  { id: 'boss_demon', name: 'Demon Lord', baseStats: Stats.create({ hp: 650, maxHp: 650, atk: 38, def: 12 }), skillIds: ['poison_inject', 'lifesteal', 'flame_summon'], isBoss: true, ragePerAttack: 25 },
-  { id: 'boss_golem', name: 'Stone Golem', baseStats: Stats.create({ hp: 1000, maxHp: 1000, atk: 24, def: 25 }), skillIds: ['counter', 'iron_shield', 'poison_inject'], isBoss: true, ragePerAttack: 25 },
-];
-
-const CHAPTER_ENEMY_POOL = ['slime', 'goblin', 'skeleton', 'orc', 'dark_knight'];
-const CHAPTER_ELITE_POOL = ['elite_wolf', 'elite_mage'];
-const CHAPTER_BOSS_POOL = ['boss_dragon', 'boss_demon', 'boss_golem'];
+const CHAPTER_ENEMY_POOL = data.pools.enemy;
+const CHAPTER_ELITE_POOL = data.pools.elite;
+const CHAPTER_BOSS_POOL = data.pools.boss;
 
 export const EnemyTable = {
   getTemplate(id: string): EnemyTemplateData | undefined {

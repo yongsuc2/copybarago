@@ -1,0 +1,19 @@
+{
+  "statPerLevel": {
+    "HP": 15,
+    "ATK": 3,
+    "DEF": 2,
+    "CRIT": 0
+  },
+  "baseUpgradeCost": 100,
+  "costGrowthRate": 1.15,
+  "gradeThresholds": [
+    { "grade": "DISCIPLE", "totalLevel": 0 },
+    { "grade": "ADVENTURER", "totalLevel": 30 },
+    { "grade": "ELITE", "totalLevel": 90 },
+    { "grade": "MASTER", "totalLevel": 200 },
+    { "grade": "WARRIOR", "totalLevel": 400 },
+    { "grade": "HERO", "totalLevel": 700 }
+  ],
+  "gradeOrder": ["DISCIPLE", "ADVENTURER", "ELITE", "MASTER", "WARRIOR", "HERO"]
+}

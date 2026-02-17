@@ -1,0 +1,53 @@
+[
+  { "skill": "lifesteal", "tier": 1, "rate": 0.15 },
+  { "skill": "lifesteal", "tier": 2, "rate": 0.22 },
+  { "skill": "lifesteal", "tier": 3, "rate": 0.30 },
+  { "skill": "lifesteal", "tier": 4, "rate": 0.40 },
+
+  { "skill": "regen", "tier": 1, "healPerTurn": 10 },
+  { "skill": "regen", "tier": 2, "healPerTurn": 18 },
+  { "skill": "regen", "tier": 3, "healPerTurn": 28 },
+  { "skill": "regen", "tier": 4, "healPerTurn": 42 },
+
+  { "skill": "counter", "tier": 1, "triggerChance": 0.1 },
+  { "skill": "counter", "tier": 2, "triggerChance": 0.2 },
+  { "skill": "counter", "tier": 3, "triggerChance": 0.35 },
+  { "skill": "counter", "tier": 4, "triggerChance": 0.5 },
+
+  { "skill": "iron_shield", "tier": 1, "hpPercent": 0.1 },
+  { "skill": "iron_shield", "tier": 2, "hpPercent": 0.18 },
+  { "skill": "iron_shield", "tier": 3, "hpPercent": 0.28 },
+  { "skill": "iron_shield", "tier": 4, "hpPercent": 0.4 },
+
+  { "skill": "multi_hit", "tier": 1, "chance": 0.1 },
+  { "skill": "multi_hit", "tier": 2, "chance": 0.15 },
+  { "skill": "multi_hit", "tier": 3, "chance": 0.25 },
+  { "skill": "multi_hit", "tier": 4, "chance": 0.35 },
+
+  { "skill": "crit_mastery", "tier": 1, "value": 0.12 },
+  { "skill": "crit_mastery", "tier": 2, "value": 0.2 },
+  { "skill": "crit_mastery", "tier": 3, "value": 0.3 },
+  { "skill": "crit_mastery", "tier": 4, "value": 0.42 },
+
+  { "skill": "rage_mastery", "tier": 1, "value": 0.25 },
+  { "skill": "rage_mastery", "tier": 2, "value": 0.4 },
+  { "skill": "rage_mastery", "tier": 3, "value": 0.55 },
+  { "skill": "rage_mastery", "tier": 4, "value": 0.75 },
+
+  { "skill": "atk_proficiency", "tier": 1, "value": 0.15 },
+  { "skill": "atk_proficiency", "tier": 2, "value": 0.25 },
+  { "skill": "atk_proficiency", "tier": 3, "value": 0.4 },
+  { "skill": "atk_proficiency", "tier": 4, "value": 0.6 },
+
+  { "skill": "def_proficiency", "tier": 1, "value": 0.15 },
+  { "skill": "def_proficiency", "tier": 2, "value": 0.25 },
+  { "skill": "def_proficiency", "tier": 3, "value": 0.4 },
+  { "skill": "def_proficiency", "tier": 4, "value": 0.6 },
+
+  { "skill": "revive", "tier": 1, "hpPercent": 0.3 },
+  { "skill": "revive", "tier": 2, "hpPercent": 0.4 },
+  { "skill": "revive", "tier": 3, "hpPercent": 0.55 },
+  { "skill": "revive", "tier": 4, "hpPercent": 0.75 },
+
+  { "skill": "angel_power", "tier": 4, "value": 0.3 }
+]

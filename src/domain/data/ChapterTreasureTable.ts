@@ -1,5 +1,6 @@
 import { ChapterType, ResourceType } from '../enums';
 import { Reward, type ResourceReward } from '../value-objects/Reward';
+import data from './json/chapter-treasure.data.json';
 
 export interface ChapterMilestone {
   id: string;
@@ -61,12 +62,12 @@ export const ChapterTreasureTable = {
   },
 
   getMilestonesForChapter(chapterId: number): ChapterMilestone[] {
-    return [
-      makeSurviveMilestone(chapterId, 15, 150, 10, 1, 0),
-      makeSurviveMilestone(chapterId, 25, 250, 25, 3, 0),
-      makeSurviveMilestone(chapterId, 40, 400, 40, 5, 1),
-      makeClearMilestone(chapterId, 600, 60, 8, 2),
-    ];
+    const milestones: ChapterMilestone[] = data.survivalMilestones.map(m =>
+      makeSurviveMilestone(chapterId, m.day, m.gold, m.gems, m.eqStone, m.pwStone)
+    );
+    const c = data.clearMilestone;
+    milestones.push(makeClearMilestone(chapterId, c.gold, c.gems, c.eqStone, c.pwStone));
+    return milestones;
   },
 
   getMilestoneById(milestoneId: string): ChapterMilestone | null {

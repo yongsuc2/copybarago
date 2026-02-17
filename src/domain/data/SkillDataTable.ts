@@ -1,136 +1,24 @@
-export const SkillDataTable = {
-  lightning: {
-    1: { damage: 15 }, 2: { damage: 25 },
-    3: { damage: 40 }, 4: { damage: 60 },
-  },
-  lance: {
-    1: { damage: 12 }, 2: { damage: 22 },
-    3: { damage: 36 }, 4: { damage: 55 },
-  },
-  shuriken: {
-    1: { damage: 10 }, 2: { damage: 18 },
-    3: { damage: 30 }, 4: { damage: 48 },
-  },
-  sword_aura: {
-    1: { damage: 12 }, 2: { damage: 22 },
-    3: { damage: 36 }, 4: { damage: 55 },
-  },
-  thunderstorm: {
-    1: { damage: 40 }, 2: { damage: 65 },
-    3: { damage: 95 }, 4: { damage: 130 },
-  },
-  tyrant: {
-    1: { damage: 35 }, 2: { damage: 55 },
-    3: { damage: 80 }, 4: { damage: 115 },
-  },
+import rows from './json/skill-tier.data.json';
 
-  rage_lightning: {
-    1: { damage: 30 }, 2: { damage: 50 },
-    3: { damage: 75 }, 4: { damage: 110 },
-  },
-  rage_lance: {
-    1: { damage: 35 }, 2: { damage: 55 },
-    3: { damage: 80 }, 4: { damage: 115 },
-  },
-  rage_flame_wave: {
-    1: { damage: 25 }, 2: { damage: 42 },
-    3: { damage: 65 }, 4: { damage: 95 },
-  },
+type NestedMap = Record<string, Record<number, Record<string, number>>>;
 
-  poison_weapon: {
-    1: { damagePerTurn: 8, duration: 3 },
-    2: { damagePerTurn: 12, duration: 4 },
-    3: { damagePerTurn: 18, duration: 5 },
-    4: { damagePerTurn: 25, duration: 6 },
-  },
+const NESTED: NestedMap = {};
+for (const row of rows) {
+  const { skill, tier, ...params } = row;
+  if (!NESTED[skill]) NESTED[skill] = {};
+  NESTED[skill][tier] = params as Record<string, number>;
+}
 
-  lifesteal: {
-    1: { rate: 0.15 }, 2: { rate: 0.22 },
-    3: { rate: 0.30 }, 4: { rate: 0.40 },
-  },
-  regen: {
-    1: { healPerTurn: 10 }, 2: { healPerTurn: 18 },
-    3: { healPerTurn: 28 }, 4: { healPerTurn: 42 },
-  },
-  counter: {
-    1: { reflectRate: 0.3 }, 2: { reflectRate: 0.45 },
-    3: { reflectRate: 0.6 }, 4: { reflectRate: 0.8 },
-  },
-  iron_shield: {
-    1: { shieldRate: 0.1 }, 2: { shieldRate: 0.18 },
-    3: { shieldRate: 0.28 }, 4: { shieldRate: 0.4 },
-  },
-  multi_hit_mastery: {
-    1: { chance: 0.25 }, 2: { chance: 0.35 },
-    3: { chance: 0.45 }, 4: { chance: 0.6 },
-  },
-  crit_mastery: {
-    1: { critBonus: 0.15 }, 2: { critBonus: 0.25 },
-    3: { critBonus: 0.35 }, 4: { critBonus: 0.5 },
-  },
-  rage_mastery: {
-    1: { powerBonus: 0.25 }, 2: { powerBonus: 0.4 },
-    3: { powerBonus: 0.55 }, 4: { powerBonus: 0.75 },
-  },
-  complete_rage_mastery: {
-    1: { bonusRagePerAttack: 25 }, 2: { bonusRagePerAttack: 40 },
-    3: { bonusRagePerAttack: 55 }, 4: { bonusRagePerAttack: 75 },
-  },
-  shrink_magic: {
-    1: { reduction: 0.2, duration: 3 },
-    2: { reduction: 0.3, duration: 3 },
-    3: { reduction: 0.4, duration: 4 },
-    4: { reduction: 0.5, duration: 5 },
-  },
-
-  hp_proficiency: {
-    1: { bonus: 0.1 }, 2: { bonus: 0.18 },
-    3: { bonus: 0.28 }, 4: { bonus: 0.4 },
-  },
-  atk_proficiency: {
-    1: { bonus: 0.1 }, 2: { bonus: 0.18 },
-    3: { bonus: 0.28 }, 4: { bonus: 0.4 },
-  },
-  def_proficiency: {
-    1: { bonus: 0.1 }, 2: { bonus: 0.18 },
-    3: { bonus: 0.28 }, 4: { bonus: 0.4 },
-  },
-  crit_proficiency: {
-    1: { bonus: 0.1 }, 2: { bonus: 0.18 },
-    3: { bonus: 0.28 }, 4: { bonus: 0.4 },
-  },
-  defense_ultimate: {
-    1: { bonus: 0.5 }, 2: { bonus: 0.7 },
-    3: { bonus: 0.9 }, 4: { bonus: 1.2 },
-  },
-  valor_ultimate: {
-    1: { bonus: 0.5 }, 2: { bonus: 0.7 },
-    3: { bonus: 0.9 }, 4: { bonus: 1.2 },
-  },
-  super_atk: {
-    1: { bonus: 0.8 }, 2: { bonus: 1.1 },
-    3: { bonus: 1.4 }, 4: { bonus: 1.8 },
-  },
-  revive: {
-    1: { hpPercent: 0.3 }, 2: { hpPercent: 0.4 },
-    3: { hpPercent: 0.55 }, 4: { hpPercent: 0.75 },
-  },
-
-  angel_power: { 4: { bonus: 1.0 } },
-  demon_power: { 4: { damage: 60 } },
-} as const;
-
-type SD = typeof SkillDataTable;
+export const SkillDataTable = NESTED;
 
 const pct = (v: number) => `${v * 100}%`;
 
-function tierData<K extends keyof SD>(id: K, tier: number) {
-  const family = SkillDataTable[id] as Record<number, unknown>;
-  return family[tier] as Record<string, number> | undefined;
+function tierData(id: string, tier: number): Record<string, number> | undefined {
+  return NESTED[id]?.[tier];
 }
 
 export function getSkillDescription(id: string, tier: number = 1): string {
-  const d = tierData(id as keyof SD, tier);
+  const d = tierData(id, tier);
   if (!d) return '';
 
   const builders: Record<string, (v: Record<string, number>) => string> = {

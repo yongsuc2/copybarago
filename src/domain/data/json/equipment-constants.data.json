@@ -1,0 +1,16 @@
+{
+  "upgradeMultiplierPerLevel": 0.05,
+  "mergeCount": {
+    "COMMON": 3,
+    "UNCOMMON": 3,
+    "RARE": 3,
+    "EPIC": 3,
+    "LEGENDARY": 3,
+    "MYTHIC": 0
+  },
+  "gradeOrder": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+  "promoteLevels": [10, 20, 30],
+  "slotMaxCount": {
+    "RING": 2
+  }
+}

@@ -1,25 +1,13 @@
 import { HeritageRoute, ResourceType } from '../enums';
 import { Stats } from '../value-objects/Stats';
+import data from './json/heritage.data.json';
 
-const BOOK_TYPE_MAP: Record<HeritageRoute, ResourceType> = {
-  [HeritageRoute.SKULL]: ResourceType.SKULL_BOOK,
-  [HeritageRoute.KNIGHT]: ResourceType.KNIGHT_BOOK,
-  [HeritageRoute.RANGER]: ResourceType.RANGER_BOOK,
-  [HeritageRoute.GHOST]: ResourceType.GHOST_BOOK,
-};
+const BOOK_TYPE_MAP = data.bookTypeMap as Record<HeritageRoute, ResourceType>;
 
-const BASE_UPGRADE_COST = 1;
-const COST_GROWTH = 1;
-
-const PASSIVE_PER_LEVEL: Record<HeritageRoute, Stats> = {
-  [HeritageRoute.SKULL]: Stats.create({ atk: 3 }),
-  [HeritageRoute.KNIGHT]: Stats.create({ def: 2, maxHp: 10 }),
-  [HeritageRoute.RANGER]: Stats.create({ atk: 2, crit: 0.005 }),
-  [HeritageRoute.GHOST]: Stats.create({ atk: 1, maxHp: 5 }),
-};
-
-const BASE_SKILL_MULTIPLIER = 1.0;
-const SYNERGY_MULTIPLIER_PER_LEVEL = 0.02;
+const PASSIVE_PER_LEVEL: Record<HeritageRoute, Stats> = {} as Record<HeritageRoute, Stats>;
+for (const [route, raw] of Object.entries(data.passivePerLevel)) {
+  PASSIVE_PER_LEVEL[route as HeritageRoute] = Stats.create(raw);
+}
 
 export const HeritageTable = {
   getBookType(route: HeritageRoute): ResourceType {
@@ -27,7 +15,7 @@ export const HeritageTable = {
   },
 
   getUpgradeCost(level: number): number {
-    return BASE_UPGRADE_COST + level * COST_GROWTH;
+    return data.baseUpgradeCost + level * data.costGrowth;
   },
 
   getPassivePerLevel(route: HeritageRoute): Stats {
@@ -35,7 +23,7 @@ export const HeritageTable = {
   },
 
   getSkillMultiplier(_route: HeritageRoute, level: number, isSynergy: boolean): number {
-    if (!isSynergy) return BASE_SKILL_MULTIPLIER;
-    return BASE_SKILL_MULTIPLIER + level * SYNERGY_MULTIPLIER_PER_LEVEL;
+    if (!isSynergy) return data.baseSkillMultiplier;
+    return data.baseSkillMultiplier + level * data.synergyMultiplierPerLevel;
   },
 };

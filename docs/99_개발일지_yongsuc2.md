@@ -460,3 +460,61 @@ docs/12_모험시스템.md (보물상자 보상 수치)
 ### 누적 현황
 - 테스트: 21개 파일, 222개 테스트 전부 통과
 - tsc 타입 체크 통과
+
+---
+
+## 2026-02-17 (Day 6)
+
+### 완료 작업
+- **데이터 테이블 JSON 분리** (Y-14)
+  - 15개 데이터 테이블의 순수 데이터를 JSON 파일로 분리
+  - TypeScript 래퍼 파일이 JSON을 import하여 타입 안전성 + 헬퍼 함수 유지
+  - 소비자(consumer) 코드 변경 없이 동일 export API 유지
+  - JSON 파일은 Excel/VS Code에서 직관적으로 편집 가능
+  - 변환 대상: BattleDataTable, EncounterDataTable, ActiveSkillTierData, PassiveSkillTierData, SkillDataTable, EnemyTable, EquipmentDataTable, EquipmentTable, EquipmentPassiveTable, PetTable, ResourceDataTable, AttendanceDataTable, TalentTable, HeritageTable, ChapterTreasureTable
+  - 변환하지 않은 파일 (로직 중심): ActiveSkillRegistry, PassiveSkillRegistry, SkillTable
+  - tsconfig.app.json에 resolveJsonModule 추가
+
+### 생성된 파일
+```
+src/domain/data/json/battle.data.json
+src/domain/data/json/encounter.data.json
+src/domain/data/json/active-skill-tier.data.json
+src/domain/data/json/passive-skill-tier.data.json
+src/domain/data/json/skill-tier.data.json
+src/domain/data/json/enemy.data.json
+src/domain/data/json/equipment-labels.data.json
+src/domain/data/json/equipment-base-stats.data.json
+src/domain/data/json/equipment-constants.data.json
+src/domain/data/json/equipment-passive.data.json
+src/domain/data/json/pet.data.json
+src/domain/data/json/resource-labels.data.json
+src/domain/data/json/attendance.data.json
+src/domain/data/json/talent.data.json
+src/domain/data/json/heritage.data.json
+src/domain/data/json/chapter-treasure.data.json
+```
+
+### 수정된 파일
+```
+tsconfig.app.json (resolveJsonModule 추가)
+src/domain/data/BattleDataTable.ts (JSON import 래퍼)
+src/domain/data/EncounterDataTable.ts (JSON import + 템플릿 함수 유지)
+src/domain/data/ActiveSkillTierData.ts (플랫 행 → 중첩맵 변환)
+src/domain/data/PassiveSkillTierData.ts (플랫 행 → 중첩맵 변환)
+src/domain/data/SkillDataTable.ts (플랫 행 → 중첩맵 + getSkillDescription 유지)
+src/domain/data/EnemyTable.ts (JSON + Stats.create 재구성)
+src/domain/data/EquipmentDataTable.ts (JSON import 래퍼)
+src/domain/data/EquipmentTable.ts (JSON + Stats.create 재구성)
+src/domain/data/EquipmentPassiveTable.ts (JSON + description 동적 생성)
+src/domain/data/PetTable.ts (JSON + Stats.create + description 로직 유지)
+src/domain/data/ResourceDataTable.ts (JSON import 래퍼)
+src/domain/data/AttendanceDataTable.ts (JSON import + enum 캐스팅)
+src/domain/data/TalentTable.ts (JSON import + 헬퍼 함수 유지)
+src/domain/data/HeritageTable.ts (JSON + Stats.create 재구성)
+src/domain/data/ChapterTreasureTable.ts (JSON + Reward 구성 로직 유지)
+```
+
+### 누적 현황
+- 테스트: 21개 파일, 222개 테스트 전부 통과
+- tsc 타입 체크 통과

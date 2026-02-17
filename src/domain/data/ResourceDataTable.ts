@@ -1,51 +1,10 @@
 import { ResourceType, DungeonType } from '../enums';
+import data from './json/resource-labels.data.json';
 
-const RESOURCE_LABELS: Record<ResourceType, string> = {
-  [ResourceType.GOLD]: '골드',
-  [ResourceType.GEMS]: '보석',
-  [ResourceType.STAMINA]: '스태미나',
-  [ResourceType.CHALLENGE_TOKEN]: '도전 토큰',
-  [ResourceType.ARENA_TICKET]: '투기장 티켓',
-  [ResourceType.PICKAXE]: '곡괭이',
-  [ResourceType.EQUIPMENT_STONE]: '장비석',
-  [ResourceType.POWER_STONE]: '파워스톤',
-  [ResourceType.SKULL_BOOK]: '해골 서적',
-  [ResourceType.KNIGHT_BOOK]: '기사 서적',
-  [ResourceType.RANGER_BOOK]: '레인저 서적',
-  [ResourceType.GHOST_BOOK]: '유령 서적',
-  [ResourceType.PET_EGG]: '펫 알',
-  [ResourceType.PET_FOOD]: '사료',
-};
-
-const RESOURCE_SHORT_LABELS: Record<ResourceType, string> = {
-  [ResourceType.GOLD]: 'G',
-  [ResourceType.GEMS]: '보석',
-  [ResourceType.STAMINA]: '스태미나',
-  [ResourceType.CHALLENGE_TOKEN]: '토큰',
-  [ResourceType.ARENA_TICKET]: '티켓',
-  [ResourceType.PICKAXE]: '곡괭이',
-  [ResourceType.EQUIPMENT_STONE]: '장비석',
-  [ResourceType.POWER_STONE]: '파워스톤',
-  [ResourceType.SKULL_BOOK]: '해골 서적',
-  [ResourceType.KNIGHT_BOOK]: '기사 서적',
-  [ResourceType.RANGER_BOOK]: '레인저 서적',
-  [ResourceType.GHOST_BOOK]: '유령 서적',
-  [ResourceType.PET_EGG]: '펫 알',
-  [ResourceType.PET_FOOD]: '사료',
-};
-
-const RESOURCE_COLORS: Partial<Record<ResourceType, string>> = {
-  [ResourceType.GOLD]: '#ffd700',
-  [ResourceType.GEMS]: '#e040fb',
-  [ResourceType.EQUIPMENT_STONE]: '#4fc3f7',
-  [ResourceType.POWER_STONE]: '#ff7043',
-};
-
-const DUNGEON_LABELS: Record<DungeonType, string> = {
-  [DungeonType.DRAGON_NEST]: '용의 둥지',
-  [DungeonType.CELESTIAL_TREE]: '세계수',
-  [DungeonType.SKY_ISLAND]: '하늘섬',
-};
+const RESOURCE_LABELS = data.labels as Record<ResourceType, string>;
+const RESOURCE_SHORT_LABELS = data.shortLabels as Record<ResourceType, string>;
+const RESOURCE_COLORS = data.colors as Partial<Record<ResourceType, string>>;
+const DUNGEON_LABELS = data.dungeonLabels as Record<DungeonType, string>;
 
 export const ResourceDataTable = {
   getLabel(type: ResourceType): string {

@@ -1,32 +1,9 @@
 import { StatType, TalentGrade } from '../enums';
+import data from './json/talent.data.json';
 
-const STAT_PER_LEVEL: Record<StatType, number> = {
-  [StatType.HP]: 15,
-  [StatType.ATK]: 3,
-  [StatType.DEF]: 2,
-  [StatType.CRIT]: 0,
-};
-
-const BASE_UPGRADE_COST = 100;
-const COST_GROWTH_RATE = 1.15;
-
-const GRADE_THRESHOLDS: { grade: TalentGrade; totalLevel: number }[] = [
-  { grade: TalentGrade.DISCIPLE, totalLevel: 0 },
-  { grade: TalentGrade.ADVENTURER, totalLevel: 30 },
-  { grade: TalentGrade.ELITE, totalLevel: 90 },
-  { grade: TalentGrade.MASTER, totalLevel: 200 },
-  { grade: TalentGrade.WARRIOR, totalLevel: 400 },
-  { grade: TalentGrade.HERO, totalLevel: 700 },
-];
-
-const GRADE_ORDER: TalentGrade[] = [
-  TalentGrade.DISCIPLE,
-  TalentGrade.ADVENTURER,
-  TalentGrade.ELITE,
-  TalentGrade.MASTER,
-  TalentGrade.WARRIOR,
-  TalentGrade.HERO,
-];
+const STAT_PER_LEVEL = data.statPerLevel as Record<StatType, number>;
+const GRADE_THRESHOLDS = data.gradeThresholds as { grade: TalentGrade; totalLevel: number }[];
+const GRADE_ORDER = data.gradeOrder as TalentGrade[];
 
 export const TalentTable = {
   getStatPerLevel(statType: StatType): number {
@@ -34,7 +11,7 @@ export const TalentTable = {
   },
 
   getUpgradeCost(level: number): number {
-    return Math.floor(BASE_UPGRADE_COST * Math.pow(COST_GROWTH_RATE, level));
+    return Math.floor(data.baseUpgradeCost * Math.pow(data.costGrowthRate, level));
   },
 
   getGradeForTotalLevel(totalLevel: number): TalentGrade {
