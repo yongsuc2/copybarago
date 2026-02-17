@@ -192,7 +192,7 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
             </div>
             <span className="ba-power">{formatNumber(playerUnit.maxHp)}</span>
           </div>
-          {playerUnit.ragePerAttack > 0 && (
+          {playerUnit.maxRage > 0 && (
             <div className="ba-rage-bar-wrap">
               <div className="ba-rage-bar">
                 <div className="ba-rage-fill" style={{ width: `${(playerUnit.rage / playerUnit.maxRage) * 100}%` }} />
@@ -279,7 +279,7 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
                   </div>
                   <span className="ba-power">{formatNumber(eu.maxHp)}</span>
                 </div>
-                {eu.ragePerAttack > 0 && (
+                {eu.maxRage > 0 && (
                   <div className="ba-rage-bar-wrap">
                     <div className="ba-rage-bar">
                       <div className="ba-rage-fill" style={{ width: `${(eu.rage / eu.maxRage) * 100}%` }} />
