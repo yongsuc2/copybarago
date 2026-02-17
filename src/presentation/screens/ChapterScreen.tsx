@@ -8,13 +8,13 @@ import type { BattleLogEntry } from '../../domain/battle/BattleLog';
 import { BattleLogType } from '../../domain/battle/BattleLog';
 import type { AttackPhase } from '../components/BattleArena';
 import { AdventureStage } from '../components/AdventureStage';
-import { PlayerStatsBar } from '../components/PlayerStatsBar';
+import { PlayerStatsBar, formatNumber } from '../components/PlayerStatsBar';
 import { DamageGraph, type DamageSource } from '../components/DamageGraph';
 import { EncounterDataTable } from '../../domain/data/EncounterDataTable';
 import { ActiveSkillRegistry } from '../../domain/data/ActiveSkillRegistry';
 import { PassiveSkillRegistry } from '../../domain/data/PassiveSkillRegistry';
 import type { SessionSkill } from '../../domain/battle/BattleUnit';
-import { Package, Home, Swords, Zap, Star, BarChart3, FastForward } from 'lucide-react';
+import { Package, Home, Swords, Zap, Star, BarChart3, FastForward, Coins } from 'lucide-react';
 import { BattleDataTable } from '../../domain/data/BattleDataTable';
 
 const MAX_BATTLE_TURNS = BattleDataTable.maxTurns;
@@ -759,6 +759,10 @@ export function ChapterScreen() {
               </div>
               <div className="progress-bar">
                 <div className="progress-fill" style={{ width: `${chapter.getProgress() * 100}%` }} />
+              </div>
+              <div className="stat-row">
+                <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Coins size={13} color="#ffd700" /> 획득 골드</span>
+                <span style={{ color: '#ffd700' }}>{formatNumber(chapter.sessionGold)}</span>
               </div>
               {!isBattling && (
                 <div className="stat-row">
