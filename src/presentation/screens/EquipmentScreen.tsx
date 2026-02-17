@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useGame } from '../GameContext';
 import { SlotType, ResourceType, EquipmentGrade, WeaponSubType } from '../../domain/enums';
+import type { Stats } from '../../domain/value-objects/Stats';
 import { EquipmentTable } from '../../domain/data/EquipmentTable';
 import { EquipmentDataTable } from '../../domain/data/EquipmentDataTable';
 import type { Equipment } from '../../domain/entities/Equipment';
@@ -15,7 +16,7 @@ const SELL_PRICES = EquipmentDataTable.sellPrices;
 const SLOTS = [SlotType.WEAPON, SlotType.ARMOR, SlotType.RING, SlotType.NECKLACE, SlotType.SHOES, SlotType.GLOVES, SlotType.HAT];
 
 type Tab = 'equip' | 'forge';
-type InvFilter = SlotType | 'all';
+type InvFilter = SlotType | 'all' | null;
 
 const PAPER_DOLL_LAYOUT: ({ slot: SlotType; idx: number } | 'character' | null)[][] = [
   [{ slot: SlotType.NECKLACE, idx: 0 }, { slot: SlotType.HAT, idx: 0 }, { slot: SlotType.WEAPON, idx: 0 }],
@@ -27,13 +28,29 @@ const PAPER_DOLL_LAYOUT: ({ slot: SlotType; idx: number } | 'character' | null)[
 export function EquipmentScreen() {
   const { game, refresh } = useGame();
   const [tab, setTab] = useState<Tab>('equip');
-  const [inventoryFilter, setInventoryFilter] = useState<InvFilter>('all');
+  const [inventoryFilter, setInventoryFilter] = useState<InvFilter>(null);
   const [selectedSlotKey, setSelectedSlotKey] = useState<string | null>(null);
   const [selectedInventoryId, setSelectedInventoryId] = useState<string | null>(null);
   const [selectedForgeGroupIndex, setSelectedForgeGroupIndex] = useState<number | null>(null);
   const [batchResults, setBatchResults] = useState<{ name: string; slot: SlotType; grade: EquipmentGrade; weaponSubType: WeaponSubType | null; mergeLevel: number }[] | null>(null);
+  const [statToast, setStatToast] = useState<{ atk: number; maxHp: number; def: number; crit: number } | null>(null);
+  const statToastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const mergeCandidates = game.forge.findMergeCandidates(game.player.inventory);
+  const playerStats = game.player.computeStats();
+
+  function showStatChange(before: Stats, after: Stats) {
+    const diff = {
+      atk: after.atk - before.atk,
+      maxHp: after.maxHp - before.maxHp,
+      def: after.def - before.def,
+      crit: after.crit - before.crit,
+    };
+    if (diff.atk === 0 && diff.maxHp === 0 && diff.def === 0 && diff.crit === 0) return;
+    if (statToastTimer.current) clearTimeout(statToastTimer.current);
+    setStatToast(diff);
+    statToastTimer.current = setTimeout(() => setStatToast(null), 700);
+  }
 
   function eqDisplayName(eq: Equipment): string {
     if (eq.mergeLevel > 0) return `${eq.name} +${eq.mergeLevel}`;
@@ -68,26 +85,32 @@ export function EquipmentScreen() {
     if (!eq) return;
     if (!game.player.resources.canAfford(ResourceType.EQUIPMENT_STONE, 1)) return;
 
+    const before = game.player.computeStats();
     const result = eq.upgrade(game.player.resources.equipmentStones);
     if (result.isOk()) {
       game.player.resources.spend(ResourceType.EQUIPMENT_STONE, 1);
       slot.syncLevel(index);
       game.saveGame();
+      showStatChange(before, game.player.computeStats());
     }
     refresh();
   }
 
   function unequip(slotType: SlotType, index: number) {
+    const before = game.player.computeStats();
     game.player.unequipToInventory(slotType, index);
     setSelectedSlotKey(null);
     game.saveGame();
+    showStatChange(before, game.player.computeStats());
     refresh();
   }
 
   function equipFromInventory(id: string) {
+    const before = game.player.computeStats();
     game.player.equipFromInventory(id);
     setSelectedInventoryId(null);
     game.saveGame();
+    showStatChange(before, game.player.computeStats());
     refresh();
   }
 
@@ -144,6 +167,7 @@ export function EquipmentScreen() {
   }
 
   function getFilteredInventory(): Equipment[] {
+    if (inventoryFilter === null) return [];
     const items = inventoryFilter === 'all'
       ? [...game.player.inventory]
       : game.player.inventory.filter(e => e.slot === inventoryFilter);
@@ -368,6 +392,31 @@ export function EquipmentScreen() {
 
     return (
       <>
+        {statToast && (
+          <div className="stat-toast">
+            {statToast.atk !== 0 && (
+              <span style={{ color: statToast.atk > 0 ? '#4caf50' : '#e94560' }}>
+                ATK {statToast.atk > 0 ? '+' : ''}{statToast.atk}
+              </span>
+            )}
+            {statToast.maxHp !== 0 && (
+              <span style={{ color: statToast.maxHp > 0 ? '#4caf50' : '#e94560' }}>
+                HP {statToast.maxHp > 0 ? '+' : ''}{statToast.maxHp}
+              </span>
+            )}
+            {statToast.def !== 0 && (
+              <span style={{ color: statToast.def > 0 ? '#4caf50' : '#e94560' }}>
+                DEF {statToast.def > 0 ? '+' : ''}{statToast.def}
+              </span>
+            )}
+            {statToast.crit !== 0 && (
+              <span style={{ color: statToast.crit > 0 ? '#4caf50' : '#e94560' }}>
+                CRIT {statToast.crit > 0 ? '+' : ''}{(statToast.crit * 100).toFixed(1)}%
+              </span>
+            )}
+          </div>
+        )}
+
         <div className="paper-doll">
           {PAPER_DOLL_LAYOUT.map((row, rowIdx) =>
             row.map((cell, colIdx) => {
@@ -400,7 +449,12 @@ export function EquipmentScreen() {
                     }}
                     onClick={() => {
                       setSelectedInventoryId(null);
-                      setSelectedSlotKey(isSelected ? null : (eq ? slotKey : null));
+                      setInventoryFilter(slotType);
+                      if (eq) {
+                        setSelectedSlotKey(isSelected ? null : slotKey);
+                      } else {
+                        setSelectedSlotKey(null);
+                      }
                     }}
                   >
                     {eq ? (
@@ -420,6 +474,13 @@ export function EquipmentScreen() {
           )}
         </div>
 
+        <div className="equip-stats-bar">
+          <span>ATK <b>{playerStats.atk}</b></span>
+          <span>HP <b>{playerStats.maxHp}</b></span>
+          <span>DEF <b>{playerStats.def}</b></span>
+          <span>CRIT <b>{(playerStats.crit * 100).toFixed(1)}%</b></span>
+        </div>
+
         {renderDetailPanel()}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '10px 0 4px' }}>
@@ -431,7 +492,7 @@ export function EquipmentScreen() {
           </span>
         </div>
 
-        <div className="inv-filter-bar">
+        <div className="inv-filter-bar" style={{ marginTop: 0 }}>
           <button
             className={`inv-filter-btn ${inventoryFilter === 'all' ? 'active' : ''}`}
             onClick={() => setInventoryFilter('all')}
@@ -452,37 +513,39 @@ export function EquipmentScreen() {
           ))}
         </div>
 
-        {inventoryItems.length === 0 ? (
-          <div style={{ textAlign: 'center', color: '#555', padding: 16, fontSize: 13 }}>
-            보관 중인 장비가 없습니다
-          </div>
-        ) : (
-          <div className="inv-grid">
-            {inventoryItems.map(eq => {
-              const isSelected = selectedInventoryId === eq.id;
-              const gradeColor = eq.isS ? '#ffd700' : GRADE_COLORS[eq.grade];
+        {inventoryFilter !== null && (
+          inventoryItems.length === 0 ? (
+            <div style={{ textAlign: 'center', color: '#555', padding: 16, fontSize: 13 }}>
+              보관 중인 장비가 없습니다
+            </div>
+          ) : (
+            <div className="inv-grid">
+              {inventoryItems.map(eq => {
+                const isSelected = selectedInventoryId === eq.id;
+                const gradeColor = eq.isS ? '#ffd700' : GRADE_COLORS[eq.grade];
 
-              return (
-                <div
-                  key={eq.id}
-                  className={`inv-grid-item${isSelected ? ' selected' : ''}`}
-                  style={{ borderColor: isSelected ? undefined : gradeColor }}
-                  onClick={() => {
-                    setSelectedSlotKey(null);
-                    setSelectedInventoryId(isSelected ? null : eq.id);
-                  }}
-                >
-                  <EquipmentIcon slot={eq.slot} grade={eq.grade} size={32} weaponSubType={eq.weaponSubType} />
-                  <span style={{ fontSize: 9, color: gradeColor, fontWeight: 'bold' }}>
-                    {eq.isS ? 'S' : GRADE_LABELS[eq.grade]}
-                  </span>
-                  <span style={{ fontSize: 9, color: '#777' }}>
-                    {SLOT_LABELS[eq.slot]}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+                return (
+                  <div
+                    key={eq.id}
+                    className={`inv-grid-item${isSelected ? ' selected' : ''}`}
+                    style={{ borderColor: isSelected ? undefined : gradeColor }}
+                    onClick={() => {
+                      setSelectedSlotKey(null);
+                      setSelectedInventoryId(isSelected ? null : eq.id);
+                    }}
+                  >
+                    <EquipmentIcon slot={eq.slot} grade={eq.grade} size={32} weaponSubType={eq.weaponSubType} />
+                    <span style={{ fontSize: 9, color: gradeColor, fontWeight: 'bold' }}>
+                      {eq.isS ? 'S' : GRADE_LABELS[eq.grade]}
+                    </span>
+                    <span style={{ fontSize: 9, color: '#777' }}>
+                      {SLOT_LABELS[eq.slot]}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )
         )}
       </>
     );
