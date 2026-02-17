@@ -7,7 +7,7 @@ import { EquipmentIcon } from '../components/EquipmentIcon';
 export function GachaScreen() {
   const { game, refresh } = useGame();
   const [results, setResults] = useState<PullResult[]>([]);
-  const chest = game.goldChest;
+  const chest = game.equipmentChest;
 
   function addEquipmentToInventory(pullResults: PullResult[]) {
     for (const r of pullResults) {

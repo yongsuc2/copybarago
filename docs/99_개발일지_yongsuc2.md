@@ -435,6 +435,28 @@ src/index.css (상태 아이콘 스타일)
 docs/01_전투시스템.md (상태 효과 아이콘, DoT 중첩 규칙)
 ```
 
+- **뽑기 시스템 통합** (Y-13)
+  - 브론즈/실버/골드 3종 → 단일 장비 상자로 통합
+  - 합성 비율(3:1) 기반 확률 분배: 일반 66.76%, 우수 22.25%, 희귀 7.42%, 에픽 2.47%, 전설 0.82%, 신화 0.27%
+  - 비용 150보석, 10연차 1,350보석, 천장 180회 → 신화 확정
+  - S-등급 대상 에픽 이상으로 확장
+  - 엘리트/보스 몬스터 강화, 보물상자 보상 50% 하향
+
+### 수정된 파일
+```
+src/domain/enums/index.ts (ChestType: BRONZE/SILVER/GOLD → EQUIPMENT)
+src/domain/economy/TreasureChest.ts (단일 상자 확률, 천장 신화, S-등급 확장)
+src/services/GameManager.ts (goldChest → equipmentChest)
+src/presentation/screens/GachaScreen.tsx (equipmentChest 참조)
+src/services/SaveSerializer.ts (equipmentChest 키, 하위 호환)
+src/__tests__/economy/TreasureChest.test.ts (통합 상자 테스트)
+src/domain/data/EnemyTable.ts (엘리트/보스 강화)
+src/domain/data/ChapterTreasureTable.ts (보상 50% 하향)
+docs/06_가챠시스템.md (전면 재작성)
+docs/01_전투시스템.md (몬스터 스킬 업데이트)
+docs/12_모험시스템.md (보물상자 보상 수치)
+```
+
 ### 누적 현황
 - 테스트: 21개 파일, 222개 테스트 전부 통과
 - tsc 타입 체크 통과

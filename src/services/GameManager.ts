@@ -42,7 +42,7 @@ export class GameManager {
   travel: Travel;
   goblinMiner: GoblinMiner;
 
-  goldChest: TreasureChest;
+  equipmentChest: TreasureChest;
   collection: Collection;
   dailyReset: DailyResetSystem;
   eventManager: EventManager;
@@ -73,7 +73,7 @@ export class GameManager {
     this.travel = new Travel();
     this.goblinMiner = new GoblinMiner();
 
-    this.goldChest = new TreasureChest(ChestType.GOLD);
+    this.equipmentChest = new TreasureChest(ChestType.EQUIPMENT);
     this.collection = new Collection();
     this.dailyReset = new DailyResetSystem();
     this.eventManager = new EventManager();
@@ -128,21 +128,21 @@ export class GameManager {
   }
 
   pullGacha() {
-    const cost = this.goldChest.getCostPerPull();
+    const cost = this.equipmentChest.getCostPerPull();
     if (!this.player.resources.canAfford(ResourceType.GEMS, cost)) {
       return null;
     }
     this.player.resources.spend(ResourceType.GEMS, cost);
-    return this.goldChest.pull(this.rng);
+    return this.equipmentChest.pull(this.rng);
   }
 
   pullGacha10() {
-    const cost = this.goldChest.getPull10Cost();
+    const cost = this.equipmentChest.getPull10Cost();
     if (!this.player.resources.canAfford(ResourceType.GEMS, cost)) {
       return null;
     }
     this.player.resources.spend(ResourceType.GEMS, cost);
-    return this.goldChest.pull10(this.rng);
+    return this.equipmentChest.pull10(this.rng);
   }
 
   travelRun(stamina: number) {
@@ -195,7 +195,7 @@ export class GameManager {
       );
       this.player.ownedPets.push(pet);
     } else if (rewardDef.type === 'EQUIPMENT_GACHA') {
-      const pullResult = this.goldChest.pull(this.rng);
+      const pullResult = this.equipmentChest.pull(this.rng);
       if (pullResult.equipment) {
         this.player.addToInventory(pullResult.equipment);
         equipment = pullResult.equipment;

@@ -11,36 +11,16 @@ interface ChestConfig {
 }
 
 const CHEST_CONFIGS: Record<ChestType, ChestConfig> = {
-  [ChestType.BRONZE]: {
-    type: ChestType.BRONZE,
-    costPerPull: 100,
-    pityThreshold: 0,
-    gradeWeights: [
-      { grade: EquipmentGrade.COMMON, weight: 60 },
-      { grade: EquipmentGrade.UNCOMMON, weight: 30 },
-      { grade: EquipmentGrade.RARE, weight: 10 },
-    ],
-  },
-  [ChestType.SILVER]: {
-    type: ChestType.SILVER,
-    costPerPull: 200,
-    pityThreshold: 0,
-    gradeWeights: [
-      { grade: EquipmentGrade.COMMON, weight: 30 },
-      { grade: EquipmentGrade.UNCOMMON, weight: 40 },
-      { grade: EquipmentGrade.RARE, weight: 25 },
-      { grade: EquipmentGrade.EPIC, weight: 5 },
-    ],
-  },
-  [ChestType.GOLD]: {
-    type: ChestType.GOLD,
-    costPerPull: 298,
+  [ChestType.EQUIPMENT]: {
+    type: ChestType.EQUIPMENT,
+    costPerPull: 150,
     pityThreshold: 180,
     gradeWeights: [
-      { grade: EquipmentGrade.UNCOMMON, weight: 25 },
-      { grade: EquipmentGrade.RARE, weight: 40 },
-      { grade: EquipmentGrade.EPIC, weight: 28 },
-      { grade: EquipmentGrade.LEGENDARY, weight: 6 },
+      { grade: EquipmentGrade.COMMON, weight: 243 },
+      { grade: EquipmentGrade.UNCOMMON, weight: 81 },
+      { grade: EquipmentGrade.RARE, weight: 27 },
+      { grade: EquipmentGrade.EPIC, weight: 9 },
+      { grade: EquipmentGrade.LEGENDARY, weight: 3 },
       { grade: EquipmentGrade.MYTHIC, weight: 1 },
     ],
   },
@@ -61,6 +41,8 @@ const CHEST_CONFIGS: Record<ChestType, ChestConfig> = {
 const SLOTS = [SlotType.WEAPON, SlotType.ARMOR, SlotType.RING, SlotType.NECKLACE, SlotType.SHOES, SlotType.GLOVES, SlotType.HAT];
 const WEAPON_SUB_TYPES = [WeaponSubType.SWORD, WeaponSubType.STAFF, WeaponSubType.BOW];
 const S_RATE = 0.02;
+
+const S_ELIGIBLE_GRADES = new Set([EquipmentGrade.EPIC, EquipmentGrade.LEGENDARY, EquipmentGrade.MYTHIC]);
 
 export interface PullResult {
   equipment: Equipment | null;
@@ -108,7 +90,7 @@ export class TreasureChest {
     );
 
     const slot = rng.pick(SLOTS);
-    const isS = grade === EquipmentGrade.EPIC && rng.chance(S_RATE);
+    const isS = S_ELIGIBLE_GRADES.has(grade) && rng.chance(S_RATE);
     const subType = slot === SlotType.WEAPON ? rng.pick(WEAPON_SUB_TYPES) : null;
     const name = slot === SlotType.WEAPON && subType
       ? `${EquipmentDataTable.getGradeLabel(grade)} ${EquipmentDataTable.getWeaponSubTypeLabel(subType)}`
@@ -143,10 +125,10 @@ export class TreasureChest {
       : EquipmentDataTable.getSlotLabel(slot);
     const equipment = new Equipment(
       `pity_${Date.now()}`,
-      `S-에픽 ${slotLabel}`,
+      `신화 ${slotLabel}`,
       slot,
-      EquipmentGrade.EPIC,
-      true,
+      EquipmentGrade.MYTHIC,
+      false,
       0, 0, null,
       subType,
     );

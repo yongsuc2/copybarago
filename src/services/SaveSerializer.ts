@@ -81,7 +81,7 @@ export interface SaveState {
   arena: { tier: ArenaTier; points: number; todayEntries: number };
   travel: { maxClearedChapter: number; multiplier: number };
   goblinMiner: { oreCount: number };
-  goldChest: { pityCount: number };
+  equipmentChest: { pityCount: number };
   collection: string[];
   dailyReset: { lastResetDate: string };
   events: EventData[];
@@ -273,7 +273,7 @@ export class SaveSerializer {
         multiplier: game.travel.multiplier,
       },
       goblinMiner: { oreCount: game.goblinMiner.oreCount },
-      goldChest: { pityCount: game.goldChest.pityCount },
+      equipmentChest: { pityCount: game.equipmentChest.pityCount },
       collection: collectionIds,
       dailyReset: { lastResetDate: game.dailyReset.getLastResetDate() },
       events,
@@ -362,7 +362,8 @@ export class SaveSerializer {
     game.travel.multiplier = data.travel.multiplier;
 
     game.goblinMiner.oreCount = data.goblinMiner.oreCount;
-    game.goldChest.pityCount = data.goldChest.pityCount;
+    const chestData = data.equipmentChest ?? (data as any).goldChest;
+    if (chestData) game.equipmentChest.pityCount = chestData.pityCount;
 
     for (const id of data.collection) {
       game.collection.acquire(id);

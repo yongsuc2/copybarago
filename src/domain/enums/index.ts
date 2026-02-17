@@ -107,9 +107,7 @@ export enum ArenaTier {
 }
 
 export enum ChestType {
-  BRONZE = 'BRONZE',
-  SILVER = 'SILVER',
-  GOLD = 'GOLD',
+  EQUIPMENT = 'EQUIPMENT',
   PET = 'PET',
   GEM = 'GEM',
 }
