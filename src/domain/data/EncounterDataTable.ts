@@ -60,4 +60,8 @@ export const EncounterDataTable = {
   getChapterClearGems(chapterId: number): number {
     return data.chapterClearReward.gemsBase + data.chapterClearReward.gemsPerChapter * chapterId;
   },
+  getChapterBossAssignment(chapterId: number): { elite: string; midBoss: string; boss: string } {
+    const assignments = data.chapterBossAssignment;
+    return assignments[(chapterId - 1) % assignments.length];
+  },
 };

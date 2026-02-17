@@ -214,31 +214,31 @@ export class Chapter {
   }
 
   createEliteBattle(playerUnit: BattleUnit): Battle | null {
-    const eliteId = EnemyTable.getRandomEliteId();
-    const template = EnemyTemplate.fromId(eliteId);
+    const assignment = EncounterDataTable.getChapterBossAssignment(this.id);
+    const template = EnemyTemplate.fromId(assignment.elite);
     if (!template) return null;
 
-    const elite = template.createInstance(this.id);
+    const elite = template.createInstance(this.id, 1.0, this.getProgress());
     this.currentBattle = new Battle(playerUnit, elite, this.rng.nextInt(0, 999999));
     return this.currentBattle;
   }
 
   createMidBossBattle(playerUnit: BattleUnit): Battle | null {
-    const bossId = EnemyTable.getRandomBossId();
-    const template = EnemyTemplate.fromId(bossId);
+    const assignment = EncounterDataTable.getChapterBossAssignment(this.id);
+    const template = EnemyTemplate.fromId(assignment.midBoss);
     if (!template) return null;
 
-    const boss = template.createInstance(this.id);
+    const boss = template.createInstance(this.id, 1.0, this.getProgress());
     this.currentBattle = new Battle(playerUnit, boss, this.rng.nextInt(0, 999999));
     return this.currentBattle;
   }
 
   createBossBattle(playerUnit: BattleUnit): Battle | null {
-    const bossId = EnemyTable.getRandomBossId();
-    const template = EnemyTemplate.fromId(bossId);
+    const assignment = EncounterDataTable.getChapterBossAssignment(this.id);
+    const template = EnemyTemplate.fromId(assignment.boss);
     if (!template) return null;
 
-    const boss = template.createInstance(this.id);
+    const boss = template.createInstance(this.id, 1.0, this.getProgress());
     this.currentBattle = new Battle(playerUnit, boss, this.rng.nextInt(0, 999999));
     return this.currentBattle;
   }

@@ -80,6 +80,11 @@
     "elite": 20,
     "midBoss": 30
   },
+  "chapterBossAssignment": [
+    { "elite": "elite_wolf", "midBoss": "boss_demon", "boss": "boss_dragon" },
+    { "elite": "elite_mage", "midBoss": "boss_golem", "boss": "boss_demon" },
+    { "elite": "elite_wolf", "midBoss": "boss_dragon", "boss": "boss_golem" }
+  ],
   "chapterClearReward": {
     "goldBase": 200,
     "goldPerChapter": 300,
