@@ -15,8 +15,9 @@ import { ActiveSkillRegistry } from '../../domain/data/ActiveSkillRegistry';
 import { PassiveSkillRegistry } from '../../domain/data/PassiveSkillRegistry';
 import type { SessionSkill } from '../../domain/battle/BattleUnit';
 import { Package, Home, Swords, Zap, Star, BarChart3, FastForward } from 'lucide-react';
+import { BattleDataTable } from '../../domain/data/BattleDataTable';
 
-const MAX_BATTLE_TURNS = 15;
+const MAX_BATTLE_TURNS = BattleDataTable.maxTurns;
 
 const SKILL_GRADE_COLORS: Record<SkillGrade, string> = {
   [SkillGrade.NORMAL]: '#aaa',
