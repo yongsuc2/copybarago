@@ -481,10 +481,13 @@ export function ChapterScreen() {
 
     const playerEntries: BattleLogEntry[] = [];
     const enemyEntriesBySource = new Map<string, BattleLogEntry[]>();
+    const statusEntries: BattleLogEntry[] = [];
 
     for (const entry of result.entries) {
       if (!isDamageOrHeal(entry.type)) continue;
-      if (entry.source === playerName) {
+      if (entry.type === BattleLogType.DOT_DAMAGE || entry.type === BattleLogType.HOT_HEAL) {
+        statusEntries.push(entry);
+      } else if (entry.source === playerName) {
         playerEntries.push(entry);
       } else {
         const arr = enemyEntriesBySource.get(entry.source) || [];
@@ -557,7 +560,36 @@ export function ChapterScreen() {
       }
     }
 
-    if (playerEntries.length === 0 && enemyEntriesBySource.size === 0) {
+    if (statusEntries.length > 0 && !cancelledRef.current) {
+      const newHps = computeMidTurnHp(
+        running, statusEntries, playerName,
+        b.player.maxHp,
+        b.enemies.map(e => e.maxHp),
+        enemyNames,
+      );
+      running = newHps;
+
+      const midPlayer = cloneUnit(curPlayer);
+      midPlayer.currentHp = newHps.playerHp;
+      const midEnemies = curEnemies.map((prev, i) => {
+        const clone = cloneUnit(prev);
+        clone.currentHp = newHps.enemyHps[i];
+        return clone;
+      });
+
+      setDamageEntries(statusEntries);
+      setPlayerUnit(midPlayer);
+      setEnemyUnits(midEnemies);
+      setAttackPhase('idle');
+      await delay(PHASE_DURATION.hit / battleSpeedRef.current);
+      setDamageEntries([]);
+      await delay(PHASE_DURATION.pause / battleSpeedRef.current);
+
+      curPlayer = midPlayer;
+      curEnemies = midEnemies;
+    }
+
+    if (playerEntries.length === 0 && enemyEntriesBySource.size === 0 && statusEntries.length === 0) {
       await delay(PHASE_DURATION.pause / battleSpeedRef.current);
     }
 
