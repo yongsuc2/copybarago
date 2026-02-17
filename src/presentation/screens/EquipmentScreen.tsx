@@ -18,10 +18,16 @@ type Tab = SlotType | 'forge';
 export function EquipmentScreen() {
   const { game, refresh } = useGame();
   const [tab, setTab] = useState<Tab>(SlotType.WEAPON);
-  const [selectedMergeIndex, setSelectedMergeIndex] = useState<number | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [selectedForgeGroupIndex, setSelectedForgeGroupIndex] = useState<number | null>(null);
+  const [batchResults, setBatchResults] = useState<string[] | null>(null);
 
   const mergeCandidates = game.forge.findMergeCandidates(game.player.inventory);
+
+  function eqDisplayName(eq: Equipment): string {
+    if (eq.mergeLevel > 0) return `${eq.name} +${eq.mergeLevel}`;
+    return eq.name;
+  }
 
   function getForgeGroups() {
     const groups = new Map<string, Equipment[]>();
@@ -31,7 +37,8 @@ export function EquipmentScreen() {
       const required = EquipmentTable.getMergeCount(eq.grade);
       if (required <= 0) continue;
       const subKey = eq.slot === SlotType.WEAPON ? `_${eq.weaponSubType}` : '';
-      const key = `${eq.slot}${subKey}_${eq.grade}`;
+      const mlKey = EquipmentTable.isHighGradeMerge(eq.grade) ? `_ml${eq.mergeLevel}` : '';
+      const key = `${eq.slot}${subKey}_${eq.grade}${mlKey}`;
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key)!.push(eq);
     }
@@ -39,7 +46,8 @@ export function EquipmentScreen() {
     return [...groups.values()].sort((a, b) => {
       const gi = EquipmentTable.getGradeIndex(b[0].grade) - EquipmentTable.getGradeIndex(a[0].grade);
       if (gi !== 0) return gi;
-      return a[0].slot.localeCompare(b[0].slot);
+      if (a[0].slot !== b[0].slot) return a[0].slot.localeCompare(b[0].slot);
+      return (b[0].mergeLevel ?? 0) - (a[0].mergeLevel ?? 0);
     });
   }
 
@@ -80,15 +88,43 @@ export function EquipmentScreen() {
   }
 
   function mergeEquipment(group: Equipment[]) {
-    const result = game.forge.merge(group);
+    const required = EquipmentTable.getMergeCount(group[0].grade);
+    const result = game.forge.merge(group.slice(0, required));
     if (result.isFail() || !result.data) return;
 
-    for (const eq of group) {
+    for (const eq of group.slice(0, required)) {
       game.player.removeFromInventory(eq.id);
     }
     game.player.addToInventory(result.data.result);
     game.saveGame();
-    setSelectedMergeIndex(null);
+    setSelectedForgeGroupIndex(null);
+    refresh();
+  }
+
+  function batchMerge() {
+    const forgeGroups = getForgeGroups();
+    const results: string[] = [];
+
+    for (const group of forgeGroups) {
+      const required = EquipmentTable.getMergeCount(group[0].grade);
+      if (group.length < required) continue;
+
+      const mergeResult = game.forge.merge(group.slice(0, required));
+      if (mergeResult.isFail() || !mergeResult.data) continue;
+
+      for (const eq of group.slice(0, required)) {
+        game.player.removeFromInventory(eq.id);
+      }
+      game.player.addToInventory(mergeResult.data.result);
+      results.push(eqDisplayName(mergeResult.data.result));
+    }
+
+    if (results.length > 0) {
+      game.saveGame();
+      setBatchResults(results);
+      setSelectedForgeGroupIndex(null);
+      setTimeout(() => setBatchResults(null), 4000);
+    }
     refresh();
   }
 
@@ -100,6 +136,7 @@ export function EquipmentScreen() {
       if (other.isS) return false;
       if (other.slot !== eq.slot || other.grade !== eq.grade) return false;
       if (other.weaponSubType !== eq.weaponSubType) return false;
+      if (EquipmentTable.isHighGradeMerge(eq.grade) && other.mergeLevel !== eq.mergeLevel) return false;
       return true;
     });
   }
@@ -259,7 +296,7 @@ export function EquipmentScreen() {
                       <div>
                         <span className={`grade-${eq.grade.toLowerCase()}`}>
                           {eq.isS && <span className="grade-s">[S] </span>}
-                          {eq.name}
+                          {eqDisplayName(eq)}
                         </span>
                         <div style={{ fontSize: 12, color: '#888' }}>
                           {GRADE_LABELS[eq.grade]} Lv.{eq.level} | ATK +{eq.getStats().atk} HP +{eq.getStats().maxHp}
@@ -324,7 +361,7 @@ export function EquipmentScreen() {
                       <div>
                         <span className={`grade-${eq.grade.toLowerCase()}`}>
                           {eq.isS && <span className="grade-s">[S] </span>}
-                          {eq.name}
+                          {eqDisplayName(eq)}
                         </span>
                       </div>
                       <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
@@ -377,7 +414,7 @@ export function EquipmentScreen() {
         ))}
         <button
           className={`inv-filter-btn ${tab === 'forge' ? 'active' : ''}`}
-          onClick={() => { setTab('forge'); setSelectedMergeIndex(null); }}
+          onClick={() => { setTab('forge'); setSelectedForgeGroupIndex(null); }}
         >
           합성 ({mergeCandidates.length})
         </button>
@@ -395,192 +432,215 @@ export function EquipmentScreen() {
           return SLOT_LABELS[eq.slot];
         }
 
+        function isEnhanceMerge(source: Equipment): boolean {
+          return EquipmentTable.isHighGradeMerge(source.grade) && source.mergeLevel < EquipmentTable.getMergeEnhanceMax();
+        }
+
         function getMergeResultGrade(source: Equipment): EquipmentGrade | null {
+          if (isEnhanceMerge(source)) return source.grade;
           return EquipmentTable.getNextGrade(source.grade);
         }
 
+        function getMergeResultMergeLevel(source: Equipment): number {
+          if (isEnhanceMerge(source)) return source.mergeLevel + 1;
+          return 0;
+        }
+
         function getMergeResultLabel(source: Equipment): string | null {
-          const nextGrade = getMergeResultGrade(source);
+          if (isEnhanceMerge(source)) {
+            return `${GRADE_LABELS[source.grade]} ${getSlotLabel(source)} +${source.mergeLevel + 1}`;
+          }
+          const nextGrade = EquipmentTable.getNextGrade(source.grade);
           if (!nextGrade) return null;
           return `${GRADE_LABELS[nextGrade]} ${getSlotLabel(source)}`;
         }
 
+        const mergeableCount = forgeGroups.filter(g => g.length >= EquipmentTable.getMergeCount(g[0].grade)).length;
+        const selectedGroup = selectedForgeGroupIndex !== null ? forgeGroups[selectedForgeGroupIndex] : null;
+        const selectedSource = selectedGroup?.[0] ?? null;
+
         return (
           <>
-            {forgeGroups.length === 0 ? (
-              <div className="card" style={{ textAlign: 'center', color: '#555', padding: 24 }}>
-                보관함에 합성 가능한 장비가 없습니다
+            {batchResults && (
+              <div className="card" style={{ background: '#1a3a1a', borderColor: '#4caf50' }}>
+                <div style={{ fontSize: 13, color: '#4caf50', fontWeight: 'bold', marginBottom: 4 }}>
+                  {batchResults.length}건 합성 완료
+                </div>
+                {batchResults.map((name, i) => (
+                  <div key={i} style={{ fontSize: 12, color: '#ccc', padding: '2px 0' }}>
+                    {name}
+                  </div>
+                ))}
               </div>
-            ) : (
-              forgeGroups.map((group, groupIndex) => {
-                const source = group[0];
-                const required = EquipmentTable.getMergeCount(source.grade);
+            )}
+
+            <button
+              className="btn btn-primary"
+              style={{ width: '100%', marginTop: 4, marginBottom: 4 }}
+              disabled={mergeableCount === 0}
+              onClick={batchMerge}
+            >
+              일괄 합성 ({mergeableCount}건)
+            </button>
+
+            <div className="forge-preview">
+              {!selectedSource ? (
+                <div style={{ textAlign: 'center', color: '#555', padding: 12, fontSize: 13 }}>
+                  장비를 선택하면 합성 미리보기가 표시됩니다
+                </div>
+              ) : (() => {
+                const group = selectedGroup!;
+                const required = EquipmentTable.getMergeCount(selectedSource.grade);
                 const canMerge = group.length >= required;
-                const isSelected = selectedMergeIndex === groupIndex;
-                const resultLabel = getMergeResultLabel(source);
-                const resultGrade = getMergeResultGrade(source);
-                const nextPassive = resultGrade
-                  ? EquipmentPassiveTable.getPassive(source.slot, resultGrade, source.weaponSubType)
+                const resultGrade = getMergeResultGrade(selectedSource);
+                const resultLabel = getMergeResultLabel(selectedSource);
+                const isEnhance = isEnhanceMerge(selectedSource);
+                const resultStats = resultGrade ? EquipmentTable.getBaseStats(selectedSource.slot, resultGrade) : null;
+                const nextPassive = (!isEnhance && resultGrade)
+                  ? EquipmentPassiveTable.getPassive(selectedSource.slot, resultGrade, selectedSource.weaponSubType)
                   : null;
-                const currentPassive = EquipmentPassiveTable.getPassive(source.slot, source.grade, source.weaponSubType);
 
                 return (
-                  <div
-                    className="card"
-                    key={`${source.slot}_${source.grade}_${groupIndex}`}
-                    style={{
-                      cursor: 'pointer',
-                      borderColor: isSelected ? '#e94560' : undefined,
-                    }}
-                    onClick={() => setSelectedMergeIndex(isSelected ? null : groupIndex)}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <EquipmentIcon slot={source.slot} grade={source.grade} size={36} weaponSubType={source.weaponSubType} />
-                      <div style={{ flex: 1 }}>
-                        <div>
-                          <span className={`grade-${source.grade.toLowerCase()}`} style={{ fontWeight: 'bold' }}>
-                            {GRADE_LABELS[source.grade]} {getSlotLabel(source)}
-                          </span>
-                        </div>
-                        <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>
-                          {currentPassive && <>{currentPassive.icon} {currentPassive.description}</>}
-                        </div>
-                      </div>
-                      <span style={{
-                        fontSize: 13,
-                        fontWeight: 'bold',
-                        color: canMerge ? '#4caf50' : '#888',
-                      }}>
-                        {group.length} / {required}
-                      </span>
-                    </div>
-
-                    <div style={{ marginTop: 6 }}>
-                      <div className="progress-bar">
-                        <div
-                          className="progress-fill"
-                          style={{
-                            width: `${Math.min((group.length / required) * 100, 100)}%`,
-                            background: canMerge ? '#4caf50' : '#e94560',
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 12 }}>
-                      {canMerge ? (
-                        <span style={{ color: '#4caf50' }}>합성 가능!</span>
-                      ) : (
-                        <span style={{ color: '#888' }}>{required - group.length}개 더 필요</span>
-                      )}
-                      {resultLabel && resultGrade && (
-                        <span style={{ color: '#aaa' }}>
-                          →{' '}
-                          <span className={`grade-${resultGrade.toLowerCase()}`}>{resultLabel}</span>
-                        </span>
-                      )}
-                    </div>
-
-                    {isSelected && (
-                      <div style={{ marginTop: 8, borderTop: '1px solid #333', paddingTop: 12 }} onClick={e => e.stopPropagation()}>
-                        <div style={{
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          gap: 8, padding: '8px 0', marginBottom: 8,
-                        }}>
-                          {Array.from({ length: required }).map((_, i) => {
-                            const owned = i < group.length;
-                            return (
-                              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <div style={{
-                                  opacity: owned ? 1 : 0.2,
-                                  border: owned
-                                    ? `2px solid ${GRADE_COLORS[source.grade]}`
-                                    : `2px dashed #444`,
-                                  borderRadius: 8,
-                                  padding: 4,
-                                  background: owned ? `${GRADE_COLORS[source.grade]}15` : 'transparent',
-                                }}>
-                                  <EquipmentIcon slot={source.slot} grade={source.grade} size={36} weaponSubType={source.weaponSubType} />
-                                </div>
-                                {i < required - 1 && (
-                                  <span style={{ color: '#555', fontSize: 16, fontWeight: 'bold' }}>+</span>
-                                )}
-                              </div>
-                            );
-                          })}
-                          <span style={{ color: '#aaa', fontSize: 18, fontWeight: 'bold', margin: '0 2px' }}>=</span>
-                          {resultGrade && (
+                  <>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      gap: 6, padding: '4px 0', marginBottom: 8,
+                    }}>
+                      {Array.from({ length: required }).map((_, i) => {
+                        const owned = i < group.length;
+                        return (
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <div style={{
-                              border: `2px solid ${GRADE_COLORS[resultGrade]}`,
+                              opacity: owned ? 1 : 0.2,
+                              border: owned
+                                ? `2px solid ${GRADE_COLORS[selectedSource.grade]}`
+                                : `2px dashed #444`,
                               borderRadius: 8,
-                              padding: 4,
-                              background: `${GRADE_COLORS[resultGrade]}15`,
+                              padding: 3,
+                              background: owned ? `${GRADE_COLORS[selectedSource.grade]}15` : 'transparent',
+                              position: 'relative',
                             }}>
-                              <EquipmentIcon slot={source.slot} grade={resultGrade} size={36} weaponSubType={source.weaponSubType} />
+                              <EquipmentIcon slot={selectedSource.slot} grade={selectedSource.grade} size={32} weaponSubType={selectedSource.weaponSubType} />
+                              {selectedSource.mergeLevel > 0 && (
+                                <span style={{
+                                  position: 'absolute', bottom: -4, right: -4,
+                                  background: GRADE_COLORS[selectedSource.grade], color: '#fff',
+                                  fontSize: 9, fontWeight: 'bold', borderRadius: 4, padding: '0 3px',
+                                }}>+{selectedSource.mergeLevel}</span>
+                              )}
                             </div>
-                          )}
-                        </div>
-
-                        <div style={{ background: '#0f1923', borderRadius: 6, padding: 10, marginBottom: 8 }}>
-                          {resultLabel && resultGrade && (
-                            <div className="stat-row" style={{ fontSize: 13 }}>
-                              <span style={{ color: '#aaa' }}>합성 결과</span>
-                              <span className={`grade-${resultGrade.toLowerCase()}`} style={{ fontWeight: 'bold' }}>
-                                {resultLabel}
-                              </span>
-                            </div>
-                          )}
-
-                          {nextPassive && (
-                            <div className="stat-row" style={{ fontSize: 13 }}>
-                              <span style={{ color: '#aaa' }}>패시브 변화</span>
-                              <span style={{ fontSize: 12 }}>
-                                {nextPassive.icon} {nextPassive.description}
-                              </span>
-                            </div>
-                          )}
-
-                        </div>
-
-                        <div style={{ fontSize: 12, color: '#aaa', marginBottom: 4 }}>
-                          보유 장비 ({group.length}개)
-                        </div>
-                        {group.map(eq => (
-                          <div key={eq.id} style={{
-                            fontSize: 12, color: '#ccc', padding: '5px 8px',
-                            background: '#1a1a2e', borderRadius: 4, marginBottom: 2,
-                            display: 'flex', alignItems: 'center', gap: 6,
-                          }}>
-                            <EquipmentIcon slot={eq.slot} grade={eq.grade} size={20} weaponSubType={eq.weaponSubType} />
-                            <span className={`grade-${eq.grade.toLowerCase()}`} style={{ flex: 1 }}>{eq.name}</span>
-                            <span style={{ color: '#666' }}>Lv.{eq.level}</span>
+                            {i < required - 1 && (
+                              <span style={{ color: '#555', fontSize: 14, fontWeight: 'bold' }}>+</span>
+                            )}
                           </div>
-                        ))}
-                        {canMerge ? (
-                          <button
-                            className="btn btn-primary"
-                            style={{ marginTop: 8, width: '100%' }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              mergeEquipment(group.slice(0, required));
-                            }}
-                          >
-                            합성하기
-                          </button>
-                        ) : (
-                          <button
-                            className="btn btn-secondary"
-                            style={{ marginTop: 8, width: '100%' }}
-                            disabled
-                          >
-                            재료 부족
-                          </button>
-                        )}
+                        );
+                      })}
+                      <span style={{ color: '#aaa', fontSize: 16, fontWeight: 'bold', margin: '0 2px' }}>=</span>
+                      {resultGrade && (
+                        <div style={{
+                          border: `2px solid ${GRADE_COLORS[resultGrade]}`,
+                          borderRadius: 8,
+                          padding: 3,
+                          background: `${GRADE_COLORS[resultGrade]}15`,
+                          position: 'relative',
+                        }}>
+                          <EquipmentIcon slot={selectedSource.slot} grade={resultGrade} size={32} weaponSubType={selectedSource.weaponSubType} />
+                          {getMergeResultMergeLevel(selectedSource) > 0 && (
+                            <span style={{
+                              position: 'absolute', bottom: -4, right: -4,
+                              background: GRADE_COLORS[resultGrade], color: '#fff',
+                              fontSize: 9, fontWeight: 'bold', borderRadius: 4, padding: '0 3px',
+                            }}>+{getMergeResultMergeLevel(selectedSource)}</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {resultLabel && resultGrade && (
+                      <div style={{ textAlign: 'center', marginBottom: 4 }}>
+                        <span className={`grade-${resultGrade.toLowerCase()}`} style={{ fontWeight: 'bold', fontSize: 14 }}>
+                          {resultLabel}
+                        </span>
                       </div>
                     )}
-                  </div>
+
+                    {resultStats && (
+                      <div style={{ textAlign: 'center', fontSize: 12, color: '#aaa', marginBottom: 4 }}>
+                        {resultStats.atk > 0 && <span style={{ marginRight: 12 }}>ATK +{resultStats.atk}</span>}
+                        {resultStats.maxHp > 0 && <span>HP +{resultStats.maxHp}</span>}
+                      </div>
+                    )}
+
+                    {nextPassive && (
+                      <div style={{ textAlign: 'center', fontSize: 12, color: '#ccc', marginBottom: 6 }}>
+                        {nextPassive.icon} {nextPassive.description}
+                      </div>
+                    )}
+
+                    {canMerge ? (
+                      <button
+                        className="btn btn-primary"
+                        style={{ width: '100%', marginTop: 4 }}
+                        onClick={() => mergeEquipment(group)}
+                      >
+                        합성하기
+                      </button>
+                    ) : (
+                      <div style={{ textAlign: 'center', fontSize: 12, color: '#888', marginTop: 4 }}>
+                        {required - group.length}개 더 필요
+                      </div>
+                    )}
+                  </>
                 );
-              })
+              })()}
+            </div>
+
+            <h3 style={{ fontSize: 13, color: '#aaa', margin: '12px 0 4px' }}>
+              보유 장비 ({forgeGroups.length}그룹)
+            </h3>
+
+            {forgeGroups.length === 0 ? (
+              <div style={{ textAlign: 'center', color: '#555', padding: 16, fontSize: 13 }}>
+                합성 가능한 장비가 없습니다
+              </div>
+            ) : (
+              <div className="forge-grid">
+                {forgeGroups.map((group, groupIndex) => {
+                  const source = group[0];
+                  const required = EquipmentTable.getMergeCount(source.grade);
+                  const canMerge = group.length >= required;
+                  const isSelected = selectedForgeGroupIndex === groupIndex;
+                  const gradeColor = GRADE_COLORS[source.grade];
+
+                  return (
+                    <div
+                      key={`${source.slot}_${source.grade}_${groupIndex}`}
+                      className={`forge-grid-item${isSelected ? ' selected' : ''}${canMerge && !isSelected ? ' mergeable' : ''}`}
+                      onClick={() => setSelectedForgeGroupIndex(isSelected ? null : groupIndex)}
+                    >
+                      <EquipmentIcon slot={source.slot} grade={source.grade} size={36} weaponSubType={source.weaponSubType} />
+                      {source.mergeLevel > 0 && (
+                        <span style={{
+                          position: 'absolute', top: 1, right: 3,
+                          fontSize: 9, fontWeight: 'bold', color: gradeColor,
+                        }}>+{source.mergeLevel}</span>
+                      )}
+                      <span style={{ fontSize: 10, color: gradeColor }}>
+                        {GRADE_LABELS[source.grade]}
+                      </span>
+                      <span style={{ fontSize: 10, color: '#888' }}>
+                        {getSlotLabel(source)}
+                      </span>
+                      <span className="forge-badge" style={{
+                        color: canMerge ? '#4caf50' : '#888',
+                        border: `1px solid ${canMerge ? '#4caf5050' : '#44444450'}`,
+                      }}>
+                        {group.length}/{required}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </>
         );

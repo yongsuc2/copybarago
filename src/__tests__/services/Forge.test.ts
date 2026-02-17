@@ -6,7 +6,7 @@ import { EquipmentGrade, SlotType } from '../../domain/enums';
 function makeEquipment(
   slot: SlotType,
   grade: EquipmentGrade,
-  overrides: { isS?: boolean; level?: number; promoteCount?: number } = {},
+  overrides: { isS?: boolean; level?: number; promoteCount?: number; mergeLevel?: number } = {},
 ): Equipment {
   return new Equipment(
     `eq_${Math.random().toString(36).slice(2)}`,
@@ -16,6 +16,9 @@ function makeEquipment(
     overrides.isS ?? false,
     overrides.level ?? 0,
     overrides.promoteCount ?? 0,
+    null,
+    null,
+    overrides.mergeLevel ?? 0,
   );
 }
 
@@ -23,7 +26,7 @@ function makeMany(
   count: number,
   slot: SlotType,
   grade: EquipmentGrade,
-  overrides: { isS?: boolean; level?: number } = {},
+  overrides: { isS?: boolean; level?: number; mergeLevel?: number } = {},
 ): Equipment[] {
   return Array.from({ length: count }, () => makeEquipment(slot, grade, overrides));
 }
@@ -74,12 +77,20 @@ describe('Forge', () => {
       expect(forge.canMerge(makeMany(3, SlotType.ARMOR, EquipmentGrade.RARE))).toBe(true);
     });
 
-    it('returns true for 3 EPIC same slot', () => {
-      expect(forge.canMerge(makeMany(3, SlotType.WEAPON, EquipmentGrade.EPIC))).toBe(true);
+    it('returns true for 2 EPIC same slot same mergeLevel', () => {
+      expect(forge.canMerge(makeMany(2, SlotType.WEAPON, EquipmentGrade.EPIC))).toBe(true);
     });
 
-    it('returns true for 3 LEGENDARY same slot', () => {
-      expect(forge.canMerge(makeMany(3, SlotType.NECKLACE, EquipmentGrade.LEGENDARY))).toBe(true);
+    it('returns true for 2 LEGENDARY same slot same mergeLevel', () => {
+      expect(forge.canMerge(makeMany(2, SlotType.NECKLACE, EquipmentGrade.LEGENDARY))).toBe(true);
+    });
+
+    it('returns false for EPIC with different mergeLevels', () => {
+      const items = [
+        makeEquipment(SlotType.WEAPON, EquipmentGrade.EPIC, { mergeLevel: 0 }),
+        makeEquipment(SlotType.WEAPON, EquipmentGrade.EPIC, { mergeLevel: 1 }),
+      ];
+      expect(forge.canMerge(items)).toBe(false);
     });
 
     it('returns false for MYTHIC (no merge)', () => {
@@ -91,7 +102,7 @@ describe('Forge', () => {
     });
   });
 
-  describe('merge - grade progression', () => {
+  describe('merge - grade progression (low grades)', () => {
     it('COMMON x3 → UNCOMMON', () => {
       const items = makeMany(3, SlotType.WEAPON, EquipmentGrade.COMMON);
       const result = forge.merge(items);
@@ -111,20 +122,57 @@ describe('Forge', () => {
       const result = forge.merge(items);
       expect(result.isOk()).toBe(true);
       expect(result.data!.result.grade).toBe(EquipmentGrade.EPIC);
+      expect(result.data!.result.mergeLevel).toBe(0);
+    });
+  });
+
+  describe('merge - high grade mergeLevel progression', () => {
+    it('EPIC+0 x2 → EPIC+1', () => {
+      const items = makeMany(2, SlotType.WEAPON, EquipmentGrade.EPIC, { mergeLevel: 0 });
+      const result = forge.merge(items);
+      expect(result.isOk()).toBe(true);
+      expect(result.data!.result.grade).toBe(EquipmentGrade.EPIC);
+      expect(result.data!.result.mergeLevel).toBe(1);
     });
 
-    it('EPIC x3 → LEGENDARY', () => {
-      const items = makeMany(3, SlotType.WEAPON, EquipmentGrade.EPIC);
+    it('EPIC+1 x2 → EPIC+2', () => {
+      const items = makeMany(2, SlotType.WEAPON, EquipmentGrade.EPIC, { mergeLevel: 1 });
+      const result = forge.merge(items);
+      expect(result.isOk()).toBe(true);
+      expect(result.data!.result.grade).toBe(EquipmentGrade.EPIC);
+      expect(result.data!.result.mergeLevel).toBe(2);
+    });
+
+    it('EPIC+2 x2 → LEGENDARY+0', () => {
+      const items = makeMany(2, SlotType.WEAPON, EquipmentGrade.EPIC, { mergeLevel: 2 });
       const result = forge.merge(items);
       expect(result.isOk()).toBe(true);
       expect(result.data!.result.grade).toBe(EquipmentGrade.LEGENDARY);
+      expect(result.data!.result.mergeLevel).toBe(0);
     });
 
-    it('LEGENDARY x3 → MYTHIC', () => {
-      const items = makeMany(3, SlotType.NECKLACE, EquipmentGrade.LEGENDARY);
+    it('LEGENDARY+0 x2 → LEGENDARY+1', () => {
+      const items = makeMany(2, SlotType.WEAPON, EquipmentGrade.LEGENDARY, { mergeLevel: 0 });
+      const result = forge.merge(items);
+      expect(result.isOk()).toBe(true);
+      expect(result.data!.result.grade).toBe(EquipmentGrade.LEGENDARY);
+      expect(result.data!.result.mergeLevel).toBe(1);
+    });
+
+    it('LEGENDARY+1 x2 → LEGENDARY+2', () => {
+      const items = makeMany(2, SlotType.WEAPON, EquipmentGrade.LEGENDARY, { mergeLevel: 1 });
+      const result = forge.merge(items);
+      expect(result.isOk()).toBe(true);
+      expect(result.data!.result.grade).toBe(EquipmentGrade.LEGENDARY);
+      expect(result.data!.result.mergeLevel).toBe(2);
+    });
+
+    it('LEGENDARY+2 x2 → MYTHIC', () => {
+      const items = makeMany(2, SlotType.WEAPON, EquipmentGrade.LEGENDARY, { mergeLevel: 2 });
       const result = forge.merge(items);
       expect(result.isOk()).toBe(true);
       expect(result.data!.result.grade).toBe(EquipmentGrade.MYTHIC);
+      expect(result.data!.result.mergeLevel).toBe(0);
     });
   });
 
@@ -186,7 +234,6 @@ describe('Forge', () => {
     it('rejects S-grade EPIC merge', () => {
       const items = [
         makeEquipment(SlotType.WEAPON, EquipmentGrade.EPIC, { isS: true }),
-        makeEquipment(SlotType.WEAPON, EquipmentGrade.EPIC),
         makeEquipment(SlotType.WEAPON, EquipmentGrade.EPIC),
       ];
       expect(forge.merge(items).isFail()).toBe(true);
@@ -276,18 +323,27 @@ describe('Forge', () => {
       expect(candidates.length).toBe(0);
     });
 
-    it('EPIC groups by slot and grade (no upgradeCount)', () => {
-      const inventory = makeMany(3, SlotType.WEAPON, EquipmentGrade.EPIC);
+    it('EPIC groups by slot, grade, and mergeLevel', () => {
+      const inventory = makeMany(2, SlotType.WEAPON, EquipmentGrade.EPIC, { mergeLevel: 0 });
       const candidates = forge.findMergeCandidates(inventory);
       expect(candidates.length).toBe(1);
-      expect(candidates[0].length).toBe(3);
+      expect(candidates[0].length).toBe(2);
     });
 
-    it('LEGENDARY groups by slot and grade', () => {
-      const inventory = makeMany(3, SlotType.WEAPON, EquipmentGrade.LEGENDARY);
+    it('EPIC separates different mergeLevels', () => {
+      const inventory = [
+        makeEquipment(SlotType.WEAPON, EquipmentGrade.EPIC, { mergeLevel: 0 }),
+        makeEquipment(SlotType.WEAPON, EquipmentGrade.EPIC, { mergeLevel: 1 }),
+      ];
+      const candidates = forge.findMergeCandidates(inventory);
+      expect(candidates.length).toBe(0);
+    });
+
+    it('LEGENDARY groups by mergeLevel', () => {
+      const inventory = makeMany(2, SlotType.WEAPON, EquipmentGrade.LEGENDARY, { mergeLevel: 1 });
       const candidates = forge.findMergeCandidates(inventory);
       expect(candidates.length).toBe(1);
-      expect(candidates[0].length).toBe(3);
+      expect(candidates[0].length).toBe(2);
     });
 
     it('mixed scenario: multiple slots and grades', () => {
@@ -295,7 +351,7 @@ describe('Forge', () => {
         ...makeMany(3, SlotType.WEAPON, EquipmentGrade.COMMON),
         ...makeMany(2, SlotType.WEAPON, EquipmentGrade.COMMON),
         ...makeMany(3, SlotType.ARMOR, EquipmentGrade.RARE),
-        ...makeMany(3, SlotType.RING, EquipmentGrade.EPIC),
+        ...makeMany(2, SlotType.RING, EquipmentGrade.EPIC),
         makeEquipment(SlotType.WEAPON, EquipmentGrade.MYTHIC),
         makeEquipment(SlotType.WEAPON, EquipmentGrade.COMMON, { isS: true }),
       ];
@@ -317,12 +373,12 @@ describe('Forge', () => {
       expect(forge.getMergeRequirement(EquipmentGrade.RARE)).toBe(3);
     });
 
-    it('EPIC requires 3', () => {
-      expect(forge.getMergeRequirement(EquipmentGrade.EPIC)).toBe(3);
+    it('EPIC requires 2', () => {
+      expect(forge.getMergeRequirement(EquipmentGrade.EPIC)).toBe(2);
     });
 
-    it('LEGENDARY requires 3', () => {
-      expect(forge.getMergeRequirement(EquipmentGrade.LEGENDARY)).toBe(3);
+    it('LEGENDARY requires 2', () => {
+      expect(forge.getMergeRequirement(EquipmentGrade.LEGENDARY)).toBe(2);
     });
 
     it('MYTHIC requires 0 (cannot merge)', () => {
@@ -331,7 +387,7 @@ describe('Forge', () => {
   });
 
   describe('full synthesis chain', () => {
-    it('COMMON → UNCOMMON → RARE → EPIC → LEGENDARY → MYTHIC progression', () => {
+    it('COMMON → UNCOMMON → RARE → EPIC → EPIC+1 → EPIC+2 → LEGENDARY → LEGENDARY+1 → LEGENDARY+2 → MYTHIC', () => {
       const commons = makeMany(9, SlotType.WEAPON, EquipmentGrade.COMMON);
 
       const uncommons: Equipment[] = [];
@@ -355,24 +411,55 @@ describe('Forge', () => {
       const epicResult = forge.merge(rares);
       expect(epicResult.isOk()).toBe(true);
       expect(epicResult.data!.result.grade).toBe(EquipmentGrade.EPIC);
+      expect(epicResult.data!.result.mergeLevel).toBe(0);
 
-      const epics = [
+      const epic1Result = forge.merge([
         epicResult.data!.result,
         makeEquipment(SlotType.WEAPON, EquipmentGrade.EPIC),
-        makeEquipment(SlotType.WEAPON, EquipmentGrade.EPIC),
-      ];
-      const legendaryResult = forge.merge(epics);
+      ]);
+      expect(epic1Result.isOk()).toBe(true);
+      expect(epic1Result.data!.result.grade).toBe(EquipmentGrade.EPIC);
+      expect(epic1Result.data!.result.mergeLevel).toBe(1);
+
+      const epic2Result = forge.merge([
+        epic1Result.data!.result,
+        makeEquipment(SlotType.WEAPON, EquipmentGrade.EPIC, { mergeLevel: 1 }),
+      ]);
+      expect(epic2Result.isOk()).toBe(true);
+      expect(epic2Result.data!.result.grade).toBe(EquipmentGrade.EPIC);
+      expect(epic2Result.data!.result.mergeLevel).toBe(2);
+
+      const legendaryResult = forge.merge([
+        epic2Result.data!.result,
+        makeEquipment(SlotType.WEAPON, EquipmentGrade.EPIC, { mergeLevel: 2 }),
+      ]);
       expect(legendaryResult.isOk()).toBe(true);
       expect(legendaryResult.data!.result.grade).toBe(EquipmentGrade.LEGENDARY);
+      expect(legendaryResult.data!.result.mergeLevel).toBe(0);
 
-      const legendaries = [
+      const leg1Result = forge.merge([
         legendaryResult.data!.result,
         makeEquipment(SlotType.WEAPON, EquipmentGrade.LEGENDARY),
-        makeEquipment(SlotType.WEAPON, EquipmentGrade.LEGENDARY),
-      ];
-      const mythicResult = forge.merge(legendaries);
+      ]);
+      expect(leg1Result.isOk()).toBe(true);
+      expect(leg1Result.data!.result.grade).toBe(EquipmentGrade.LEGENDARY);
+      expect(leg1Result.data!.result.mergeLevel).toBe(1);
+
+      const leg2Result = forge.merge([
+        leg1Result.data!.result,
+        makeEquipment(SlotType.WEAPON, EquipmentGrade.LEGENDARY, { mergeLevel: 1 }),
+      ]);
+      expect(leg2Result.isOk()).toBe(true);
+      expect(leg2Result.data!.result.grade).toBe(EquipmentGrade.LEGENDARY);
+      expect(leg2Result.data!.result.mergeLevel).toBe(2);
+
+      const mythicResult = forge.merge([
+        leg2Result.data!.result,
+        makeEquipment(SlotType.WEAPON, EquipmentGrade.LEGENDARY, { mergeLevel: 2 }),
+      ]);
       expect(mythicResult.isOk()).toBe(true);
       expect(mythicResult.data!.result.grade).toBe(EquipmentGrade.MYTHIC);
+      expect(mythicResult.data!.result.mergeLevel).toBe(0);
     });
   });
 });

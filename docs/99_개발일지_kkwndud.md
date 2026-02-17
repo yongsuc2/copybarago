@@ -2,6 +2,34 @@
 
 ---
 
+## 2026-02-17
+
+### 합성 탭 UI 리디자인: 아이콘 그리드 + 일괄 합성
+- 합성 탭 전면 재설계: 리스트 카드 → 아이콘 그리드 + 미리보기 레이아웃
+- 일괄 합성 기능: 가능한 모든 그룹을 한 번에 합성, 결과 메시지 4초 표시
+- 상단 미리보기: 선택 장비의 재료 아이콘 다이어그램 + 결과 등급/스탯/패시브
+- 하단 아이콘 그리드: 5열 CSS Grid, 등급 테두리/수량 뱃지/합성 가능 glow
+- `index.css`: `.forge-grid`, `.forge-grid-item`, `.forge-badge`, `.forge-preview` 스타일 추가
+
+### 장비 강화 스탯 고정값 변경
+- 강화 시 능력치 증가 방식 변경: 곱연산(레벨당 5%) → 고정값 가산(레벨당 +8)
+- `EquipmentTable.UPGRADE_FLAT_PER_LEVEL = 8`, 기본 스탯이 있는 항목에만 적용
+- 고등급 장비의 과도한 능력치 스케일링 해소
+
+### 에픽 이상 합성 mergeLevel 단계 시스템
+- 에픽/전설 합성: 3개 → 2개 변경, mergeLevel(+0/+1/+2) 단계 도입
+- 에픽+0×2→에픽+1, 에픽+1×2→에픽+2, 에픽+2×2→전설 (전설→신화도 동일)
+- Equipment 엔티티에 `mergeLevel` 프로퍼티 추가
+- EquipmentTable: `isHighGradeMerge()`, `getMergeEnhanceMax()` 메서드 추가
+- Forge: canMerge/merge/findMergeCandidates에 mergeLevel 로직 반영
+- SaveSerializer: mergeLevel 직렬화/역직렬화 + 하위호환
+- EquipmentScreen: 장비 이름에 "+N" 표시, 합성 그룹 mergeLevel별 분리, 결과 미리보기
+
+### 펫 경험치 프로그레스 바
+- PetScreen: 현재 EXP/필요 EXP 프로그레스 바 + "먹이 N개→레벨업" 표시 추가
+
+---
+
 ## 2026-02-15
 
 ### 전투 배속 기능 (1x / 2x)

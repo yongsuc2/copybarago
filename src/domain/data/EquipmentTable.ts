@@ -19,6 +19,7 @@ const MERGE_COUNT = constantsData.mergeCount as Record<EquipmentGrade, number>;
 const GRADE_ORDER = constantsData.gradeOrder as EquipmentGrade[];
 const PROMOTE_LEVELS = constantsData.promoteLevels;
 const SLOT_MAX_COUNT = constantsData.slotMaxCount as Record<string, number>;
+const HIGH_GRADE_MERGE_SET = new Set(constantsData.highGradeMergeGrades as EquipmentGrade[]);
 
 export const EquipmentTable = {
   getBaseStats(slot: SlotType, grade: EquipmentGrade): Stats {
@@ -26,8 +27,8 @@ export const EquipmentTable = {
     return entry?.stats ?? Stats.ZERO;
   },
 
-  getUpgradeMultiplier(level: number): number {
-    return 1 + level * constantsData.upgradeMultiplierPerLevel;
+  getUpgradeFlatPerLevel(): number {
+    return constantsData.upgradeFlatPerLevel;
   },
 
   getMergeCount(grade: EquipmentGrade): number {
@@ -54,5 +55,13 @@ export const EquipmentTable = {
 
   getSlotMaxCount(slot: SlotType): number {
     return SLOT_MAX_COUNT[slot] ?? 1;
+  },
+
+  isHighGradeMerge(grade: EquipmentGrade): boolean {
+    return HIGH_GRADE_MERGE_SET.has(grade);
+  },
+
+  getMergeEnhanceMax(): number {
+    return constantsData.mergeEnhanceMax;
   },
 };

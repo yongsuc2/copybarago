@@ -23,6 +23,7 @@ interface EquipmentData {
   promoteCount: number;
   uniqueEffect: { description: string; statBonus: { hp: number; maxHp: number; atk: number; def: number; crit: number } } | null;
   weaponSubType?: WeaponSubType | null;
+  mergeLevel?: number;
 }
 
 interface PetData {
@@ -112,6 +113,7 @@ function serializeEquipment(eq: Equipment): EquipmentData {
       },
     } : null,
     weaponSubType: eq.weaponSubType,
+    mergeLevel: eq.mergeLevel,
   };
 }
 
@@ -138,7 +140,7 @@ function deserializeEquipment(data: EquipmentData): Equipment {
   return new Equipment(
     data.id, data.name, data.slot, data.grade, data.isS,
     data.level, data.promoteCount, uniqueEffect,
-    weaponSubType,
+    weaponSubType, data.mergeLevel ?? 0,
   );
 }
 

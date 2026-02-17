@@ -21,6 +21,7 @@ export class Equipment {
     public promoteCount: number = 0,
     public readonly uniqueEffect: UniqueEffect | null = null,
     public readonly weaponSubType: WeaponSubType | null = null,
+    public mergeLevel: number = 0,
   ) {}
 
   getPassive(): EquipmentPassiveDef | null {
@@ -29,8 +30,12 @@ export class Equipment {
 
   getStats(): Stats {
     const baseStats = EquipmentTable.getBaseStats(this.slot, this.grade);
-    const multiplier = EquipmentTable.getUpgradeMultiplier(this.level);
-    let stats = baseStats.multiply(multiplier);
+    const flat = EquipmentTable.getUpgradeFlatPerLevel();
+    const bonus = Stats.create({
+      atk: baseStats.atk > 0 ? this.level * flat : 0,
+      maxHp: baseStats.maxHp > 0 ? this.level * flat : 0,
+    });
+    let stats = baseStats.add(bonus);
     if (this.uniqueEffect) {
       stats = stats.add(this.uniqueEffect.statBonus);
     }

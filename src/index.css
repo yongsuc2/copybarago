@@ -202,6 +202,48 @@ body {
   margin: 6px 0;
 }
 
+.forge-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 8px 0;
+}
+.forge-grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 4px;
+  background: #1a1a2e;
+  border: 2px solid #333;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.forge-grid-item:hover { border-color: #888; }
+.forge-grid-item.selected { border-color: #e94560; box-shadow: 0 0 8px #e9456040; }
+.forge-grid-item.mergeable { border-color: #4caf50; box-shadow: 0 0 6px #4caf5030; }
+.forge-grid-item.selected.mergeable { border-color: #e94560; box-shadow: 0 0 8px #e9456040; }
+.forge-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 0 4px;
+  border-radius: 4px;
+  line-height: 16px;
+  background: #222;
+}
+.forge-preview {
+  background: #0f1923;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 0;
+}
+
 .quest-card {
   display: flex;
   align-items: center;

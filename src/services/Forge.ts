@@ -15,6 +15,11 @@ export class Forge {
       return false;
     }
 
+    if (EquipmentTable.isHighGradeMerge(firstGrade)) {
+      const firstMergeLevel = equipments[0].mergeLevel;
+      if (!equipments.every(e => e.mergeLevel === firstMergeLevel)) return false;
+    }
+
     const required = EquipmentTable.getMergeCount(firstGrade);
     if (required === 0) return false;
 
@@ -27,13 +32,51 @@ export class Forge {
     }
 
     const source = equipments[0];
-    const nextGrade = EquipmentTable.getNextGrade(source.grade);
-    if (!nextGrade) {
-      return Result.fail('Already at max grade');
-    }
 
     if (source.isS || equipments.some(e => e.isS)) {
       return Result.fail('S-grade equipment cannot be used as merge material');
+    }
+
+    if (EquipmentTable.isHighGradeMerge(source.grade)) {
+      const maxEnhance = EquipmentTable.getMergeEnhanceMax();
+      if (source.mergeLevel < maxEnhance) {
+        const resultEquipment = new Equipment(
+          `merged_${Date.now()}`,
+          `${source.grade} ${source.slot}`,
+          source.slot,
+          source.grade,
+          false,
+          source.level,
+          source.promoteCount,
+          null,
+          source.weaponSubType,
+          source.mergeLevel + 1,
+        );
+        return Result.ok({ result: resultEquipment });
+      }
+
+      const nextGrade = EquipmentTable.getNextGrade(source.grade);
+      if (!nextGrade) {
+        return Result.fail('Already at max grade');
+      }
+      const resultEquipment = new Equipment(
+        `merged_${Date.now()}`,
+        `${nextGrade} ${source.slot}`,
+        source.slot,
+        nextGrade,
+        false,
+        source.level,
+        source.promoteCount,
+        null,
+        source.weaponSubType,
+        0,
+      );
+      return Result.ok({ result: resultEquipment });
+    }
+
+    const nextGrade = EquipmentTable.getNextGrade(source.grade);
+    if (!nextGrade) {
+      return Result.fail('Already at max grade');
     }
 
     const resultEquipment = new Equipment(
@@ -46,6 +89,7 @@ export class Forge {
       source.promoteCount,
       null,
       source.weaponSubType,
+      0,
     );
 
     return Result.ok({ result: resultEquipment });
@@ -61,7 +105,8 @@ export class Forge {
     for (const eq of inventory) {
       if (eq.isS) continue;
       const subKey = eq.slot === SlotType.WEAPON ? `_${eq.weaponSubType}` : '';
-      const key = `${eq.slot}${subKey}_${eq.grade}`;
+      const mlKey = EquipmentTable.isHighGradeMerge(eq.grade) ? `_ml${eq.mergeLevel}` : '';
+      const key = `${eq.slot}${subKey}_${eq.grade}${mlKey}`;
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key)!.push(eq);
     }
