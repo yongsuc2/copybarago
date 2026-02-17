@@ -62,10 +62,10 @@ export const ChapterTreasureTable = {
 
   getMilestonesForChapter(chapterId: number): ChapterMilestone[] {
     return [
-      makeSurviveMilestone(chapterId, 15, 300, 30, 3, 0),
-      makeSurviveMilestone(chapterId, 25, 500, 60, 5, 1),
-      makeSurviveMilestone(chapterId, 40, 800, 100, 8, 2),
-      makeClearMilestone(chapterId, 1200, 150, 12, 3),
+      makeSurviveMilestone(chapterId, 15, 150, 10, 1, 0),
+      makeSurviveMilestone(chapterId, 25, 250, 25, 3, 0),
+      makeSurviveMilestone(chapterId, 40, 400, 40, 5, 1),
+      makeClearMilestone(chapterId, 600, 60, 8, 2),
     ];
   },
 
