@@ -1,7 +1,8 @@
 import { ChestType, EquipmentGrade, ResourceType, SlotType, WeaponSubType } from '../enums';
 import { Equipment } from '../entities/Equipment';
-import { SeededRandom } from '../../infrastructure/SeededRandom';
+import type { SeededRandom } from '../../infrastructure/SeededRandom';
 import { EquipmentDataTable } from '../data/EquipmentDataTable';
+import gachaData from '../data/json/gacha.data.json';
 
 interface ChestConfig {
   type: ChestType;
@@ -13,36 +14,31 @@ interface ChestConfig {
 const CHEST_CONFIGS: Record<ChestType, ChestConfig> = {
   [ChestType.EQUIPMENT]: {
     type: ChestType.EQUIPMENT,
-    costPerPull: 150,
-    pityThreshold: 180,
-    gradeWeights: [
-      { grade: EquipmentGrade.COMMON, weight: 243 },
-      { grade: EquipmentGrade.UNCOMMON, weight: 81 },
-      { grade: EquipmentGrade.RARE, weight: 27 },
-      { grade: EquipmentGrade.EPIC, weight: 9 },
-      { grade: EquipmentGrade.LEGENDARY, weight: 3 },
-      { grade: EquipmentGrade.MYTHIC, weight: 1 },
-    ],
+    costPerPull: gachaData.equipment.costPerPull,
+    pityThreshold: gachaData.equipment.pityThreshold,
+    gradeWeights: gachaData.equipment.gradeWeights.map(w => ({
+      grade: w.grade as EquipmentGrade,
+      weight: w.weight,
+    })),
   },
   [ChestType.PET]: {
     type: ChestType.PET,
-    costPerPull: 298,
-    pityThreshold: 0,
+    costPerPull: gachaData.pet.costPerPull,
+    pityThreshold: gachaData.pet.pityThreshold,
     gradeWeights: [],
   },
   [ChestType.GEM]: {
     type: ChestType.GEM,
-    costPerPull: 0,
-    pityThreshold: 0,
+    costPerPull: gachaData.gem.costPerPull,
+    pityThreshold: gachaData.gem.pityThreshold,
     gradeWeights: [],
   },
 };
 
 const SLOTS = [SlotType.WEAPON, SlotType.ARMOR, SlotType.RING, SlotType.NECKLACE, SlotType.SHOES, SlotType.GLOVES, SlotType.HAT];
 const WEAPON_SUB_TYPES = [WeaponSubType.SWORD, WeaponSubType.STAFF, WeaponSubType.BOW];
-const S_RATE = 0.02;
-
-const S_ELIGIBLE_GRADES = new Set([EquipmentGrade.EPIC, EquipmentGrade.LEGENDARY, EquipmentGrade.MYTHIC]);
+const S_RATE = gachaData.equipment.sRate;
+const S_ELIGIBLE_GRADES = new Set(gachaData.equipment.sEligibleGrades as EquipmentGrade[]);
 
 export interface PullResult {
   equipment: Equipment | null;
@@ -140,8 +136,8 @@ export class TreasureChest {
       return {
         equipment: null,
         resources: [
-          { type: ResourceType.PET_EGG, amount: 1 },
-          { type: ResourceType.PET_FOOD, amount: rng.nextInt(1, 5) },
+          { type: ResourceType.PET_EGG, amount: gachaData.pet.eggAmount },
+          { type: ResourceType.PET_FOOD, amount: rng.nextInt(gachaData.pet.foodMin, gachaData.pet.foodMax) },
         ],
         isPity: false,
       };
@@ -150,7 +146,7 @@ export class TreasureChest {
     return {
       equipment: null,
       resources: [
-        { type: ResourceType.GEMS, amount: rng.nextInt(20, 100) },
+        { type: ResourceType.GEMS, amount: rng.nextInt(gachaData.gem.gemsMin, gachaData.gem.gemsMax) },
       ],
       isPity: false,
     };
