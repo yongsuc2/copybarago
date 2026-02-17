@@ -11,8 +11,8 @@ export interface EnemyTemplateData {
 }
 
 const BASE_ENEMY_STATS = Stats.create({ hp: 80, maxHp: 80, atk: 8, def: 3 });
-const BASE_ELITE_STATS = Stats.create({ hp: 150, maxHp: 150, atk: 15, def: 6 });
-const BASE_BOSS_STATS = Stats.create({ hp: 300, maxHp: 300, atk: 20, def: 10 });
+const BASE_ELITE_STATS = Stats.create({ hp: 260, maxHp: 260, atk: 24, def: 9 });
+const BASE_BOSS_STATS = Stats.create({ hp: 600, maxHp: 600, atk: 32, def: 14 });
 
 const SCALING_PER_CHAPTER = BattleDataTable.enemy.scalingPerChapter;
 const TOWER_SCALING_PER_FLOOR = BattleDataTable.enemy.scalingPerTowerFloor;
@@ -24,12 +24,12 @@ const ENEMY_TEMPLATES: EnemyTemplateData[] = [
   { id: 'orc', name: 'Orc', baseStats: Stats.create({ hp: 140, maxHp: 140, atk: 16, def: 7 }), skillIds: ['multi_hit'], isBoss: false, ragePerAttack: 25 },
   { id: 'dark_knight', name: 'Dark Knight', baseStats: Stats.create({ hp: 200, maxHp: 200, atk: 20, def: 10 }), skillIds: ['counter', 'iron_shield'], isBoss: false, ragePerAttack: 25 },
 
-  { id: 'elite_wolf', name: 'Alpha Wolf', baseStats: BASE_ELITE_STATS, skillIds: ['multi_hit', 'counter'], isBoss: false, ragePerAttack: 25 },
-  { id: 'elite_mage', name: 'Dark Mage', baseStats: Stats.create({ hp: 120, maxHp: 120, atk: 22, def: 4 }), skillIds: ['lightning_summon'], isBoss: false, ragePerAttack: 25 },
+  { id: 'elite_wolf', name: 'Alpha Wolf', baseStats: BASE_ELITE_STATS, skillIds: ['multi_hit', 'counter', 'lifesteal'], isBoss: false, ragePerAttack: 25 },
+  { id: 'elite_mage', name: 'Dark Mage', baseStats: Stats.create({ hp: 220, maxHp: 220, atk: 28, def: 6 }), skillIds: ['lightning_summon', 'flame_summon'], isBoss: false, ragePerAttack: 25 },
 
-  { id: 'boss_dragon', name: 'Ancient Dragon', baseStats: Stats.create({ hp: 500, maxHp: 500, atk: 25, def: 12 }), skillIds: ['lightning_summon'], isBoss: true, ragePerAttack: 25 },
-  { id: 'boss_demon', name: 'Demon Lord', baseStats: Stats.create({ hp: 400, maxHp: 400, atk: 30, def: 8 }), skillIds: ['poison_inject', 'lifesteal'], isBoss: true, ragePerAttack: 25 },
-  { id: 'boss_golem', name: 'Stone Golem', baseStats: Stats.create({ hp: 700, maxHp: 700, atk: 18, def: 20 }), skillIds: ['counter', 'iron_shield'], isBoss: true, ragePerAttack: 25 },
+  { id: 'boss_dragon', name: 'Ancient Dragon', baseStats: Stats.create({ hp: 750, maxHp: 750, atk: 34, def: 15 }), skillIds: ['lightning_summon', 'flame_summon', 'iron_shield'], isBoss: true, ragePerAttack: 25 },
+  { id: 'boss_demon', name: 'Demon Lord', baseStats: Stats.create({ hp: 650, maxHp: 650, atk: 38, def: 12 }), skillIds: ['poison_inject', 'lifesteal', 'flame_summon'], isBoss: true, ragePerAttack: 25 },
+  { id: 'boss_golem', name: 'Stone Golem', baseStats: Stats.create({ hp: 1000, maxHp: 1000, atk: 24, def: 25 }), skillIds: ['counter', 'iron_shield', 'poison_inject'], isBoss: true, ragePerAttack: 25 },
 ];
 
 const CHAPTER_ENEMY_POOL = ['slime', 'goblin', 'skeleton', 'orc', 'dark_knight'];
