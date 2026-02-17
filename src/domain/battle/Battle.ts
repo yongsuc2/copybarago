@@ -143,6 +143,41 @@ export class Battle {
       }
     }
 
+    if (!isBunno && bunno && target.isAlive() && player.rage >= player.maxRage) {
+      const bunnoResults = this.engine.executeSkillEffects(bunno, player, target, allSkills);
+      for (const r of bunnoResults) {
+        if (r.damage > 0) {
+          r.damage = Math.floor(r.damage * player.ragePowerMultiplier);
+        }
+      }
+      this.logSkillResults(bunnoResults, player, target, true);
+      this.applyLifesteal(player, bunnoResults);
+
+      if (target.isAlive() && player.multiHitChance > 0 && this.rng.chance(player.multiHitChance)) {
+        const multiResults = this.engine.executeSkillEffects(bunno, player, target, allSkills);
+        for (const r of multiResults) {
+          if (r.damage > 0) {
+            r.damage = Math.floor(r.damage * player.ragePowerMultiplier);
+          }
+        }
+        this.logSkillResults(multiResults, player, target, true);
+        this.applyLifesteal(player, multiResults);
+      }
+
+      if (target.isAlive()) {
+        for (const skill of player.activeSkills) {
+          if (!target.isAlive()) break;
+          if (skill.hierarchy === SkillHierarchy.BUILTIN) continue;
+          if (skill.hierarchy !== SkillHierarchy.UPPER) continue;
+          if (this.engine.evaluateTrigger(skill.trigger, this.turnCount, player, bunno.id)) {
+            const upperResults = this.engine.executeSkillEffects(skill, player, target, allSkills);
+            this.logSkillResults(upperResults, player, target, false);
+            this.applyLifesteal(player, upperResults);
+          }
+        }
+      }
+    }
+
     if (target.isAlive() && target.counterTriggerChance > 0 && this.rng.chance(target.counterTriggerChance)) {
       this.processCounter(target, player);
     }

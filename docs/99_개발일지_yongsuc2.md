@@ -518,3 +518,31 @@ src/domain/data/ChapterTreasureTable.ts (JSON + Reward 구성 로직 유지)
 ### 누적 현황
 - 테스트: 21개 파일, 222개 테스트 전부 통과
 - tsc 타입 체크 통과
+
+---
+
+## 2026-02-17 (Day 6 - 오후)
+
+### 완료 작업
+- **챕터 획득 골드 UI** — 챕터 헤더 카드에 sessionGold 표시 (Coins 아이콘 + 골드색)
+- **상태효과 틱 애니메이션 분리** — DOT_DAMAGE/HOT_HEAL을 적 공격 애니메이션에서 분리, 턴 끝에 캐릭터 이동 없이 데미지 팝업만 표시
+- **전투 연출 순서도 기획서** — 01_전투시스템.md에 페이즈 타이밍, 턴 연출 흐름, 히트 그룹 분할, HP 중간 갱신 문서화
+- **DoT 메카닉 기획서** — 04_스킬시스템.md에 즉발 피해 vs 지속 피해 구분, DoT 틱 타이밍 문서화
+- **엘리트/보스 dayProgress 스케일링** — 일반 몬스터만 적용되던 일수 보너스를 엘리트/보스에도 적용
+- **엘리트/보스 챕터별 고정 배치** (Y-15) — 랜덤 풀 → chapterBossAssignment JSON 테이블 기반 고정 배치 (3패턴 순환)
+
+### 수정된 파일
+```
+src/presentation/screens/ChapterScreen.tsx (획득 골드 UI, 상태효과 틱 분리)
+src/domain/chapter/Chapter.ts (엘리트/보스 dayProgress + 고정 배치)
+src/domain/data/EncounterDataTable.ts (getChapterBossAssignment 추가)
+src/domain/data/json/encounter.data.json (chapterBossAssignment 테이블)
+docs/01_전투시스템.md (전투 연출 시스템 섹션 전면 재작성)
+docs/04_스킬시스템.md (DoT 메카닉 섹션 추가)
+docs/12_모험시스템.md (엘리트/보스 고정 배치, dayProgress 적용)
+docs/화면기획문서/모험화면_기획서.md (챕터 정보 카드에 획득 골드 추가)
+```
+
+### 누적 현황
+- 테스트: 21개 파일, 228개 테스트 전부 통과
+- tsc 타입 체크 통과
