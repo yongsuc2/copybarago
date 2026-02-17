@@ -474,14 +474,14 @@ export function EquipmentScreen() {
           )}
         </div>
 
+        {renderDetailPanel()}
+
         <div className="equip-stats-bar">
           <span>ATK <b>{playerStats.atk}</b></span>
           <span>HP <b>{playerStats.maxHp}</b></span>
           <span>DEF <b>{playerStats.def}</b></span>
           <span>CRIT <b>{(playerStats.crit * 100).toFixed(1)}%</b></span>
         </div>
-
-        {renderDetailPanel()}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '10px 0 4px' }}>
           <h3 style={{ fontSize: 13, color: '#aaa', margin: 0 }}>
