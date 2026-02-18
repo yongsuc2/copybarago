@@ -4,10 +4,10 @@
   { "skill": "lifesteal", "tier": 3, "rate": 0.30 },
   { "skill": "lifesteal", "tier": 4, "rate": 0.40 },
 
-  { "skill": "regen", "tier": 1, "healPerTurn": 10 },
-  { "skill": "regen", "tier": 2, "healPerTurn": 18 },
-  { "skill": "regen", "tier": 3, "healPerTurn": 28 },
-  { "skill": "regen", "tier": 4, "healPerTurn": 42 },
+  { "skill": "regen", "tier": 1, "healPerTurn": 0.02 },
+  { "skill": "regen", "tier": 2, "healPerTurn": 0.035 },
+  { "skill": "regen", "tier": 3, "healPerTurn": 0.05 },
+  { "skill": "regen", "tier": 4, "healPerTurn": 0.07 },
 
   { "skill": "counter", "tier": 1, "triggerChance": 0.1 },
   { "skill": "counter", "tier": 2, "triggerChance": 0.2 },

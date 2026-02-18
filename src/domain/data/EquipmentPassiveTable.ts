@@ -30,7 +30,7 @@ const DESCRIPTION_BUILDERS: Record<string, (v: number) => string> = {
   MAGIC_BOOST: v => `마법 스킬 계수 +${pct(v)}`,
   RAGE_BOOST: v => `분노 추가 충전 +${v}`,
   SHIELD: v => `최대체력의 ${pct(v)} 방어막`,
-  HOT_REGEN: v => `매턴 HP ${v} 회복`,
+  HOT_REGEN: v => `매턴 최대체력의 ${pct(v)} 회복`,
   MULTI_HIT: v => `${pct(v)} 확률로 추가 타격`,
 };
 

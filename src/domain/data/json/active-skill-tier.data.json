@@ -14,10 +14,10 @@
   { "skill": "rage_accumulate", "tier": 3, "amount": 45 },
   { "skill": "rage_accumulate", "tier": 4, "amount": 60 },
 
-  { "skill": "hp_recovery", "tier": 1, "amount": 10 },
-  { "skill": "hp_recovery", "tier": 2, "amount": 18 },
-  { "skill": "hp_recovery", "tier": 3, "amount": 28 },
-  { "skill": "hp_recovery", "tier": 4, "amount": 42 },
+  { "skill": "hp_recovery", "tier": 1, "amount": 0.02 },
+  { "skill": "hp_recovery", "tier": 2, "amount": 0.035 },
+  { "skill": "hp_recovery", "tier": 3, "amount": 0.05 },
+  { "skill": "hp_recovery", "tier": 4, "amount": 0.07 },
 
   { "skill": "lightning_summon", "tier": 1, "coefficient": 0.2 },
   { "skill": "lightning_summon", "tier": 2, "coefficient": 0.3 },

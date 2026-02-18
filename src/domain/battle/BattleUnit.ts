@@ -219,7 +219,9 @@ export class BattleUnit implements SkillExecutionUnit {
 
     for (const effect of this.statusEffects) {
       totalDamage += effect.getDamagePerTurn();
-      totalHeal += effect.getHealPerTurn();
+      if (effect.isHot()) {
+        totalHeal += Math.floor(this.maxHp * effect.value);
+      }
       effect.tick();
     }
 

@@ -43,12 +43,12 @@
     { "slot": "NECKLACE", "grade": "LEGENDARY", "effectType": "BUFF", "statusEffectType": "ATK_UP", "value": 0.15, "icon": "📿" },
     { "slot": "NECKLACE", "grade": "MYTHIC", "effectType": "BUFF", "statusEffectType": "ATK_UP", "value": 0.18, "icon": "📿" },
 
-    { "slot": "SHOES", "grade": "COMMON", "effectType": "HOT", "statusEffectType": "REGEN", "value": 3, "icon": "👟" },
-    { "slot": "SHOES", "grade": "UNCOMMON", "effectType": "HOT", "statusEffectType": "REGEN", "value": 8, "icon": "👟" },
-    { "slot": "SHOES", "grade": "RARE", "effectType": "HOT", "statusEffectType": "REGEN", "value": 18, "icon": "👟" },
-    { "slot": "SHOES", "grade": "EPIC", "effectType": "HOT", "statusEffectType": "REGEN", "value": 30, "icon": "👟" },
-    { "slot": "SHOES", "grade": "LEGENDARY", "effectType": "HOT", "statusEffectType": "REGEN", "value": 45, "icon": "👟" },
-    { "slot": "SHOES", "grade": "MYTHIC", "effectType": "HOT", "statusEffectType": "REGEN", "value": 60, "icon": "👟" },
+    { "slot": "SHOES", "grade": "COMMON", "effectType": "HOT", "statusEffectType": "REGEN", "value": 0.005, "icon": "👟" },
+    { "slot": "SHOES", "grade": "UNCOMMON", "effectType": "HOT", "statusEffectType": "REGEN", "value": 0.01, "icon": "👟" },
+    { "slot": "SHOES", "grade": "RARE", "effectType": "HOT", "statusEffectType": "REGEN", "value": 0.02, "icon": "👟" },
+    { "slot": "SHOES", "grade": "EPIC", "effectType": "HOT", "statusEffectType": "REGEN", "value": 0.03, "icon": "👟" },
+    { "slot": "SHOES", "grade": "LEGENDARY", "effectType": "HOT", "statusEffectType": "REGEN", "value": 0.04, "icon": "👟" },
+    { "slot": "SHOES", "grade": "MYTHIC", "effectType": "HOT", "statusEffectType": "REGEN", "value": 0.05, "icon": "👟" },
 
     { "slot": "GLOVES", "grade": "COMMON", "effectType": "MULTI_HIT", "value": 0.03, "icon": "🧤" },
     { "slot": "GLOVES", "grade": "UNCOMMON", "effectType": "MULTI_HIT", "value": 0.06, "icon": "🧤" },

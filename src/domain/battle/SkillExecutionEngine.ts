@@ -166,7 +166,8 @@ export class SkillExecutionEngine {
         }
 
         case SkillEffectType.HEAL_HP: {
-          const healed = source.heal(effect.amount);
+          const healAmount = Math.floor(source.maxHp * effect.amount);
+          const healed = source.heal(healAmount);
           if (healed > 0) {
             results.push({
               skillName: skill.name, skillIcon: skill.icon,

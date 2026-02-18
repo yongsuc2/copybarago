@@ -137,7 +137,7 @@ describe('SkillExecutionEngine', () => {
       'test_heal', 'Heal', '💚',
       SkillHierarchy.LOWEST, 1, [], [],
       trigger(everyNTurns(1)),
-      [{ type: SkillEffectType.HEAL_HP, amount: 20 }],
+      [{ type: SkillEffectType.HEAL_HP, amount: 0.2 }],
     );
 
     const source = makeUnit({ currentHp: 50 });

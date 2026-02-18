@@ -45,7 +45,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
     buildEffect: (t) => ({
       type: PassiveType.REGEN, healPerTurn: td('regen', t).healPerTurn,
     }),
-    buildDescription: (t) => `매턴 HP ${td('regen', t).healPerTurn} 회복`,
+    buildDescription: (t) => `매턴 최대체력의 ${pct(td('regen', t).healPerTurn)} 회복`,
   },
   {
     id: 'counter', name: '반격', icon: '🛡️',

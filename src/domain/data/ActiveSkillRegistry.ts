@@ -88,7 +88,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     buildEffects: (t) => [
       { type: SkillEffectType.HEAL_HP, amount: td('hp_recovery', t).amount },
     ],
-    buildDescription: (t) => `HP ${td('hp_recovery', t).amount} 회복`,
+    buildDescription: (t) => `최대체력의 ${pct(td('hp_recovery', t).amount)} 회복`,
   },
   {
     id: 'lightning_summon', name: '번개 소환', icon: '⚡',

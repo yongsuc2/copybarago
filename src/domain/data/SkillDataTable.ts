@@ -36,7 +36,7 @@ export function getSkillDescription(id: string, tier: number = 1): string {
     poison_weapon: v => `공격 시 독을 부여하여 ${v.duration}턴간 매턴 ${v.damagePerTurn} 피해`,
 
     lifesteal: v => `가한 피해의 ${pct(v.rate)}만큼 체력 회복`,
-    regen: v => `매 턴 체력 ${v.healPerTurn} 회복`,
+    regen: v => `매 턴 최대체력의 ${pct(v.healPerTurn)} 회복`,
     counter: v => `피격 시 받은 피해의 ${pct(v.reflectRate)}를 반격`,
     iron_shield: v => `최대 체력의 ${pct(v.shieldRate)}만큼 방어막 생성`,
     multi_hit_mastery: v => `공격 시 ${pct(v.chance)} 확률로 추가 타격`,
