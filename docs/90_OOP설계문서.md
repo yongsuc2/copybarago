@@ -89,7 +89,7 @@ Skill
 ├── id: string
 ├── name: string
 ├── grade: SkillGrade (일반/전설/신화/불멸)
-├── category: SkillCategory (공격/마스터리/Proficiency/생존/디버프)
+├── category: SkillCategory (공격/마스터리/생존/디버프/버프)
 ├── heritageSynergy: HeritageRoute[]
 ├── effect: SkillEffect
 └── triggerCondition: TriggerCondition (턴시작/공격시/피격시/항상)
