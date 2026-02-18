@@ -598,6 +598,16 @@ docs/04_스킬시스템.md (REGEN/HEAL_HP 설명 % 반영, 숙련 스킬 제거)
 docs/90_OOP설계문서.md (SkillCategory 설명 정리)
 ```
 
+- **죽은 코드 삭제** — SkillTable.ts, SkillDataTable.ts, skill-tier.data.json (미사용 파일 제거)
+- **밸런스 실제 데이터 반영** — 이전 밸런스 변경이 죽은 코드에만 적용된 문제 수정, passive-skill-tier/active-skill-tier에 재적용
+- **속성 마스터리 패시브 3종 추가** (SKILL_MODIFIER 구현)
+  - 번개 마스터리, 수리검 마스터리, 광창 마스터리 — 태그 기반 데미지 증가 (+8%~25%)
+  - BattleUnit에 skillTagBonuses 저장, SkillExecutionEngine ATTACK 케이스에서 태그 배율 적용
+- **크리티컬 물리 전용** — 마법/고정 공격에서 크리티컬 제거, 물리만 적용
+- **데미지 분산 제거** — variance(0.9~1.1) 랜덤 배율 삭제
+- **폭군의 일격 밸런스 하향** — coefficient 0.3→0.11 (비례 하향)
+- **연타 밸런스 하향** — chance 0.1→0.07 (비례 하향)
+
 ### 누적 현황
 - 테스트: 21개 파일, 228개 테스트 전부 통과
 - tsc 타입 체크 통과
