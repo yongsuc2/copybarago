@@ -116,16 +116,9 @@ export class Battle {
     this.logSkillResults(mainResults, player, target, isBunno);
     this.applyLifesteal(player, mainResults);
 
-    if (target.isAlive() && player.multiHitChance > 0 && this.rng.chance(player.multiHitChance)) {
+    if (!isBunno && target.isAlive() && player.multiHitChance > 0 && this.rng.chance(player.multiHitChance)) {
       const multiResults = this.engine.executeSkillEffects(mainSkill, player, target, allSkills);
-      if (isBunno) {
-        for (const r of multiResults) {
-          if (r.damage > 0) {
-            r.damage = Math.floor(r.damage * player.ragePowerMultiplier);
-          }
-        }
-      }
-      this.logSkillResults(multiResults, player, target, isBunno);
+      this.logSkillResults(multiResults, player, target, false);
       this.applyLifesteal(player, multiResults);
     }
 
@@ -153,16 +146,6 @@ export class Battle {
       this.logSkillResults(bunnoResults, player, target, true);
       this.applyLifesteal(player, bunnoResults);
 
-      if (target.isAlive() && player.multiHitChance > 0 && this.rng.chance(player.multiHitChance)) {
-        const multiResults = this.engine.executeSkillEffects(bunno, player, target, allSkills);
-        for (const r of multiResults) {
-          if (r.damage > 0) {
-            r.damage = Math.floor(r.damage * player.ragePowerMultiplier);
-          }
-        }
-        this.logSkillResults(multiResults, player, target, true);
-        this.applyLifesteal(player, multiResults);
-      }
 
       if (target.isAlive()) {
         for (const skill of player.activeSkills) {
