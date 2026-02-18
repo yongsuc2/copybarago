@@ -75,9 +75,9 @@
   { "skill": "lance_strike", "tier": 4, "count": 4 },
 
   { "skill": "aura_strike", "tier": 1, "count": 1 },
-  { "skill": "aura_strike", "tier": 2, "count": 1 },
-  { "skill": "aura_strike", "tier": 3, "count": 2 },
-  { "skill": "aura_strike", "tier": 4, "count": 2 },
+  { "skill": "aura_strike", "tier": 2, "count": 2 },
+  { "skill": "aura_strike", "tier": 3, "count": 3 },
+  { "skill": "aura_strike", "tier": 4, "count": 4 },
 
   { "skill": "bunno_thunder", "tier": 1, "count": 1 },
   { "skill": "bunno_thunder", "tier": 2, "count": 2 },
