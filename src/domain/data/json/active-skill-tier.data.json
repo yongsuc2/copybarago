@@ -109,10 +109,10 @@
   { "skill": "thunderstorm", "tier": 3, "count": 4 },
   { "skill": "thunderstorm", "tier": 4, "count": 5 },
 
-  { "skill": "tyrant", "tier": 1, "coefficient": 0.3 },
-  { "skill": "tyrant", "tier": 2, "coefficient": 0.45 },
-  { "skill": "tyrant", "tier": 3, "coefficient": 0.6 },
-  { "skill": "tyrant", "tier": 4, "coefficient": 0.8 },
+  { "skill": "tyrant", "tier": 1, "coefficient": 0.11 },
+  { "skill": "tyrant", "tier": 2, "coefficient": 0.17 },
+  { "skill": "tyrant", "tier": 3, "coefficient": 0.22 },
+  { "skill": "tyrant", "tier": 4, "coefficient": 0.29 },
 
   { "skill": "shrink_magic", "tier": 1, "reduction": 0.1, "duration": 3 },
   { "skill": "shrink_magic", "tier": 2, "reduction": 0.15, "duration": 3 },
