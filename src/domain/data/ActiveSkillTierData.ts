@@ -20,7 +20,7 @@ export type ActiveSkillId =
   | 'thunder_strike' | 'lance_strike' | 'aura_strike'
   | 'bunno_thunder' | 'bunno_lance' | 'bunno_flame'
   | 'rage_gauge_boost' | 'venom_sword'
-  | 'thunderstorm' | 'tyrant' | 'shrink_magic' | 'demon_power';
+  | 'tyrant' | 'shrink_magic' | 'demon_power';
 
 export function getActiveTierData(id: string, tier: number): Record<string, number> | undefined {
   const family = NESTED[id];

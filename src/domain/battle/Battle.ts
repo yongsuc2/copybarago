@@ -116,24 +116,14 @@ export class Battle {
     this.logSkillResults(mainResults, player, target, isBunno);
     this.applyLifesteal(player, mainResults);
 
+    this.executeUpperSkills(player, target, allSkills, mainSkill.id);
+
     if (!isBunno && target.isAlive() && player.multiHitChance > 0 && this.rng.chance(player.multiHitChance)) {
       const multiResults = this.engine.executeSkillEffects(mainSkill, player, target, allSkills);
       this.logSkillResults(multiResults, player, target, false);
       this.applyLifesteal(player, multiResults);
-    }
 
-    if (!target.isAlive()) return;
-
-    for (const skill of player.activeSkills) {
-      if (!target.isAlive()) break;
-      if (skill.hierarchy === SkillHierarchy.BUILTIN) continue;
-      if (skill.hierarchy !== SkillHierarchy.UPPER) continue;
-
-      if (this.engine.evaluateTrigger(skill.trigger, this.turnCount, player, mainSkill.id)) {
-        const upperResults = this.engine.executeSkillEffects(skill, player, target, allSkills);
-        this.logSkillResults(upperResults, player, target, false);
-        this.applyLifesteal(player, upperResults);
-      }
+      this.executeUpperSkills(player, target, allSkills, mainSkill.id);
     }
 
     if (!isBunno && bunno && target.isAlive() && player.rage >= player.maxRage) {
@@ -147,22 +137,28 @@ export class Battle {
       this.applyLifesteal(player, bunnoResults);
 
 
-      if (target.isAlive()) {
-        for (const skill of player.activeSkills) {
-          if (!target.isAlive()) break;
-          if (skill.hierarchy === SkillHierarchy.BUILTIN) continue;
-          if (skill.hierarchy !== SkillHierarchy.UPPER) continue;
-          if (this.engine.evaluateTrigger(skill.trigger, this.turnCount, player, bunno.id)) {
-            const upperResults = this.engine.executeSkillEffects(skill, player, target, allSkills);
-            this.logSkillResults(upperResults, player, target, false);
-            this.applyLifesteal(player, upperResults);
-          }
-        }
-      }
+      this.executeUpperSkills(player, target, allSkills, bunno.id);
     }
 
     if (target.isAlive() && target.counterTriggerChance > 0 && this.rng.chance(target.counterTriggerChance)) {
       this.processCounter(target, player);
+    }
+  }
+
+  private executeUpperSkills(
+    player: BattleUnit, target: BattleUnit,
+    allSkills: ActiveSkill[], triggerSkillId: string,
+  ): void {
+    if (!target.isAlive()) return;
+    for (const skill of player.activeSkills) {
+      if (!target.isAlive()) break;
+      if (skill.hierarchy === SkillHierarchy.BUILTIN) continue;
+      if (skill.hierarchy !== SkillHierarchy.UPPER) continue;
+      if (this.engine.evaluateTrigger(skill.trigger, this.turnCount, player, triggerSkillId)) {
+        const results = this.engine.executeSkillEffects(skill, player, target, allSkills);
+        this.logSkillResults(results, player, target, false);
+        this.applyLifesteal(player, results);
+      }
     }
   }
 

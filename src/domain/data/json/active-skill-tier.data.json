@@ -65,14 +65,14 @@
   { "skill": "recovery_shuriken", "tier": 4, "injectedProbability": 0.6 },
 
   { "skill": "thunder_strike", "tier": 1, "count": 1 },
-  { "skill": "thunder_strike", "tier": 2, "count": 1 },
-  { "skill": "thunder_strike", "tier": 3, "count": 2 },
-  { "skill": "thunder_strike", "tier": 4, "count": 2 },
+  { "skill": "thunder_strike", "tier": 2, "count": 2 },
+  { "skill": "thunder_strike", "tier": 3, "count": 3 },
+  { "skill": "thunder_strike", "tier": 4, "count": 4 },
 
   { "skill": "lance_strike", "tier": 1, "count": 1 },
-  { "skill": "lance_strike", "tier": 2, "count": 1 },
-  { "skill": "lance_strike", "tier": 3, "count": 2 },
-  { "skill": "lance_strike", "tier": 4, "count": 2 },
+  { "skill": "lance_strike", "tier": 2, "count": 2 },
+  { "skill": "lance_strike", "tier": 3, "count": 3 },
+  { "skill": "lance_strike", "tier": 4, "count": 4 },
 
   { "skill": "aura_strike", "tier": 1, "count": 1 },
   { "skill": "aura_strike", "tier": 2, "count": 1 },
@@ -103,11 +103,6 @@
   { "skill": "venom_sword", "tier": 2, "duration": 4 },
   { "skill": "venom_sword", "tier": 3, "duration": 5 },
   { "skill": "venom_sword", "tier": 4, "duration": 6 },
-
-  { "skill": "thunderstorm", "tier": 1, "count": 2 },
-  { "skill": "thunderstorm", "tier": 2, "count": 3 },
-  { "skill": "thunderstorm", "tier": 3, "count": 4 },
-  { "skill": "thunderstorm", "tier": 4, "count": 5 },
 
   { "skill": "tyrant", "tier": 1, "coefficient": 0.11 },
   { "skill": "tyrant", "tier": 2, "coefficient": 0.17 },

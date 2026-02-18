@@ -321,17 +321,6 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     buildDescription: () => '일반 공격 시 독 주입',
   },
   {
-    id: 'thunderstorm', name: '뇌우', icon: '⛈️',
-    hierarchy: SkillHierarchy.UPPER,
-    tags: [SkillTag.LIGHTNING],
-    heritageSynergy: [HeritageRoute.GHOST],
-    buildTrigger: () => trigger(everyNTurns(1)),
-    buildEffects: (t) => [
-      { type: SkillEffectType.TRIGGER_SKILL, targetSkillId: 'lightning_summon', count: td('thunderstorm', t).count },
-    ],
-    buildDescription: (t) => `매턴 번개 소환 ${td('thunderstorm', t).count}회`,
-  },
-  {
     id: 'tyrant', name: '폭군의 일격', icon: '👹',
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.PHYSICAL],
