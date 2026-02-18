@@ -81,18 +81,18 @@
 
   { "skill": "bunno_thunder", "tier": 1, "count": 1 },
   { "skill": "bunno_thunder", "tier": 2, "count": 2 },
-  { "skill": "bunno_thunder", "tier": 3, "count": 2 },
-  { "skill": "bunno_thunder", "tier": 4, "count": 3 },
+  { "skill": "bunno_thunder", "tier": 3, "count": 3 },
+  { "skill": "bunno_thunder", "tier": 4, "count": 4 },
 
   { "skill": "bunno_lance", "tier": 1, "count": 1 },
   { "skill": "bunno_lance", "tier": 2, "count": 2 },
-  { "skill": "bunno_lance", "tier": 3, "count": 2 },
-  { "skill": "bunno_lance", "tier": 4, "count": 3 },
+  { "skill": "bunno_lance", "tier": 3, "count": 3 },
+  { "skill": "bunno_lance", "tier": 4, "count": 4 },
 
   { "skill": "bunno_flame", "tier": 1, "count": 1 },
   { "skill": "bunno_flame", "tier": 2, "count": 2 },
-  { "skill": "bunno_flame", "tier": 3, "count": 2 },
-  { "skill": "bunno_flame", "tier": 4, "count": 3 },
+  { "skill": "bunno_flame", "tier": 3, "count": 3 },
+  { "skill": "bunno_flame", "tier": 4, "count": 4 },
 
   { "skill": "rage_gauge_boost", "tier": 1, "amount": 25 },
   { "skill": "rage_gauge_boost", "tier": 2, "amount": 35 },
