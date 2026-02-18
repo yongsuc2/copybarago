@@ -89,22 +89,6 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
     buildDescription: (t) => `분노 공격 데미지 +${pct(td('rage_mastery', t).value)}`,
   },
   {
-    id: 'atk_proficiency', name: 'ATK 숙련', icon: '🗡️',
-    tags: [], heritageSynergy: [],
-    buildEffect: (t) => ({
-      type: PassiveType.STAT_MODIFIER, stat: StatType.ATK, value: td('atk_proficiency', t).value, isPercentage: true,
-    }),
-    buildDescription: (t) => `공격력 +${pct(td('atk_proficiency', t).value)}`,
-  },
-  {
-    id: 'def_proficiency', name: 'DEF 숙련', icon: '🏛️',
-    tags: [], heritageSynergy: [],
-    buildEffect: (t) => ({
-      type: PassiveType.STAT_MODIFIER, stat: StatType.DEF, value: td('def_proficiency', t).value, isPercentage: true,
-    }),
-    buildDescription: (t) => `방어력 +${pct(td('def_proficiency', t).value)}`,
-  },
-  {
     id: 'revive', name: '부활', icon: '✨',
     tags: [], heritageSynergy: [],
     buildEffect: (t) => ({

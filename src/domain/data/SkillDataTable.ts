@@ -45,10 +45,6 @@ export function getSkillDescription(id: string, tier: number = 1): string {
     complete_rage_mastery: () => `분노 게이지 충전량 2배`,
     shrink_magic: v => `턴 시작 시 적 공격력 ${pct(v.reduction)} 감소 (${v.duration}턴)`,
 
-    hp_proficiency: v => `방어력 ${pct(v.bonus)} 증가`,
-    atk_proficiency: v => `공격력 ${pct(v.bonus)} 증가`,
-    def_proficiency: v => `방어력 ${pct(v.bonus)} 증가`,
-    crit_proficiency: v => `치명타 확률 ${pct(v.bonus)} 증가`,
     defense_ultimate: v => `방어력 ${pct(v.bonus)} 증가`,
     valor_ultimate: v => `공격력 ${pct(v.bonus)} 증가`,
     super_atk: v => `공격력 ${pct(v.bonus)} 증가`,

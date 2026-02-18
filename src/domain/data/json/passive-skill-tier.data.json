@@ -34,16 +34,6 @@
   { "skill": "rage_mastery", "tier": 3, "value": 0.55 },
   { "skill": "rage_mastery", "tier": 4, "value": 0.75 },
 
-  { "skill": "atk_proficiency", "tier": 1, "value": 0.15 },
-  { "skill": "atk_proficiency", "tier": 2, "value": 0.25 },
-  { "skill": "atk_proficiency", "tier": 3, "value": 0.4 },
-  { "skill": "atk_proficiency", "tier": 4, "value": 0.6 },
-
-  { "skill": "def_proficiency", "tier": 1, "value": 0.15 },
-  { "skill": "def_proficiency", "tier": 2, "value": 0.25 },
-  { "skill": "def_proficiency", "tier": 3, "value": 0.4 },
-  { "skill": "def_proficiency", "tier": 4, "value": 0.6 },
-
   { "skill": "revive", "tier": 1, "hpPercent": 0.3 },
   { "skill": "revive", "tier": 2, "hpPercent": 0.4 },
   { "skill": "revive", "tier": 3, "hpPercent": 0.55 },

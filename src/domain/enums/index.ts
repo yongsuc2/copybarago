@@ -31,7 +31,6 @@ export enum SkillGrade {
 export enum SkillCategory {
   ATTACK = 'ATTACK',
   MASTERY = 'MASTERY',
-  PROFICIENCY = 'PROFICIENCY',
   SURVIVAL = 'SURVIVAL',
   DEBUFF = 'DEBUFF',
   BUFF = 'BUFF',

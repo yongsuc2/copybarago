@@ -147,30 +147,6 @@ const SKILL_FAMILIES: SkillFamilyDef[] = [
     },
   },
   {
-    id: 'hp_proficiency', name: 'HP Proficiency', icon: '❤️',
-    category: SkillCategory.PROFICIENCY, heritageSynergy: [],
-    triggerCondition: TriggerCondition.PASSIVE,
-    buildEffect: t => makeEffect(EffectType.BUFF, td('hp_proficiency', t).bonus, 99, StatusEffectType.DEF_UP),
-  },
-  {
-    id: 'atk_proficiency', name: 'ATK Proficiency', icon: '🗡️',
-    category: SkillCategory.PROFICIENCY, heritageSynergy: [],
-    triggerCondition: TriggerCondition.PASSIVE,
-    buildEffect: t => makeEffect(EffectType.BUFF, td('atk_proficiency', t).bonus, 99, StatusEffectType.ATK_UP),
-  },
-  {
-    id: 'def_proficiency', name: 'DEF Proficiency', icon: '🏛️',
-    category: SkillCategory.PROFICIENCY, heritageSynergy: [],
-    triggerCondition: TriggerCondition.PASSIVE,
-    buildEffect: t => makeEffect(EffectType.BUFF, td('def_proficiency', t).bonus, 99, StatusEffectType.DEF_UP),
-  },
-  {
-    id: 'crit_proficiency', name: 'CRIT Proficiency', icon: '👁️',
-    category: SkillCategory.PROFICIENCY, heritageSynergy: [],
-    triggerCondition: TriggerCondition.PASSIVE,
-    buildEffect: t => makeEffect(EffectType.BUFF, td('crit_proficiency', t).bonus, 99, StatusEffectType.CRIT_UP),
-  },
-  {
     id: 'defense_ultimate', name: 'Defense Ultimate', icon: '🏰',
     category: SkillCategory.SURVIVAL, heritageSynergy: [],
     triggerCondition: TriggerCondition.PASSIVE,
@@ -244,7 +220,7 @@ const ALL_SKILLS = generateAllSkills();
 const SYNERGY_MAP: Record<HeritageRoute, string[]> = {
   [HeritageRoute.SKULL]: ['sword_aura', 'multi_hit_mastery', 'rage_mastery', 'complete_rage_mastery', 'tyrant'],
   [HeritageRoute.KNIGHT]: ['lance', 'counter', 'rage_mastery', 'complete_rage_mastery', 'rage_lance'],
-  [HeritageRoute.RANGER]: ['shuriken', 'crit_mastery', 'crit_proficiency'],
+  [HeritageRoute.RANGER]: ['shuriken', 'crit_mastery'],
   [HeritageRoute.GHOST]: ['lightning', 'thunderstorm', 'rage_lightning'],
 };
 

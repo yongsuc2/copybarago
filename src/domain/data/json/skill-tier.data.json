@@ -94,26 +94,6 @@
   { "skill": "shrink_magic", "tier": 3, "reduction": 0.4, "duration": 4 },
   { "skill": "shrink_magic", "tier": 4, "reduction": 0.5, "duration": 5 },
 
-  { "skill": "hp_proficiency", "tier": 1, "bonus": 0.1 },
-  { "skill": "hp_proficiency", "tier": 2, "bonus": 0.18 },
-  { "skill": "hp_proficiency", "tier": 3, "bonus": 0.28 },
-  { "skill": "hp_proficiency", "tier": 4, "bonus": 0.4 },
-
-  { "skill": "atk_proficiency", "tier": 1, "bonus": 0.1 },
-  { "skill": "atk_proficiency", "tier": 2, "bonus": 0.18 },
-  { "skill": "atk_proficiency", "tier": 3, "bonus": 0.28 },
-  { "skill": "atk_proficiency", "tier": 4, "bonus": 0.4 },
-
-  { "skill": "def_proficiency", "tier": 1, "bonus": 0.1 },
-  { "skill": "def_proficiency", "tier": 2, "bonus": 0.18 },
-  { "skill": "def_proficiency", "tier": 3, "bonus": 0.28 },
-  { "skill": "def_proficiency", "tier": 4, "bonus": 0.4 },
-
-  { "skill": "crit_proficiency", "tier": 1, "bonus": 0.1 },
-  { "skill": "crit_proficiency", "tier": 2, "bonus": 0.18 },
-  { "skill": "crit_proficiency", "tier": 3, "bonus": 0.28 },
-  { "skill": "crit_proficiency", "tier": 4, "bonus": 0.4 },
-
   { "skill": "defense_ultimate", "tier": 1, "bonus": 0.5 },
   { "skill": "defense_ultimate", "tier": 2, "bonus": 0.7 },
   { "skill": "defense_ultimate", "tier": 3, "bonus": 0.9 },
