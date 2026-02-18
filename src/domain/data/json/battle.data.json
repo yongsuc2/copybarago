@@ -9,7 +9,7 @@
   },
   "rage": {
     "maxRage": 100,
-    "playerRagePerAttack": 25,
+    "playerRagePerAttack": 20,
     "attackMultiplier": 1.2
   },
   "skill": {

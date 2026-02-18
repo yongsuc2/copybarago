@@ -29,10 +29,10 @@
   { "skill": "crit_mastery", "tier": 3, "value": 0.16 },
   { "skill": "crit_mastery", "tier": 4, "value": 0.23 },
 
-  { "skill": "rage_mastery", "tier": 1, "value": 0.25 },
-  { "skill": "rage_mastery", "tier": 2, "value": 0.4 },
-  { "skill": "rage_mastery", "tier": 3, "value": 0.55 },
-  { "skill": "rage_mastery", "tier": 4, "value": 0.75 },
+  { "skill": "rage_mastery", "tier": 1, "value": 0.15 },
+  { "skill": "rage_mastery", "tier": 2, "value": 0.24 },
+  { "skill": "rage_mastery", "tier": 3, "value": 0.33 },
+  { "skill": "rage_mastery", "tier": 4, "value": 0.45 },
 
   { "skill": "revive", "tier": 1, "hpPercent": 0.3 },
   { "skill": "revive", "tier": 2, "hpPercent": 0.4 },
