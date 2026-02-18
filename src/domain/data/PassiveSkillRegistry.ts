@@ -89,6 +89,36 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
     buildDescription: (t) => `분노 공격 데미지 +${pct(td('rage_mastery', t).value)}`,
   },
   {
+    id: 'lightning_mastery', name: '번개 마스터리', icon: '⚡',
+    tags: [SkillTag.LIGHTNING], heritageSynergy: [HeritageRoute.GHOST],
+    buildEffect: (t) => ({
+      type: PassiveType.SKILL_MODIFIER,
+      targetTag: SkillTag.LIGHTNING,
+      modifier: { damageMultiplier: td('lightning_mastery', t).damageBonus },
+    }),
+    buildDescription: (t) => `번개 스킬 데미지 +${pct(td('lightning_mastery', t).damageBonus)}`,
+  },
+  {
+    id: 'shuriken_mastery', name: '수리검 마스터리', icon: '🌀',
+    tags: [SkillTag.SHURIKEN], heritageSynergy: [HeritageRoute.RANGER],
+    buildEffect: (t) => ({
+      type: PassiveType.SKILL_MODIFIER,
+      targetTag: SkillTag.SHURIKEN,
+      modifier: { damageMultiplier: td('shuriken_mastery', t).damageBonus },
+    }),
+    buildDescription: (t) => `수리검 스킬 데미지 +${pct(td('shuriken_mastery', t).damageBonus)}`,
+  },
+  {
+    id: 'lance_mastery', name: '광창 마스터리', icon: '🔱',
+    tags: [SkillTag.LANCE], heritageSynergy: [HeritageRoute.KNIGHT],
+    buildEffect: (t) => ({
+      type: PassiveType.SKILL_MODIFIER,
+      targetTag: SkillTag.LANCE,
+      modifier: { damageMultiplier: td('lance_mastery', t).damageBonus },
+    }),
+    buildDescription: (t) => `광창 스킬 데미지 +${pct(td('lance_mastery', t).damageBonus)}`,
+  },
+  {
     id: 'revive', name: '부활', icon: '✨',
     tags: [], heritageSynergy: [],
     buildEffect: (t) => ({

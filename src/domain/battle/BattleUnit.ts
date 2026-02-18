@@ -2,7 +2,7 @@ import { Stats } from '../value-objects/Stats';
 import { ActiveSkill } from '../entities/ActiveSkill';
 import { PassiveSkill } from '../entities/PassiveSkill';
 import { StatusEffect } from './StatusEffect';
-import { StatusEffectType, PassiveType, StatType, SkillHierarchy } from '../enums';
+import { StatusEffectType, PassiveType, StatType, SkillHierarchy, SkillTag } from '../enums';
 import { BattleDataTable } from '../data/BattleDataTable';
 import type { SkillExecutionUnit } from './SkillExecutionEngine';
 
@@ -38,6 +38,7 @@ export class BattleUnit implements SkillExecutionUnit {
   ragePowerMultiplier: number;
   shield: number;
   usedOnceConditions: Set<string>;
+  skillTagBonuses: Map<SkillTag, number>;
 
   constructor(
     name: string,
@@ -67,6 +68,7 @@ export class BattleUnit implements SkillExecutionUnit {
     this.ragePowerMultiplier = 1.0;
     this.shield = 0;
     this.usedOnceConditions = new Set();
+    this.skillTagBonuses = new Map();
 
     this.applyPassiveSkills();
   }
@@ -112,8 +114,14 @@ export class BattleUnit implements SkillExecutionUnit {
       case PassiveType.MULTI_HIT:
         this.multiHitChance += skill.effect.chance;
         break;
-      case PassiveType.SKILL_MODIFIER:
+      case PassiveType.SKILL_MODIFIER: {
+        const { targetTag, modifier } = skill.effect;
+        if (modifier.damageMultiplier) {
+          const current = this.skillTagBonuses.get(targetTag) ?? 0;
+          this.skillTagBonuses.set(targetTag, current + modifier.damageMultiplier);
+        }
         break;
+      }
     }
   }
 
@@ -151,6 +159,14 @@ export class BattleUnit implements SkillExecutionUnit {
       }
     }
     return Math.min(1.0, crit);
+  }
+
+  getSkillDamageMultiplier(tags: SkillTag[]): number {
+    let bonus = 0;
+    for (const tag of tags) {
+      bonus += this.skillTagBonuses.get(tag) ?? 0;
+    }
+    return 1 + bonus;
   }
 
   takeDamage(amount: number): number {

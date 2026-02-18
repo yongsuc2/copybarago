@@ -14,6 +14,7 @@ export const PassiveSkillTierData = NESTED;
 export type PassiveSkillId =
   | 'lifesteal' | 'regen' | 'counter' | 'iron_shield'
   | 'multi_hit' | 'crit_mastery' | 'rage_mastery'
+  | 'lightning_mastery' | 'shuriken_mastery' | 'lance_mastery'
   | 'revive' | 'angel_power';
 
 export function getPassiveTierData(id: string, tier: number): Record<string, number> | undefined {

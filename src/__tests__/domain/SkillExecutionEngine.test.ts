@@ -31,6 +31,7 @@ function makeUnit(overrides: Partial<SkillExecutionUnit> = {}): SkillExecutionUn
     addStatusEffect(_effect: StatusEffect) {},
     isAlive() { return this.currentHp > 0; },
     getHpPercent() { return this.currentHp / this.maxHp; },
+    getSkillDamageMultiplier: () => 1.0,
     usedOnceConditions: new Set(),
     ...overrides,
   };

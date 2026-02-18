@@ -1,4 +1,4 @@
-import { AttackType, SkillEffectType, SkillHierarchy } from '../enums';
+import { AttackType, SkillEffectType, SkillHierarchy, SkillTag } from '../enums';
 import type { ActiveSkill, ActiveSkillEffect, CompoundTrigger } from '../entities/ActiveSkill';
 import { BattleDataTable } from '../data/BattleDataTable';
 import { StatusEffect } from './StatusEffect';
@@ -22,6 +22,7 @@ export interface SkillExecutionUnit {
   isAlive(): boolean;
   getHpPercent(): number;
   usedOnceConditions: Set<string>;
+  getSkillDamageMultiplier(tags: SkillTag[]): number;
 }
 
 export interface SkillDamageResult {
@@ -125,9 +126,11 @@ export class SkillExecutionEngine {
 
       switch (effect.type) {
         case SkillEffectType.ATTACK: {
-          const { damage, isCrit } = this.calculateSkillDamage(
+          const { damage: baseDamage, isCrit } = this.calculateSkillDamage(
             source, target, effect.attackType, effect.coefficient,
           );
+          const tagMult = source.getSkillDamageMultiplier(skill.tags);
+          const damage = Math.max(1, Math.floor(baseDamage * tagMult));
           const dealt = target.takeDamage(damage);
           results.push({
             skillName: skill.name, skillIcon: skill.icon,
@@ -241,12 +244,11 @@ export class SkillExecutionEngine {
       }
     }
 
-    const variance = this.rng.nextFloat(BattleDataTable.damage.varianceMin, BattleDataTable.damage.varianceMax);
-    const isCrit = attackType !== AttackType.FIXED && this.rng.chance(source.getEffectiveCrit());
+    const isCrit = attackType === AttackType.PHYSICAL && this.rng.chance(source.getEffectiveCrit());
     const critMult = isCrit ? BattleDataTable.damage.critMultiplier : 1.0;
 
     return {
-      damage: Math.max(1, Math.floor(rawDamage * variance * critMult)),
+      damage: Math.max(1, Math.floor(rawDamage * critMult)),
       isCrit,
     };
   }
