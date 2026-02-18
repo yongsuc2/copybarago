@@ -114,10 +114,10 @@
   { "skill": "tyrant", "tier": 3, "coefficient": 0.6 },
   { "skill": "tyrant", "tier": 4, "coefficient": 0.8 },
 
-  { "skill": "shrink_magic", "tier": 1, "reduction": 0.2, "duration": 3 },
-  { "skill": "shrink_magic", "tier": 2, "reduction": 0.3, "duration": 3 },
-  { "skill": "shrink_magic", "tier": 3, "reduction": 0.4, "duration": 4 },
-  { "skill": "shrink_magic", "tier": 4, "reduction": 0.5, "duration": 5 },
+  { "skill": "shrink_magic", "tier": 1, "reduction": 0.1, "duration": 3 },
+  { "skill": "shrink_magic", "tier": 2, "reduction": 0.15, "duration": 3 },
+  { "skill": "shrink_magic", "tier": 3, "reduction": 0.2, "duration": 4 },
+  { "skill": "shrink_magic", "tier": 4, "reduction": 0.25, "duration": 5 },
 
   { "skill": "demon_power", "tier": 4, "coefficient": 0.5 }
 ]

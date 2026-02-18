@@ -198,7 +198,7 @@ describe('PassiveSkillRegistry', () => {
     const lifesteal4 = PassiveSkillRegistry.getById('lifesteal', 4);
     expect(lifesteal4).toBeDefined();
     if (lifesteal4!.effect.type === PassiveType.LIFESTEAL) {
-      expect(lifesteal4!.effect.rate).toBe(0.4);
+      expect(lifesteal4!.effect.rate).toBe(0.21);
     }
   });
 

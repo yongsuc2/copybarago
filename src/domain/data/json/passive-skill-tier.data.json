@@ -1,8 +1,8 @@
 [
-  { "skill": "lifesteal", "tier": 1, "rate": 0.15 },
-  { "skill": "lifesteal", "tier": 2, "rate": 0.22 },
-  { "skill": "lifesteal", "tier": 3, "rate": 0.30 },
-  { "skill": "lifesteal", "tier": 4, "rate": 0.40 },
+  { "skill": "lifesteal", "tier": 1, "rate": 0.08 },
+  { "skill": "lifesteal", "tier": 2, "rate": 0.12 },
+  { "skill": "lifesteal", "tier": 3, "rate": 0.16 },
+  { "skill": "lifesteal", "tier": 4, "rate": 0.21 },
 
   { "skill": "regen", "tier": 1, "healPerTurn": 0.02 },
   { "skill": "regen", "tier": 2, "healPerTurn": 0.035 },
@@ -24,10 +24,10 @@
   { "skill": "multi_hit", "tier": 3, "chance": 0.25 },
   { "skill": "multi_hit", "tier": 4, "chance": 0.35 },
 
-  { "skill": "crit_mastery", "tier": 1, "value": 0.12 },
-  { "skill": "crit_mastery", "tier": 2, "value": 0.2 },
-  { "skill": "crit_mastery", "tier": 3, "value": 0.3 },
-  { "skill": "crit_mastery", "tier": 4, "value": 0.42 },
+  { "skill": "crit_mastery", "tier": 1, "value": 0.07 },
+  { "skill": "crit_mastery", "tier": 2, "value": 0.12 },
+  { "skill": "crit_mastery", "tier": 3, "value": 0.16 },
+  { "skill": "crit_mastery", "tier": 4, "value": 0.23 },
 
   { "skill": "rage_mastery", "tier": 1, "value": 0.25 },
   { "skill": "rage_mastery", "tier": 2, "value": 0.4 },
