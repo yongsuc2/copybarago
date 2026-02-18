@@ -1,4 +1,4 @@
-import { ChapterType, EncounterType, BattleState } from '../enums';
+import { ChapterType, EncounterType, BattleState, ResourceType } from '../enums';
 import { Encounter, type EncounterResult } from './Encounter';
 import { EncounterGenerator } from './EncounterGenerator';
 import { EnemyTemplate } from './EnemyTemplate';
@@ -147,6 +147,9 @@ export class Chapter {
     }
 
     this.sessionGold += result.goldChange;
+    for (const r of result.reward.resources) {
+      if (r.type === ResourceType.GOLD) this.sessionGold += r.amount;
+    }
     this.totalReward = this.totalReward.merge(result.reward);
 
     if (encType === EncounterType.ANGEL) {

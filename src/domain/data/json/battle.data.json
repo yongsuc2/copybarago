@@ -20,9 +20,9 @@
   "enemy": {
     "dualSpawnChance": 0.5,
     "dualStatMultiplier": 0.7,
-    "scalingPerChapter": 1.12,
+    "scalingPerChapter": 1.25,
     "scalingPerTowerFloor": 1.08,
-    "dayProgressMaxBonus": 0.8
+    "dayProgressMaxBonus": 0.3
   },
   "combatGoldReward": {
     "base": 10,

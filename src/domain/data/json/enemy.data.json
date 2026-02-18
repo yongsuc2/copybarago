@@ -1,10 +1,10 @@
 {
   "templates": [
-    { "id": "slime", "name": "Slime", "hp": 60, "atk": 6, "def": 2, "crit": 0, "skillIds": [], "isBoss": false, "ragePerAttack": 25 },
-    { "id": "goblin", "name": "Goblin", "hp": 80, "atk": 10, "def": 3, "crit": 0, "skillIds": [], "isBoss": false, "ragePerAttack": 25 },
-    { "id": "skeleton", "name": "Skeleton", "hp": 100, "atk": 12, "def": 5, "crit": 0, "skillIds": ["poison_inject"], "isBoss": false, "ragePerAttack": 25 },
-    { "id": "orc", "name": "Orc", "hp": 140, "atk": 16, "def": 7, "crit": 0, "skillIds": ["multi_hit"], "isBoss": false, "ragePerAttack": 25 },
-    { "id": "dark_knight", "name": "Dark Knight", "hp": 200, "atk": 20, "def": 10, "crit": 0, "skillIds": ["counter", "iron_shield"], "isBoss": false, "ragePerAttack": 25 },
+    { "id": "slime", "name": "Slime", "hp": 110, "atk": 7, "def": 3, "crit": 0, "skillIds": [], "isBoss": false, "ragePerAttack": 25 },
+    { "id": "goblin", "name": "Goblin", "hp": 80, "atk": 10, "def": 4, "crit": 0, "skillIds": [], "isBoss": false, "ragePerAttack": 25 },
+    { "id": "skeleton", "name": "Skeleton", "hp": 60, "atk": 14, "def": 2, "crit": 0, "skillIds": ["poison_inject"], "isBoss": false, "ragePerAttack": 25 },
+    { "id": "orc", "name": "Orc", "hp": 90, "atk": 12, "def": 3, "crit": 0, "skillIds": ["multi_hit"], "isBoss": false, "ragePerAttack": 25 },
+    { "id": "dark_knight", "name": "Dark Knight", "hp": 70, "atk": 8, "def": 8, "crit": 0, "skillIds": ["counter", "iron_shield"], "isBoss": false, "ragePerAttack": 25 },
 
     { "id": "elite_wolf", "name": "Alpha Wolf", "hp": 260, "atk": 24, "def": 9, "crit": 0, "skillIds": ["multi_hit", "counter", "lifesteal"], "isBoss": false, "ragePerAttack": 25 },
     { "id": "elite_mage", "name": "Dark Mage", "hp": 220, "atk": 28, "def": 6, "crit": 0, "skillIds": ["lightning_summon", "flame_summon"], "isBoss": false, "ragePerAttack": 25 },
