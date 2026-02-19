@@ -42,8 +42,12 @@ export class Equipment {
     return stats;
   }
 
+  getUpgradeCost(): number {
+    return EquipmentTable.getUpgradeCost(this.level);
+  }
+
   upgrade(availableStones: number): Result<{ cost: number; newLevel: number }> {
-    const cost = 1;
+    const cost = this.getUpgradeCost();
     if (availableStones < cost) {
       return Result.fail('Not enough equipment stones');
     }
@@ -76,6 +80,20 @@ export class Equipment {
 
     this.promoteCount += 1;
     return Result.ok({ cost });
+  }
+
+  getTotalUpgradeCost(): number {
+    return EquipmentTable.getTotalUpgradeCost(this.level);
+  }
+
+  demote(): Result<{ refund: number }> {
+    if (this.level === 0) {
+      return Result.fail('Already at level 0');
+    }
+    const refund = this.getTotalUpgradeCost();
+    this.level = 0;
+    this.promoteCount = 0;
+    return Result.ok({ refund });
   }
 
   transferLevelTo(target: Equipment): void {

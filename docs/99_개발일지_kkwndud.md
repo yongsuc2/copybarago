@@ -2,6 +2,30 @@
 
 ---
 
+## 2026-02-19
+
+### 장비 강화 비용 구간별 기울기 시스템
+- 기존 강화석 1개 고정 비용 → 구간별 복리 배율 시스템으로 변경
+- `equipment-constants.data.json`에 `upgradeCostTiers` 배열 추가 (6구간)
+- `EquipmentTable.getUpgradeCost(level)`: 레벨별 누적 복리 비용 계산
+- `EquipmentTable.getTotalUpgradeCost(level)`: 0→level까지 총 비용 합산 (환불용)
+- `Equipment.getUpgradeCost()`, `Equipment.getTotalUpgradeCost()` 메서드 추가
+
+### 장비 강등 기능
+- 장착 장비의 강화 레벨을 0으로 초기화, 투입 강화석 100% 반환
+- `Equipment.demote()` 메서드 추가 (레벨/승급 초기화 + 총비용 환불)
+- EquipmentScreen: RotateCcw 아이콘 + 확인 패널 UI (반환 수량 표시 + 강등 버튼)
+
+### 일괄 강화 기능
+- 보유 강화석이 허용하는 최대 레벨까지 한 번에 강화
+- EquipmentScreen: ChevronsUp 아이콘 + `bulkUpgradeEquipment()` 함수
+- 승급 필요 시 자동 중단
+
+### 뽑기 화면 용어 변경
+- GachaScreen: "천장" → "신화 확정", "천장까지" → "신화 확정 뽑기까지"
+
+---
+
 ## 2026-02-17
 
 ### 장비 화면 RPG 페이퍼돌 UI 재설계

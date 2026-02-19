@@ -1,5 +1,14 @@
 {
   "upgradeFlatPerLevel": 8,
+  "upgradeCostBase": 1,
+  "upgradeCostTiers": [
+    { "upToLevel": 5, "rate": 1.15 },
+    { "upToLevel": 10, "rate": 1.25 },
+    { "upToLevel": 15, "rate": 1.35 },
+    { "upToLevel": 20, "rate": 1.45 },
+    { "upToLevel": 25, "rate": 1.55 },
+    { "upToLevel": 30, "rate": 1.65 }
+  ],
   "mergeCount": {
     "COMMON": 3,
     "UNCOMMON": 3,

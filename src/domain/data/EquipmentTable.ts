@@ -64,4 +64,27 @@ export const EquipmentTable = {
   getMergeEnhanceMax(): number {
     return constantsData.mergeEnhanceMax;
   },
+
+  getUpgradeCost(currentLevel: number): number {
+    const tiers = constantsData.upgradeCostTiers;
+    let cost = constantsData.upgradeCostBase;
+    for (let lv = 1; lv <= currentLevel; lv++) {
+      const tier = tiers.find(t => lv <= t.upToLevel) ?? tiers[tiers.length - 1];
+      cost = Math.ceil(cost * tier.rate);
+    }
+    return cost;
+  },
+
+  getTotalUpgradeCost(level: number): number {
+    let total = 0;
+    const tiers = constantsData.upgradeCostTiers;
+    let cost = constantsData.upgradeCostBase;
+    total += cost;
+    for (let lv = 1; lv < level; lv++) {
+      const tier = tiers.find(t => lv <= t.upToLevel) ?? tiers[tiers.length - 1];
+      cost = Math.ceil(cost * tier.rate);
+      total += cost;
+    }
+    return level > 0 ? total : 0;
+  },
 };

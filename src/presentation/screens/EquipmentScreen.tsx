@@ -8,6 +8,7 @@ import type { Equipment } from '../../domain/entities/Equipment';
 import { EquipmentIcon } from '../components/EquipmentIcon';
 import { EquipmentPassiveTable } from '../../domain/data/EquipmentPassiveTable';
 import { CharacterSprite } from '../components/CharacterSprite';
+import { RotateCcw, ChevronsUp } from 'lucide-react';
 
 const SLOT_LABELS = EquipmentDataTable.slotLabels;
 const GRADE_LABELS = EquipmentDataTable.gradeLabels;
@@ -35,6 +36,7 @@ export function EquipmentScreen() {
   const [batchResults, setBatchResults] = useState<{ name: string; slot: SlotType; grade: EquipmentGrade; weaponSubType: WeaponSubType | null; mergeLevel: number }[] | null>(null);
   const [statToast, setStatToast] = useState<{ atk: number; maxHp: number; def: number; crit: number } | null>(null);
   const statToastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showDemoteConfirm, setShowDemoteConfirm] = useState(false);
 
   const mergeCandidates = game.forge.findMergeCandidates(game.player.inventory);
   const playerStats = game.player.computeStats();
@@ -79,16 +81,58 @@ export function EquipmentScreen() {
     });
   }
 
+  function demoteEquipment(slotType: SlotType, index: number) {
+    const slot = game.player.getEquipmentSlot(slotType);
+    const eq = slot.equipped[index];
+    if (!eq || eq.level === 0) return;
+
+    const before = game.player.computeStats();
+    const result = eq.demote();
+    if (result.isOk()) {
+      game.player.resources.add(ResourceType.EQUIPMENT_STONE, result.data!.refund);
+      slot.syncLevel(index);
+      game.saveGame();
+      showStatChange(before, game.player.computeStats());
+    }
+    setShowDemoteConfirm(false);
+    refresh();
+  }
+
   function upgradeEquipment(slotType: SlotType, index: number) {
     const slot = game.player.getEquipmentSlot(slotType);
     const eq = slot.equipped[index];
     if (!eq) return;
-    if (!game.player.resources.canAfford(ResourceType.EQUIPMENT_STONE, 1)) return;
+    const cost = eq.getUpgradeCost();
+    if (!game.player.resources.canAfford(ResourceType.EQUIPMENT_STONE, cost)) return;
 
     const before = game.player.computeStats();
     const result = eq.upgrade(game.player.resources.equipmentStones);
     if (result.isOk()) {
-      game.player.resources.spend(ResourceType.EQUIPMENT_STONE, 1);
+      game.player.resources.spend(ResourceType.EQUIPMENT_STONE, result.data!.cost);
+      slot.syncLevel(index);
+      game.saveGame();
+      showStatChange(before, game.player.computeStats());
+    }
+    refresh();
+  }
+
+  function bulkUpgradeEquipment(slotType: SlotType, index: number) {
+    const slot = game.player.getEquipmentSlot(slotType);
+    const eq = slot.equipped[index];
+    if (!eq) return;
+
+    const before = game.player.computeStats();
+    let upgraded = false;
+    while (true) {
+      const cost = eq.getUpgradeCost();
+      if (!game.player.resources.canAfford(ResourceType.EQUIPMENT_STONE, cost)) break;
+      if (eq.needsPromote()) break;
+      const result = eq.upgrade(game.player.resources.equipmentStones);
+      if (result.isFail()) break;
+      game.player.resources.spend(ResourceType.EQUIPMENT_STONE, result.data!.cost);
+      upgraded = true;
+    }
+    if (upgraded) {
       slot.syncLevel(index);
       game.saveGame();
       showStatChange(before, game.player.computeStats());
@@ -305,7 +349,45 @@ export function EquipmentScreen() {
                 {GRADE_LABELS[eq.grade]} Lv.{eq.level}
               </div>
             </div>
+            <div style={{ display: 'flex', gap: 4 }}>
+              <button
+                className="btn-icon"
+                style={{ width: 28, height: 28, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={() => bulkUpgradeEquipment(slotType, idx)}
+                disabled={game.player.resources.equipmentStones < eq.getUpgradeCost() || eq.needsPromote()}
+                title="일괄 강화"
+              >
+                <ChevronsUp size={14} />
+              </button>
+              {eq.level > 0 && (
+                <button
+                  className="btn-icon"
+                  style={{ width: 28, height: 28, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  onClick={() => setShowDemoteConfirm(v => !v)}
+                  title="장비 강등"
+                >
+                  <RotateCcw size={14} />
+                </button>
+              )}
+            </div>
           </div>
+          {showDemoteConfirm && eq.level > 0 && (
+            <div style={{ background: '#1a1020', border: '1px solid #e94560', borderRadius: 6, padding: 10, marginBottom: 8 }}>
+              <div style={{ fontSize: 12, color: '#ccc', marginBottom: 8 }}>
+                장비 강등 시 강화석이 100% 반환됩니다.
+              </div>
+              <div style={{ fontSize: 12, color: '#4fc3f7', marginBottom: 8 }}>
+                반환: {eq.getTotalUpgradeCost()} 강화석
+              </div>
+              <button
+                className="btn btn-secondary"
+                style={{ width: '100%', color: '#e94560' }}
+                onClick={() => demoteEquipment(slotType, idx)}
+              >
+                강등하기
+              </button>
+            </div>
+          )}
           <div style={{ fontSize: 12, color: '#ccc', marginBottom: 6 }}>
             {stats.atk > 0 && <span style={{ marginRight: 12 }}>ATK +{stats.atk}</span>}
             {stats.maxHp > 0 && <span>HP +{stats.maxHp}</span>}
@@ -318,9 +400,9 @@ export function EquipmentScreen() {
               className="btn btn-secondary"
               style={{ flex: 1 }}
               onClick={() => upgradeEquipment(slotType, idx)}
-              disabled={game.player.resources.equipmentStones < 1}
+              disabled={game.player.resources.equipmentStones < eq.getUpgradeCost()}
             >
-              강화 (석:{game.player.resources.equipmentStones})
+              강화 {eq.getUpgradeCost()}석 (보유:{game.player.resources.equipmentStones})
             </button>
             <button
               className="btn btn-secondary"
@@ -450,6 +532,7 @@ export function EquipmentScreen() {
                     onClick={() => {
                       setSelectedInventoryId(null);
                       setInventoryFilter(slotType);
+                      setShowDemoteConfirm(false);
                       if (eq) {
                         setSelectedSlotKey(isSelected ? null : slotKey);
                       } else {

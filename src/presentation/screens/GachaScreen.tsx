@@ -43,11 +43,11 @@ export function GachaScreen() {
 
       <div className="card">
         <div className="stat-row"><span>보석</span><span>{Math.floor(game.player.resources.gems)}</span></div>
-        <div className="stat-row"><span>천장</span><span>{chest.pityCount} / {chest.getPityThreshold()}</span></div>
+        <div className="stat-row"><span>신화 확정</span><span>{chest.pityCount} / {chest.getPityThreshold()}</span></div>
         <div className="progress-bar">
           <div className="progress-fill" style={{ width: `${chest.getPityProgress() * 100}%` }} />
         </div>
-        <div className="stat-row"><span>천장까지</span><span>{chest.getRemainingToPity()}회</span></div>
+        <div className="stat-row"><span>신화 확정 뽑기까지</span><span>{chest.getRemainingToPity()}회</span></div>
       </div>
 
       <div style={{ display: 'flex', gap: 8, margin: '12px 0' }}>
@@ -75,7 +75,7 @@ export function GachaScreen() {
                       {r.equipment.grade}
                     </span>
                     <span style={{ marginLeft: 8, fontSize: 12 }}>{EquipmentDataTable.getSlotLabel(r.equipment.slot)}</span>
-                    {r.isPity && <span style={{ marginLeft: 8, color: '#ffd700', fontSize: 12 }}>천장!</span>}
+                    {r.isPity && <span style={{ marginLeft: 8, color: '#ffd700', fontSize: 12 }}>신화 확정!</span>}
                   </div>
                 </div>
               ) : (
