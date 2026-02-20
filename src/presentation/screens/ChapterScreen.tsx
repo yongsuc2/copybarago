@@ -764,18 +764,16 @@ export function ChapterScreen() {
               <span>5</span>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div className="chapter-start-row">
             <button
-              className="btn btn-primary"
-              style={{ flex: 1 }}
+              className="btn btn-primary flex-1"
               disabled={game.player.resources.stamina < 5}
               onClick={startChapter}
             >
               챕터 {game.player.clearedChapterMax + 1} 시작
             </button>
             <button
-              className="btn btn-secondary"
-              style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+              className="btn btn-secondary flex-row gap-xs"
               onClick={() => setScreen('chapter-treasure')}
             >
               <Package size={16} />
@@ -788,10 +786,9 @@ export function ChapterScreen() {
       {(chapter || isBattling) && !chapterResult && (
         <div>
           {chapter && (
-            <div className="card" style={{ marginBottom: 8, position: 'relative' }}>
+            <div className="card chapter-card-header">
               <button
-                className="btn-icon"
-                style={{ position: 'absolute', top: 6, right: 6, zIndex: 2 }}
+                className="btn-icon chapter-settings-btn"
                 onClick={() => { setShowSettings(true); setSelectedSkillIndex(null); }}
                 title="설정"
               >
@@ -805,8 +802,8 @@ export function ChapterScreen() {
                 <div className="progress-fill" style={{ width: `${chapter.getProgress() * 100}%` }} />
               </div>
               <div className="stat-row">
-                <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Coins size={13} color="#ffd700" /> 획득 골드</span>
-                <span style={{ color: '#ffd700' }}>{formatNumber(chapter.sessionGold)}</span>
+                <span className="chapter-gold-label"><Coins size={13} color="#ffd700" /> 획득 골드</span>
+                <span className="text-gold">{formatNumber(chapter.sessionGold)}</span>
               </div>
               {!isBattling && (
                 <div className="stat-row">
@@ -850,8 +847,8 @@ export function ChapterScreen() {
 
           {isBattling && playerUnit ? (
             <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <div style={{ flex: 1 }}>
+              <div className="chapter-battle-controls">
+                <div className="flex-1">
                   <PlayerStatsBar
                     hp={playerUnit.currentHp}
                     maxHp={playerUnit.maxHp}
@@ -869,7 +866,7 @@ export function ChapterScreen() {
                   }}
                   title="배속"
                 >
-                  {battleSpeed === 2 ? <FastForward size={16} /> : <span style={{ fontSize: 12, fontWeight: 'bold' }}>1x</span>}
+                  {battleSpeed === 2 ? <FastForward size={16} /> : <span className="text-bold" style={{ fontSize: 12 }}>1x</span>}
                 </button>
                 <button
                   className={`btn-icon ${showDamageGraph ? 'active' : ''}`}
@@ -899,14 +896,14 @@ export function ChapterScreen() {
             <>
               <div className="ba-day-divider">{chapter!.currentDay}일차</div>
               <h3>{EncounterDataTable.getLabel(encounter.type)}</h3>
-              <div style={{ fontSize: 12, color: '#aaa', marginBottom: 8 }}>
+              <div className="text-sm text-secondary" style={{ marginBottom: 8 }}>
                 {EncounterDataTable.getDescription(encounter.type)}
               </div>
               <div className="encounter-options">
                 {encounter.options.map((opt, i) => (
                   <div key={i} className="encounter-option" onClick={() => selectOption(i)}>
-                    <div style={{ fontWeight: 'bold' }}>{opt.label}</div>
-                    <div style={{ fontSize: 12, color: '#999' }}>{opt.description}</div>
+                    <div className="text-bold">{opt.label}</div>
+                    <div className="text-sm text-secondary">{opt.description}</div>
                   </div>
                 ))}
               </div>
@@ -914,52 +911,37 @@ export function ChapterScreen() {
           )}
 
           {showSettings && chapter && (
-            <div style={{
-              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-              background: 'rgba(0,0,0,0.85)', zIndex: 100,
-              display: 'flex', flexDirection: 'column', padding: 16,
-              overflowY: 'auto',
-            }}>
-              <h3 style={{ margin: '0 0 12px', textAlign: 'center' }}>모험 설정</h3>
+            <div className="modal-overlay">
+              <h3 className="settings-modal-title">모험 설정</h3>
 
-              <div style={{ fontSize: 13, color: '#aaa', marginBottom: 6 }}>
+              <div className="settings-skill-count">
                 보유 스킬 ({chapter.sessionSkills.length})
               </div>
-              <div style={{
-                display: 'flex', flexDirection: 'column', gap: 4,
-                flex: 1, overflowY: 'auto', marginBottom: 12,
-              }}>
+              <div className="settings-skill-list">
                 {chapter.sessionSkills.length === 0 && (
-                  <div style={{ color: '#666', fontSize: 13, textAlign: 'center', padding: 16 }}>
+                  <div className="settings-empty">
                     획득한 스킬이 없습니다
                   </div>
                 )}
                 {chapter.sessionSkills.map((skill, i) => (
                   <div
                     key={i}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 8,
-                      padding: '8px 10px', background: '#1a1a2e', borderRadius: 6,
-                      border: `1px solid ${selectedSkillIndex === i ? SKILL_GRADE_COLORS[skill.grade] : '#333'}`,
-                      cursor: 'pointer',
-                    }}
+                    className="settings-skill-item"
+                    style={{ borderColor: selectedSkillIndex === i ? SKILL_GRADE_COLORS[skill.grade] : undefined }}
                     onClick={() => setSelectedSkillIndex(selectedSkillIndex === i ? null : i)}
                   >
-                    <span style={{
-                      fontSize: 18, width: 28, height: 28,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: '#111', borderRadius: 4,
-                      border: `1px solid ${SKILL_GRADE_COLORS[skill.grade]}`,
-                      flexShrink: 0,
-                    }}>
+                    <span
+                      className="settings-skill-icon"
+                      style={{ borderColor: SKILL_GRADE_COLORS[skill.grade] }}
+                    >
                       {skill.icon}
                     </span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 'bold', fontSize: 13, color: SKILL_GRADE_COLORS[skill.grade] }}>
+                    <div className="flex-1" style={{ minWidth: 0 }}>
+                      <div className="settings-skill-name" style={{ color: SKILL_GRADE_COLORS[skill.grade] }}>
                         {skill.name}
                       </div>
                       {selectedSkillIndex === i && (
-                        <div style={{ fontSize: 12, color: '#aaa', marginTop: 2 }}>
+                        <div className="settings-skill-desc">
                           {skill.description}
                         </div>
                       )}
@@ -968,17 +950,15 @@ export function ChapterScreen() {
                 ))}
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div className="settings-actions">
                 <button
-                  className="btn btn-primary"
-                  style={{ width: '100%', padding: '12px 16px' }}
+                  className="btn btn-primary chapter-result-btn"
                   onClick={() => setShowSettings(false)}
                 >
                   계속하기
                 </button>
                 <button
-                  className="btn btn-secondary"
-                  style={{ width: '100%', padding: '12px 16px', color: '#ff5252' }}
+                  className="btn btn-secondary chapter-result-btn text-danger"
                   onClick={() => { setShowSettings(false); abandonChapter(); }}
                 >
                   모험 포기하기
@@ -1018,8 +998,8 @@ export function ChapterScreen() {
                 >
                   <span className="golden-chest-skill-icon">{skill.icon}</span>
                   <div>
-                    <div style={{ fontWeight: 'bold' }}>{skill.name}</div>
-                    <div style={{ fontSize: 12, color: '#aaa' }}>{skill.description}</div>
+                    <div className="text-bold">{skill.name}</div>
+                    <div className="text-sm text-secondary">{skill.description}</div>
                   </div>
                 </div>
               ))}
@@ -1043,15 +1023,14 @@ export function ChapterScreen() {
             </div>
             {(chapterResult.gold > 0 || (chapterResult.gems ?? 0) > 0) && (
               <div className="chapter-result-reward">
-                {chapterResult.gold > 0 && <span style={{ color: '#ffd700' }}>+{chapterResult.gold} G</span>}
-                {(chapterResult.gems ?? 0) > 0 && <span style={{ color: '#e040fb', marginLeft: 8 }}>+{chapterResult.gems} 보석</span>}
+                {chapterResult.gold > 0 && <span className="text-gold">+{chapterResult.gold} G</span>}
+                {(chapterResult.gems ?? 0) > 0 && <span className="text-purple" style={{ marginLeft: 8 }}>+{chapterResult.gems} 보석</span>}
               </div>
             )}
             {(damageSourcesSnapshot.length > 0 || healSourcesSnapshot.length > 0) && (
-              <div style={{ width: '100%', marginTop: 12 }}>
+              <div className="chapter-result-graph">
                 <button
                   className={`btn-icon ${showResultGraph ? 'active' : ''}`}
-                  style={{ margin: '0 auto' }}
                   onClick={() => setShowResultGraph(v => !v)}
                   title="딜 그래프"
                 >
@@ -1065,10 +1044,9 @@ export function ChapterScreen() {
                 )}
               </div>
             )}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16, width: '100%' }}>
+            <div className="chapter-result-buttons">
               <button
-                className="btn btn-primary"
-                style={{ width: '100%', padding: '12px 16px', fontSize: 15 }}
+                className="btn btn-primary chapter-result-btn"
                 onClick={() => { setChapterResult(null); setShowResultGraph(false); setScreen('main'); }}
               >
                 <Home size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
@@ -1076,8 +1054,7 @@ export function ChapterScreen() {
               </button>
               {chapterResult.type === 'victory' && game.player.resources.stamina >= 5 && (
                 <button
-                  className="btn btn-secondary"
-                  style={{ width: '100%', padding: '12px 16px', fontSize: 15 }}
+                  className="btn btn-secondary chapter-result-btn"
                   onClick={() => { setChapterResult(null); setShowResultGraph(false); startChapter(); }}
                 >
                   <Swords size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
@@ -1085,8 +1062,7 @@ export function ChapterScreen() {
                 </button>
               )}
               <button
-                className="btn btn-secondary"
-                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}
+                className="btn btn-secondary chapter-result-btn flex-center gap-xs"
                 onClick={() => { setChapterResult(null); setShowResultGraph(false); setScreen('chapter-treasure'); }}
               >
                 <Package size={16} />
@@ -1099,6 +1075,7 @@ export function ChapterScreen() {
 
       {log.length > 0 && (
         <div className="battle-log" style={{ marginTop: 12 }}>
+
           {log.slice(-15).map((entry, i) => (
             <div key={i} className="log-entry">{entry}</div>
           ))}

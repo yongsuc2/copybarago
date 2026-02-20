@@ -2,6 +2,19 @@
 
 ---
 
+## 2026-02-20
+
+### UI 비주얼 개선 — ChapterScreen + CSS 디자인 토큰 (K-7 1단계)
+- `:root`에 CSS 디자인 토큰 추가: 색상 18종(bg/border/accent/text/gold/green/purple/danger), 폰트 5종, 간격 4종, 반경 3종
+- 유틸리티 클래스 추가: `.flex-row/col/between/center`, `.gap-xs/sm/md/lg`, `.text-xs/sm/base/secondary/muted/gold/danger/green/purple/bold/center`, `.w-full`
+- `.modal-overlay` 공통 모달 클래스 추가
+- ChapterScreen 전용 CSS 클래스 추가: `.chapter-card-header`, `.chapter-settings-btn`, `.chapter-start-row`, `.chapter-gold-label`, `.chapter-battle-controls`, `.chapter-result-graph`, `.chapter-result-buttons`, `.chapter-result-btn`
+- 설정 모달 CSS 클래스: `.settings-modal-title`, `.settings-skill-count/list/item/icon/name/desc`, `.settings-empty`, `.settings-actions`
+- ChapterScreen.tsx: 인라인 스타일 ~40건을 CSS 클래스로 교체
+- index.css 기존 하드코딩 → CSS 변수 치환: `#e94560`→accent, `#aaa`→text-secondary, `#ddd`→text-bright, `#ffd700`→gold, `#ff5252`→danger, `#4caf50`→green, `#c73a52`→accent-hover, `#444`→border-light, `#333`→border, `#e0e0e0`→text-primary 등 대량 치환
+
+---
+
 ## 2026-02-19
 
 ### 장비 강화 비용 구간별 기울기 시스템
