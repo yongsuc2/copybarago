@@ -14,7 +14,7 @@ import { EncounterDataTable } from '../../domain/data/EncounterDataTable';
 import { ActiveSkillRegistry } from '../../domain/data/ActiveSkillRegistry';
 import { PassiveSkillRegistry } from '../../domain/data/PassiveSkillRegistry';
 import type { SessionSkill } from '../../domain/battle/BattleUnit';
-import { Package, Home, Swords, Zap, Star, BarChart3, FastForward, Coins } from 'lucide-react';
+import { Package, Home, Swords, Zap, Star, BarChart3, FastForward, Coins, Settings } from 'lucide-react';
 import { BattleDataTable } from '../../domain/data/BattleDataTable';
 
 const MAX_BATTLE_TURNS = BattleDataTable.maxTurns;
@@ -96,14 +96,18 @@ export function ChapterScreen() {
   const [chapterResult, setChapterResult] = useState<{ type: 'victory' | 'defeat'; chapterId: number; gold: number; gems?: number } | null>(null);
   const [activeEnemyIndex, setActiveEnemyIndex] = useState(0);
 
-  const [showDamageGraph, setShowDamageGraph] = useState(false);
+  const [showDamageGraph, setShowDamageGraph] = useState(() => localStorage.getItem('showDamageGraph') === 'true');
   const [damageSourcesSnapshot, setDamageSourcesSnapshot] = useState<DamageSource[]>([]);
   const damageMapRef = useRef<Map<string, DamageSource>>(new Map());
   const [healSourcesSnapshot, setHealSourcesSnapshot] = useState<DamageSource[]>([]);
   const healMapRef = useRef<Map<string, DamageSource>>(new Map());
 
-  const [battleSpeed, setBattleSpeed] = useState<1 | 2>(1);
-  const battleSpeedRef = useRef<1 | 2>(1);
+  const [battleSpeed, setBattleSpeed] = useState<1 | 2>(() => (localStorage.getItem('battleSpeed') === '2' ? 2 : 1));
+  const battleSpeedRef = useRef<1 | 2>(localStorage.getItem('battleSpeed') === '2' ? 2 : 1);
+
+  const [showSettings, setShowSettings] = useState(false);
+  const [selectedSkillIndex, setSelectedSkillIndex] = useState<number | null>(null);
+  const [showResultGraph, setShowResultGraph] = useState(false);
 
   const cancelledRef = useRef(false);
   const battleRef = useRef<Battle | null>(null);
@@ -784,7 +788,15 @@ export function ChapterScreen() {
       {(chapter || isBattling) && !chapterResult && (
         <div>
           {chapter && (
-            <div className="card" style={{ marginBottom: 8 }}>
+            <div className="card" style={{ marginBottom: 8, position: 'relative' }}>
+              <button
+                className="btn-icon"
+                style={{ position: 'absolute', top: 6, right: 6, zIndex: 2 }}
+                onClick={() => { setShowSettings(true); setSelectedSkillIndex(null); }}
+                title="설정"
+              >
+                <Settings size={18} />
+              </button>
               <div className="stat-row">
                 <span>챕터 {chapter.id}</span>
                 <span>{chapter.currentDay}일 / {chapter.totalDays}일</span>
@@ -853,6 +865,7 @@ export function ChapterScreen() {
                     const next = battleSpeed === 1 ? 2 : 1;
                     setBattleSpeed(next);
                     battleSpeedRef.current = next;
+                    localStorage.setItem('battleSpeed', String(next));
                   }}
                   title="배속"
                 >
@@ -860,7 +873,7 @@ export function ChapterScreen() {
                 </button>
                 <button
                   className={`btn-icon ${showDamageGraph ? 'active' : ''}`}
-                  onClick={() => setShowDamageGraph(v => !v)}
+                  onClick={() => setShowDamageGraph(v => { const next = !v; localStorage.setItem('showDamageGraph', String(next)); return next; })}
                   title="딜 그래프"
                 >
                   <BarChart3 size={18} />
@@ -900,13 +913,79 @@ export function ChapterScreen() {
             </>
           )}
 
-          <button
-            className="btn btn-secondary"
-            style={{ width: '100%', marginTop: 12, color: '#ff5252' }}
-            onClick={abandonChapter}
-          >
-            포기하기
-          </button>
+          {showSettings && chapter && (
+            <div style={{
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+              background: 'rgba(0,0,0,0.85)', zIndex: 100,
+              display: 'flex', flexDirection: 'column', padding: 16,
+              overflowY: 'auto',
+            }}>
+              <h3 style={{ margin: '0 0 12px', textAlign: 'center' }}>모험 설정</h3>
+
+              <div style={{ fontSize: 13, color: '#aaa', marginBottom: 6 }}>
+                보유 스킬 ({chapter.sessionSkills.length})
+              </div>
+              <div style={{
+                display: 'flex', flexDirection: 'column', gap: 4,
+                flex: 1, overflowY: 'auto', marginBottom: 12,
+              }}>
+                {chapter.sessionSkills.length === 0 && (
+                  <div style={{ color: '#666', fontSize: 13, textAlign: 'center', padding: 16 }}>
+                    획득한 스킬이 없습니다
+                  </div>
+                )}
+                {chapter.sessionSkills.map((skill, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '8px 10px', background: '#1a1a2e', borderRadius: 6,
+                      border: `1px solid ${selectedSkillIndex === i ? SKILL_GRADE_COLORS[skill.grade] : '#333'}`,
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => setSelectedSkillIndex(selectedSkillIndex === i ? null : i)}
+                  >
+                    <span style={{
+                      fontSize: 18, width: 28, height: 28,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: '#111', borderRadius: 4,
+                      border: `1px solid ${SKILL_GRADE_COLORS[skill.grade]}`,
+                      flexShrink: 0,
+                    }}>
+                      {skill.icon}
+                    </span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 'bold', fontSize: 13, color: SKILL_GRADE_COLORS[skill.grade] }}>
+                        {skill.name}
+                      </div>
+                      {selectedSkillIndex === i && (
+                        <div style={{ fontSize: 12, color: '#aaa', marginTop: 2 }}>
+                          {skill.description}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <button
+                  className="btn btn-primary"
+                  style={{ width: '100%', padding: '12px 16px' }}
+                  onClick={() => setShowSettings(false)}
+                >
+                  계속하기
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  style={{ width: '100%', padding: '12px 16px', color: '#ff5252' }}
+                  onClick={() => { setShowSettings(false); abandonChapter(); }}
+                >
+                  모험 포기하기
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -968,11 +1047,29 @@ export function ChapterScreen() {
                 {(chapterResult.gems ?? 0) > 0 && <span style={{ color: '#e040fb', marginLeft: 8 }}>+{chapterResult.gems} 보석</span>}
               </div>
             )}
+            {(damageSourcesSnapshot.length > 0 || healSourcesSnapshot.length > 0) && (
+              <div style={{ width: '100%', marginTop: 12 }}>
+                <button
+                  className={`btn-icon ${showResultGraph ? 'active' : ''}`}
+                  style={{ margin: '0 auto' }}
+                  onClick={() => setShowResultGraph(v => !v)}
+                  title="딜 그래프"
+                >
+                  <BarChart3 size={18} />
+                </button>
+                {showResultGraph && (
+                  <div style={{ marginTop: 8 }}>
+                    <DamageGraph sources={damageSourcesSnapshot} />
+                    <DamageGraph sources={healSourcesSnapshot} title="회복 그래프" variant="heal" />
+                  </div>
+                )}
+              </div>
+            )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16, width: '100%' }}>
               <button
                 className="btn btn-primary"
                 style={{ width: '100%', padding: '12px 16px', fontSize: 15 }}
-                onClick={() => { setChapterResult(null); setScreen('main'); }}
+                onClick={() => { setChapterResult(null); setShowResultGraph(false); setScreen('main'); }}
               >
                 <Home size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
                 메인으로
@@ -981,7 +1078,7 @@ export function ChapterScreen() {
                 <button
                   className="btn btn-secondary"
                   style={{ width: '100%', padding: '12px 16px', fontSize: 15 }}
-                  onClick={() => { setChapterResult(null); startChapter(); }}
+                  onClick={() => { setChapterResult(null); setShowResultGraph(false); startChapter(); }}
                 >
                   <Swords size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
                   다음 챕터 시작
@@ -990,7 +1087,7 @@ export function ChapterScreen() {
               <button
                 className="btn btn-secondary"
                 style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}
-                onClick={() => { setChapterResult(null); setScreen('chapter-treasure'); }}
+                onClick={() => { setChapterResult(null); setShowResultGraph(false); setScreen('chapter-treasure'); }}
               >
                 <Package size={16} />
                 보물상자 확인

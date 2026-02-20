@@ -11,7 +11,7 @@ const STATUS_ICON: Record<StatusEffectType, string> = {
   [StatusEffectType.BURN]: '🔥',
   [StatusEffectType.REGEN]: '💚',
   [StatusEffectType.ATK_UP]: '⚔️',
-  [StatusEffectType.ATK_DOWN]: '⚔️',
+  [StatusEffectType.ATK_DOWN]: '🔮',
   [StatusEffectType.DEF_UP]: '🛡️',
   [StatusEffectType.DEF_DOWN]: '🛡️',
   [StatusEffectType.CRIT_UP]: '🎯',
