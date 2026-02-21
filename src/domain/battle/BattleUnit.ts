@@ -74,9 +74,10 @@ export class BattleUnit implements SkillExecutionUnit {
   }
 
   private applyPassiveSkills(): void {
-    for (const skill of this.passiveSkills) {
-      this.applyPassiveSkill(skill);
-    }
+    const statMods = this.passiveSkills.filter(s => s.effect.type === PassiveType.STAT_MODIFIER);
+    const others = this.passiveSkills.filter(s => s.effect.type !== PassiveType.STAT_MODIFIER);
+    for (const skill of statMods) this.applyPassiveSkill(skill);
+    for (const skill of others) this.applyPassiveSkill(skill);
   }
 
   private applyPassiveSkill(skill: PassiveSkill): void {
@@ -89,6 +90,9 @@ export class BattleUnit implements SkillExecutionUnit {
           this.baseDef = isPercentage ? Math.floor(this.baseDef * (1 + value)) : this.baseDef + value;
         } else if (stat === StatType.CRIT) {
           this.baseCrit = Math.min(1.0, this.baseCrit + value);
+        } else if (stat === StatType.HP) {
+          this.maxHp = isPercentage ? Math.floor(this.maxHp * (1 + value)) : this.maxHp + value;
+          this.currentHp = this.maxHp;
         } else if (stat === 'RAGE_POWER') {
           this.ragePowerMultiplier += value;
         } else if (stat === 'MAGIC_COEFFICIENT') {

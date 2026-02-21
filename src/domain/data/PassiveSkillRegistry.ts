@@ -127,6 +127,22 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
     buildDescription: (t) => `사망 시 HP ${pct(td('revive', t).hpPercent)}로 부활 (1회)`,
   },
   {
+    id: 'magic_mastery', name: '마법 마스터리', icon: '🔮',
+    tags: [SkillTag.MAGIC], heritageSynergy: [HeritageRoute.GHOST],
+    buildEffect: (t) => ({
+      type: PassiveType.STAT_MODIFIER, stat: 'MAGIC_COEFFICIENT' as const, value: td('magic_mastery', t).value, isPercentage: false,
+    }),
+    buildDescription: (t) => `마법 계수 +${pct(td('magic_mastery', t).value)}`,
+  },
+  {
+    id: 'hp_fortify', name: '체력 강화', icon: '❤️',
+    tags: [SkillTag.HP_RECOVERY], heritageSynergy: [HeritageRoute.KNIGHT],
+    buildEffect: (t) => ({
+      type: PassiveType.STAT_MODIFIER, stat: StatType.HP, value: td('hp_fortify', t).value, isPercentage: true,
+    }),
+    buildDescription: (t) => `최대 체력 +${pct(td('hp_fortify', t).value)}`,
+  },
+  {
     id: 'angel_power', name: '천사의 힘', icon: '😇',
     tags: [], heritageSynergy: [],
     buildEffect: (t) => ({
