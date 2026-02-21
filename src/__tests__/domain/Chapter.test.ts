@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { Chapter, ChapterState } from '../../domain/chapter/Chapter';
-import { ChapterType, EncounterType, BattleState } from '../../domain/enums';
+import { ChapterType, EncounterType, BattleState, PassiveType, StatType } from '../../domain/enums';
 import { BattleUnit } from '../../domain/battle/BattleUnit';
 import { Stats } from '../../domain/value-objects/Stats';
+import { PassiveSkill } from '../../domain/entities/PassiveSkill';
 
 describe('Chapter', () => {
   it('creates with correct total days', () => {
@@ -106,5 +107,59 @@ describe('Chapter', () => {
     }
 
     expect(battleCreated).toBe(true);
+  });
+
+  describe('session HP with hp_fortify', () => {
+    function makeHpPassive(value: number): PassiveSkill {
+      return new PassiveSkill('hp_fortify', '체력 강화', '❤️', 1, [], [], {
+        type: PassiveType.STAT_MODIFIER, stat: StatType.HP, value, isPercentage: true,
+      });
+    }
+
+    it('recalcSessionMaxHp applies HP passives from base', () => {
+      const chapter = new Chapter(1, ChapterType.FIVE_DAY, 42);
+      chapter.initSessionHp(100);
+      chapter.sessionSkills.push(makeHpPassive(0.1));
+      chapter.recalcSessionMaxHp();
+
+      expect(chapter.sessionMaxHp).toBe(110);
+    });
+
+    it('recalcSessionMaxHp preserves HP ratio (50/100 → 55/110)', () => {
+      const chapter = new Chapter(1, ChapterType.FIVE_DAY, 42);
+      chapter.initSessionHp(100);
+      chapter.sessionCurrentHp = 50;
+      chapter.sessionSkills.push(makeHpPassive(0.1));
+      chapter.recalcSessionMaxHp();
+
+      expect(chapter.sessionMaxHp).toBe(110);
+      expect(chapter.sessionCurrentHp).toBe(55);
+    });
+
+    it('recalcSessionMaxHp recalculates from baseSessionMaxHp on tier upgrade', () => {
+      const chapter = new Chapter(1, ChapterType.FIVE_DAY, 42);
+      chapter.initSessionHp(100);
+
+      chapter.sessionSkills.push(makeHpPassive(0.05));
+      chapter.recalcSessionMaxHp();
+      expect(chapter.sessionMaxHp).toBe(105);
+
+      chapter.sessionSkills[0] = makeHpPassive(0.1);
+      chapter.recalcSessionMaxHp();
+      expect(chapter.sessionMaxHp).toBe(110);
+    });
+
+    it('getBattlePassiveSkills excludes HP STAT_MODIFIERs', () => {
+      const chapter = new Chapter(1, ChapterType.FIVE_DAY, 42);
+      const hpPassive = makeHpPassive(0.1);
+      const otherPassive = new PassiveSkill('lifesteal', '흡혈', '🩸', 1, [], [], {
+        type: PassiveType.LIFESTEAL, rate: 0.1,
+      });
+      chapter.sessionSkills.push(hpPassive, otherPassive);
+
+      const battlePassives = chapter.getBattlePassiveSkills();
+      expect(battlePassives).toHaveLength(1);
+      expect(battlePassives[0].id).toBe('lifesteal');
+    });
   });
 });

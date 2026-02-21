@@ -256,4 +256,96 @@ describe('SkillExecutionEngine', () => {
     expect(target.currentHp).toBeLessThanOrEqual(0);
     expect(results.length).toBeLessThanOrEqual(2);
   });
+
+  it('AoE attack hits all alive targets', () => {
+    const engine = new SkillExecutionEngine(new SeededRandom(42));
+    const skill = new ActiveSkill(
+      'test_aoe', 'AoE Attack', '💥',
+      SkillHierarchy.LOWEST, 1, [], [],
+      trigger(everyNTurns(1)),
+      [{ type: SkillEffectType.ATTACK, attackType: AttackType.PHYSICAL, coefficient: 1.0, isAoe: true }],
+    );
+
+    const source = makeUnit({ getEffectiveAtk: () => 50 });
+    const target1 = makeUnit({ currentHp: 100, name: 'Enemy1' });
+    const target2 = makeUnit({ currentHp: 100, name: 'Enemy2' });
+    const allTargets = [target1, target2];
+
+    const results = engine.executeSkillEffects(skill, source, target1, [skill], 0, allTargets);
+
+    expect(results.length).toBe(2);
+    expect(target1.currentHp).toBeLessThan(100);
+    expect(target2.currentHp).toBeLessThan(100);
+    expect(results[0].targetName).toBe('Enemy1');
+    expect(results[1].targetName).toBe('Enemy2');
+  });
+
+  it('AoE skips dead targets', () => {
+    const engine = new SkillExecutionEngine(new SeededRandom(42));
+    const skill = new ActiveSkill(
+      'test_aoe', 'AoE Attack', '💥',
+      SkillHierarchy.LOWEST, 1, [], [],
+      trigger(everyNTurns(1)),
+      [{ type: SkillEffectType.ATTACK, attackType: AttackType.PHYSICAL, coefficient: 1.0, isAoe: true }],
+    );
+
+    const source = makeUnit({ getEffectiveAtk: () => 50 });
+    const target1 = makeUnit({ currentHp: 0, name: 'Dead' });
+    const target2 = makeUnit({ currentHp: 100, name: 'Alive' });
+    const allTargets = [target1, target2];
+
+    const results = engine.executeSkillEffects(skill, source, target2, [skill], 0, allTargets);
+
+    expect(results.length).toBe(1);
+    expect(results[0].targetName).toBe('Alive');
+  });
+
+  it('percentage defense formula: physical damage = ATK * coeff * (k / (k + DEF))', () => {
+    const engine = new SkillExecutionEngine(new SeededRandom(42));
+    const skill = new ActiveSkill(
+      'test_phys', 'Phys', '⚔️',
+      SkillHierarchy.LOWEST, 1, [], [],
+      trigger(everyNTurns(1)),
+      [{ type: SkillEffectType.ATTACK, attackType: AttackType.PHYSICAL, coefficient: 1.0 }],
+    );
+
+    const atk = 100;
+    const def = 50;
+    const k = BattleDataTable.damage.defenseConstant;
+    const expectedDamage = Math.max(1, Math.floor(atk * 1.0 * (k / (k + def))));
+
+    const source = makeUnit({ getEffectiveAtk: () => atk, getEffectiveCrit: () => 0 });
+    const target = makeUnit({ currentHp: 1000, maxHp: 1000, getEffectiveDef: () => def });
+
+    const results = engine.executeSkillEffects(skill, source, target, [skill]);
+
+    expect(results[0].damage).toBe(expectedDamage);
+    expect(expectedDamage).toBe(Math.floor(100 * (100 / 150)));
+  });
+
+  it('percentage defense formula: magic damage includes magicCoefficient', () => {
+    const engine = new SkillExecutionEngine(new SeededRandom(42));
+    const skill = new ActiveSkill(
+      'test_magic_def', 'Magic', '✨',
+      SkillHierarchy.LOWEST, 1, [], [],
+      trigger(everyNTurns(1)),
+      [{ type: SkillEffectType.ATTACK, attackType: AttackType.MAGIC, coefficient: 0.5 }],
+    );
+
+    const atk = 100;
+    const def = 50;
+    const magicCoeff = 0.7;
+    const k = BattleDataTable.damage.magicDefenseConstant;
+    const expectedDamage = Math.max(1, Math.floor(atk * magicCoeff * 0.5 * (k / (k + def))));
+
+    const source = makeUnit({
+      getEffectiveAtk: () => atk, getEffectiveCrit: () => 0,
+      magicCoefficient: magicCoeff,
+    });
+    const target = makeUnit({ currentHp: 1000, maxHp: 1000, getEffectiveDef: () => def });
+
+    const results = engine.executeSkillEffects(skill, source, target, [skill]);
+
+    expect(results[0].damage).toBe(expectedDamage);
+  });
 });

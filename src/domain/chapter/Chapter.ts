@@ -1,4 +1,4 @@
-import { ChapterType, EncounterType, BattleState, ResourceType } from '../enums';
+import { ChapterType, EncounterType, BattleState, ResourceType, PassiveType, StatType } from '../enums';
 import { Encounter, type EncounterResult } from './Encounter';
 import { EncounterGenerator } from './EncounterGenerator';
 import { EnemyTemplate } from './EnemyTemplate';
@@ -45,6 +45,7 @@ export class Chapter {
   sessionGold: number;
   sessionCurrentHp: number;
   sessionMaxHp: number;
+  baseSessionMaxHp: number;
   jungbakCount: number;
   daebakCount: number;
   optionalEliteTriggered: boolean;
@@ -65,6 +66,7 @@ export class Chapter {
     this.sessionGold = 0;
     this.sessionCurrentHp = 0;
     this.sessionMaxHp = 0;
+    this.baseSessionMaxHp = 0;
     this.jungbakCount = 0;
     this.daebakCount = 0;
     this.optionalEliteTriggered = false;
@@ -73,6 +75,7 @@ export class Chapter {
   }
 
   initSessionHp(maxHp: number): void {
+    this.baseSessionMaxHp = maxHp;
     this.sessionCurrentHp = maxHp;
     this.sessionMaxHp = maxHp;
   }
@@ -149,6 +152,10 @@ export class Chapter {
       }
     }
 
+    if (result.skillsGained.length > 0) {
+      this.recalcSessionMaxHp();
+    }
+
     this.sessionGold += result.goldChange;
     for (const r of result.reward.resources) {
       if (r.type === ResourceType.GOLD) this.sessionGold += r.amount;
@@ -187,6 +194,28 @@ export class Chapter {
 
   getSessionPassiveSkills(): import('../entities/PassiveSkill').PassiveSkill[] {
     return this.sessionSkills.filter(s => !isActiveSkill(s)) as import('../entities/PassiveSkill').PassiveSkill[];
+  }
+
+  getBattlePassiveSkills(): import('../entities/PassiveSkill').PassiveSkill[] {
+    return this.getSessionPassiveSkills().filter(
+      s => !(s.effect.type === PassiveType.STAT_MODIFIER && s.effect.stat === StatType.HP),
+    );
+  }
+
+  recalcSessionMaxHp(): void {
+    let maxHp = this.baseSessionMaxHp;
+    for (const skill of this.getSessionPassiveSkills()) {
+      if (skill.effect.type === PassiveType.STAT_MODIFIER && skill.effect.stat === StatType.HP) {
+        maxHp = skill.effect.isPercentage
+          ? Math.floor(maxHp * (1 + skill.effect.value))
+          : maxHp + skill.effect.value;
+      }
+    }
+    const oldMax = this.sessionMaxHp;
+    this.sessionMaxHp = maxHp;
+    if (oldMax > 0 && maxHp !== oldMax) {
+      this.sessionCurrentHp = Math.floor(this.sessionCurrentHp * maxHp / oldMax);
+    }
   }
 
   createCombatBattle(playerUnit: BattleUnit): Battle | null {

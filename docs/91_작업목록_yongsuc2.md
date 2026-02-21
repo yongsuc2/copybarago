@@ -30,6 +30,8 @@
 | Y-18 | 전투 밸런스 대규모 조정 | 중 | 완료 | 연타 일반 공격 전용+UPPER 연계, 뇌우 삭제, 소환 횟수 1/2/3/4, 몬스터 스케일링 곡선 개선(1.25/0.3), 몬스터 컨셉 리밸런스, 골드 보상 UI 버그 수정 |
 | Y-19 | 전투 연출 개선 | 중 | 완료 | 스킬 투사체 타이밍 수정, 같은 종류 스킬 연출 그룹화(reorderBySkillType), 기획서 동기화 |
 | Y-20 | 로비 상세 스탯 팝업 | 중 | 완료 | Player.getStatsBreakdown()/getCombatPassives() 추가, 출처별 기본 스탯 분해 + 전투 스탯 + 장비 패시브 팝업 UI |
+| Y-21 | 전투 시스템 확장 (패시브/AoE/방어공식/세션HP) | 상 | 완료 | hp_fortify·magic_mastery 패시브, 검기 AoE, 방어 퍼센트 감소 공식, 세션 maxHp 연동, 연속 연출 속도 조정, 전투 시작 함수 통합 |
+| Y-22 | 스킬 특징(traits) 필드 추가 | 하 | 완료 | ActiveSkillFamilyDef·PassiveSkillFamilyDef에 traits 필드, 기획/개발 참고용(UI 미표시), 04_스킬시스템.md 문서화 |
 
 ---
 

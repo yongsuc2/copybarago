@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest';
 import { Battle } from '../../domain/battle/Battle';
 import { BattleUnit } from '../../domain/battle/BattleUnit';
 import { Stats } from '../../domain/value-objects/Stats';
-import { BattleState, PassiveType, SkillHierarchy, SkillEffectType, AttackType, SpecialConditionType } from '../../domain/enums';
+import { BattleState, PassiveType, SkillHierarchy, SkillEffectType, AttackType, SpecialConditionType, StatType } from '../../domain/enums';
 import { PassiveSkill } from '../../domain/entities/PassiveSkill';
 import { ActiveSkill, trigger, everyNTurns, prob, noCondition } from '../../domain/entities/ActiveSkill';
 import { ActiveSkillRegistry } from '../../domain/data/ActiveSkillRegistry';
+import { BattleDataTable } from '../../domain/data/BattleDataTable';
 
 function makePassive(id: string, effect: PassiveSkill['effect']): PassiveSkill {
   return new PassiveSkill(id, id, '⚔️', 1, [], [], effect);
@@ -60,6 +61,44 @@ describe('BattleUnit', () => {
     const lifesteal = makePassive('ls', { type: PassiveType.LIFESTEAL, rate: 0.15 });
     const unit = new BattleUnit('Test', Stats.create({ hp: 100, maxHp: 100, atk: 10, def: 5 }), [], [lifesteal]);
     expect(unit.lifestealRate).toBeCloseTo(0.15);
+  });
+
+  it('hp_fortify increases maxHp and currentHp by delta', () => {
+    const hpFortify = makePassive('hp_fortify', {
+      type: PassiveType.STAT_MODIFIER, stat: StatType.HP, value: 0.1, isPercentage: true,
+    });
+    const unit = new BattleUnit('Test', Stats.create({ hp: 100, maxHp: 100, atk: 10, def: 5 }), [], [hpFortify]);
+    expect(unit.maxHp).toBe(110);
+    expect(unit.currentHp).toBe(110);
+  });
+
+  it('hp_fortify preserves HP delta when not at full HP', () => {
+    const hpFortify = makePassive('hp_fortify', {
+      type: PassiveType.STAT_MODIFIER, stat: StatType.HP, value: 0.1, isPercentage: true,
+    });
+    const unit = new BattleUnit('Test', Stats.create({ hp: 50, maxHp: 100, atk: 10, def: 5 }), [], [hpFortify]);
+    expect(unit.maxHp).toBe(110);
+    expect(unit.currentHp).toBe(60);
+  });
+
+  it('magic_mastery increases magicCoefficient', () => {
+    const magicMastery = makePassive('magic_mastery', {
+      type: PassiveType.STAT_MODIFIER, stat: 'MAGIC_COEFFICIENT' as const, value: 0.1, isPercentage: false,
+    });
+    const unit = new BattleUnit('Test', Stats.create({ hp: 100, maxHp: 100, atk: 10, def: 5 }), [], [magicMastery]);
+    expect(unit.magicCoefficient).toBeCloseTo(BattleDataTable.damage.baseMagicCoefficient + 0.1);
+  });
+
+  it('STAT_MODIFIER applied before SHIELD_ON_START for correct shield calc', () => {
+    const hpUp = makePassive('hp_up', {
+      type: PassiveType.STAT_MODIFIER, stat: StatType.HP, value: 0.5, isPercentage: true,
+    });
+    const shield = makePassive('shield', {
+      type: PassiveType.SHIELD_ON_START, hpPercent: 0.1,
+    });
+    const unit = new BattleUnit('Test', Stats.create({ hp: 100, maxHp: 100, atk: 10, def: 5 }), [], [shield, hpUp]);
+    expect(unit.maxHp).toBe(150);
+    expect(unit.shield).toBe(15);
   });
 });
 

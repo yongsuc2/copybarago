@@ -16,6 +16,7 @@ import { PassiveSkillRegistry } from '../../domain/data/PassiveSkillRegistry';
 import type { SessionSkill } from '../../domain/battle/BattleUnit';
 import { Package, Home, Swords, Zap, Star, BarChart3, FastForward, Coins, Settings } from 'lucide-react';
 import { BattleDataTable } from '../../domain/data/BattleDataTable';
+import { Stats } from '../../domain/value-objects/Stats';
 
 const MAX_BATTLE_TURNS = BattleDataTable.maxTurns;
 
@@ -33,7 +34,7 @@ const PHASE_DURATION = {
   pause: 200,
 };
 
-const CONSECUTIVE_SKILL_BOOST = 1.7;
+const CONSECUTIVE_SKILL_BOOST = 1.45;
 
 function getGroupSkillKey(group: BattleLogEntry[]): string | null {
   const primary = group[0];
@@ -361,29 +362,29 @@ export function ChapterScreen() {
     if (!game.currentChapter) return;
 
     if (game.currentChapter.isBossDay()) {
-      startBossBattle();
+      startSpecialBattle('boss');
       return;
     }
 
     const enc = game.currentChapter.advanceDay();
 
     if (!enc && game.currentChapter.isEliteDay()) {
-      startEliteBattle();
+      startSpecialBattle('elite');
       return;
     }
 
     if (!enc && game.currentChapter.isMidBossDay()) {
-      startMidBossBattle();
+      startSpecialBattle('midBoss');
       return;
     }
 
     if (!enc && game.currentChapter.isOptionalEliteDay()) {
-      startEliteBattle();
+      startSpecialBattle('elite');
       return;
     }
 
     if (!enc && game.currentChapter.isBossDay()) {
-      startBossBattle();
+      startSpecialBattle('boss');
       return;
     }
 
@@ -391,12 +392,13 @@ export function ChapterScreen() {
 
     if (enc?.type === EncounterType.COMBAT) {
       const stats = game.player.computeStats();
-      const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
+      const ch = game.currentChapter;
+      const battleStats = Stats.create({ maxHp: ch.sessionMaxHp, hp: ch.sessionCurrentHp, atk: stats.atk, def: stats.def, crit: stats.crit });
       const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
       const petAbility = game.battleManager.getPetAbilitySkill(game.player);
-      const allPassives = [...game.currentChapter.getSessionPassiveSkills(), ...equipPassives];
+      const allPassives = [...ch.getBattlePassiveSkills(), ...equipPassives];
       if (petAbility) allPassives.push(petAbility);
-      const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), allPassives, true);
+      const pu = new BattleUnit('Capybara', battleStats, ch.getSessionActiveSkills(), allPassives, true);
       const b = game.currentChapter.createCombatBattle(pu);
       if (b) {
         setBattleType('normal');
@@ -717,46 +719,22 @@ export function ChapterScreen() {
     runBattleLoop(b, boss);
   }
 
-  function startEliteBattle() {
+  function startSpecialBattle(type: 'elite' | 'midBoss' | 'boss') {
     if (!game.currentChapter) return;
+    const ch = game.currentChapter;
 
     const stats = game.player.computeStats();
-    const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
+    const battleStats = Stats.create({ maxHp: ch.sessionMaxHp, hp: ch.sessionCurrentHp, atk: stats.atk, def: stats.def, crit: stats.crit });
     const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
-    const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), [...game.currentChapter.getSessionPassiveSkills(), ...equipPassives], true);
-    const b = game.currentChapter.createEliteBattle(pu);
+    const pu = new BattleUnit('Capybara', battleStats, ch.getSessionActiveSkills(), [...ch.getBattlePassiveSkills(), ...equipPassives], true);
+
+    const b = type === 'elite' ? ch.createEliteBattle(pu)
+      : type === 'midBoss' ? ch.createMidBossBattle(pu)
+      : ch.createBossBattle(pu);
     if (!b) return;
 
-    setBattleType('elite');
-    startBattle(b, false);
-  }
-
-  function startMidBossBattle() {
-    if (!game.currentChapter) return;
-
-    const stats = game.player.computeStats();
-    const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
-    const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
-    const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), [...game.currentChapter.getSessionPassiveSkills(), ...equipPassives], true);
-    const b = game.currentChapter.createMidBossBattle(pu);
-    if (!b) return;
-
-    setBattleType('midBoss');
-    startBattle(b, false);
-  }
-
-  function startBossBattle() {
-    if (!game.currentChapter) return;
-
-    const stats = game.player.computeStats();
-    const battleStats = stats.withHp(game.currentChapter.sessionCurrentHp);
-    const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
-    const pu = new BattleUnit('Capybara', battleStats, game.currentChapter.getSessionActiveSkills(), [...game.currentChapter.getSessionPassiveSkills(), ...equipPassives], true);
-    const b = game.currentChapter.createBossBattle(pu);
-    if (!b) return;
-
-    setBattleType('boss');
-    startBattle(b, true);
+    setBattleType(type);
+    startBattle(b, type === 'boss');
   }
 
   function startChapter() {

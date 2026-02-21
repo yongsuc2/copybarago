@@ -103,7 +103,8 @@ export class Battle {
     }
 
     const allSkills = player.getAllSkillsForEngine();
-    const mainResults = this.engine.executeSkillEffects(mainSkill, player, target, allSkills);
+    const allTargets = this.enemies;
+    const mainResults = this.engine.executeSkillEffects(mainSkill, player, target, allSkills, 0, allTargets);
 
     if (isBunno) {
       for (const r of mainResults) {
@@ -119,7 +120,7 @@ export class Battle {
     this.executeUpperSkills(player, target, allSkills, mainSkill.id);
 
     if (!isBunno && target.isAlive() && player.multiHitChance > 0 && this.rng.chance(player.multiHitChance)) {
-      const multiResults = this.engine.executeSkillEffects(mainSkill, player, target, allSkills);
+      const multiResults = this.engine.executeSkillEffects(mainSkill, player, target, allSkills, 0, allTargets);
       this.logSkillResults(multiResults, player, target, false);
       this.applyLifesteal(player, multiResults);
 
@@ -127,7 +128,7 @@ export class Battle {
     }
 
     if (!isBunno && bunno && target.isAlive() && player.rage >= player.maxRage) {
-      const bunnoResults = this.engine.executeSkillEffects(bunno, player, target, allSkills);
+      const bunnoResults = this.engine.executeSkillEffects(bunno, player, target, allSkills, 0, allTargets);
       for (const r of bunnoResults) {
         if (r.damage > 0) {
           r.damage = Math.floor(r.damage * player.ragePowerMultiplier);
@@ -135,7 +136,6 @@ export class Battle {
       }
       this.logSkillResults(bunnoResults, player, target, true);
       this.applyLifesteal(player, bunnoResults);
-
 
       this.executeUpperSkills(player, target, allSkills, bunno.id);
     }
@@ -149,13 +149,14 @@ export class Battle {
     player: BattleUnit, target: BattleUnit,
     allSkills: ActiveSkill[], triggerSkillId: string,
   ): void {
-    if (!target.isAlive()) return;
+    const anyAlive = this.enemies.some(e => e.isAlive());
+    if (!anyAlive) return;
     for (const skill of player.activeSkills) {
-      if (!target.isAlive()) break;
+      if (!this.enemies.some(e => e.isAlive())) break;
       if (skill.hierarchy === SkillHierarchy.BUILTIN) continue;
       if (skill.hierarchy !== SkillHierarchy.UPPER) continue;
       if (this.engine.evaluateTrigger(skill.trigger, this.turnCount, player, triggerSkillId)) {
-        const results = this.engine.executeSkillEffects(skill, player, target, allSkills);
+        const results = this.engine.executeSkillEffects(skill, player, target, allSkills, 0, this.enemies);
         this.logSkillResults(results, player, target, false);
         this.applyLifesteal(player, results);
       }
@@ -273,28 +274,29 @@ export class Battle {
 
   private logSkillResults(results: SkillDamageResult[], source: BattleUnit, target: BattleUnit, isRage: boolean): void {
     for (const r of results) {
+      const tName = r.targetName ?? target.name;
       if (r.damage > 0) {
         if (isRage && r.skillName === '분노 공격') {
           this.log.add({
             turn: this.turnCount, type: BattleLogType.RAGE_ATTACK,
-            source: source.name, target: target.name, value: r.damage,
+            source: source.name, target: tName, value: r.damage,
             skillName: r.skillName, skillIcon: r.skillIcon,
-            message: `${source.name} RAGE ATTACK ${target.name} for ${r.damage}`,
+            message: `${source.name} RAGE ATTACK ${tName} for ${r.damage}`,
           });
         } else if (r.isCrit) {
           this.log.add({
             turn: this.turnCount, type: BattleLogType.CRIT,
-            source: source.name, target: target.name, value: r.damage,
+            source: source.name, target: tName, value: r.damage,
             skillName: r.skillName, skillIcon: r.skillIcon,
-            message: `${source.name}'s ${r.skillName} CRIT ${target.name} for ${r.damage}`,
+            message: `${source.name}'s ${r.skillName} CRIT ${tName} for ${r.damage}`,
           });
         } else {
           this.log.add({
             turn: this.turnCount,
             type: r.skillName === '일반 공격' ? BattleLogType.ATTACK : BattleLogType.SKILL_DAMAGE,
-            source: source.name, target: target.name, value: r.damage,
+            source: source.name, target: tName, value: r.damage,
             skillName: r.skillName, skillIcon: r.skillIcon,
-            message: `${source.name}'s ${r.skillName} deals ${r.damage} to ${target.name}`,
+            message: `${source.name}'s ${r.skillName} deals ${r.damage} to ${tName}`,
           });
         }
       }
@@ -366,7 +368,8 @@ export class Battle {
   private calculateBaseDamage(attacker: BattleUnit, defender: BattleUnit): number {
     const atk = attacker.getEffectiveAtk();
     const def = defender.getEffectiveDef();
-    const raw = Math.max(1, atk - Math.floor(def * BattleDataTable.damage.defenseReduction));
+    const k = BattleDataTable.damage.defenseConstant;
+    const raw = Math.max(1, Math.floor(atk * (k / (k + def))));
     const variance = this.rng.nextFloat(BattleDataTable.damage.varianceMin, BattleDataTable.damage.varianceMax);
     return Math.max(1, Math.floor(raw * variance));
   }

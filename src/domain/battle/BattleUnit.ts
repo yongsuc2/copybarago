@@ -91,8 +91,9 @@ export class BattleUnit implements SkillExecutionUnit {
         } else if (stat === StatType.CRIT) {
           this.baseCrit = Math.min(1.0, this.baseCrit + value);
         } else if (stat === StatType.HP) {
+          const oldMax = this.maxHp;
           this.maxHp = isPercentage ? Math.floor(this.maxHp * (1 + value)) : this.maxHp + value;
-          this.currentHp = this.maxHp;
+          this.currentHp += (this.maxHp - oldMax);
         } else if (stat === 'RAGE_POWER') {
           this.ragePowerMultiplier += value;
         } else if (stat === 'MAGIC_COEFFICIENT') {

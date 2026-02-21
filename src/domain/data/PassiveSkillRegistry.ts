@@ -18,6 +18,7 @@ interface PassiveSkillFamilyDef {
   icon: string;
   tags: SkillTag[];
   heritageSynergy: HeritageRoute[];
+  traits: string[];
   buildEffect: (tier: number) => PassiveEffect;
   buildDescription: (tier: number) => string;
 }
@@ -34,6 +35,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
   {
     id: 'lifesteal', name: '흡혈', icon: '🩸',
     tags: [], heritageSynergy: [],
+    traits: ['물리 공격에 효과적', '지속적 체력 회복'],
     buildEffect: (t) => ({
       type: PassiveType.LIFESTEAL, rate: td('lifesteal', t).rate,
     }),
@@ -42,6 +44,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
   {
     id: 'regen', name: '재생', icon: '💚',
     tags: [SkillTag.HP_RECOVERY], heritageSynergy: [],
+    traits: ['매턴 자동 회복', '전투 지구력 향상'],
     buildEffect: (t) => ({
       type: PassiveType.REGEN, healPerTurn: td('regen', t).healPerTurn,
     }),
@@ -50,6 +53,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
   {
     id: 'counter', name: '반격', icon: '🛡️',
     tags: [], heritageSynergy: [HeritageRoute.KNIGHT],
+    traits: ['피격 시 발동', '물리 반격'],
     buildEffect: (t) => ({
       type: PassiveType.COUNTER,
       triggerChance: td('counter', t).triggerChance,
@@ -59,6 +63,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
   {
     id: 'iron_shield', name: '방어막', icon: '🔰',
     tags: [], heritageSynergy: [],
+    traits: ['전투 시작 시 1회', '초반 안정성'],
     buildEffect: (t) => ({
       type: PassiveType.SHIELD_ON_START, hpPercent: td('iron_shield', t).hpPercent,
     }),
@@ -67,6 +72,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
   {
     id: 'multi_hit', name: '연타', icon: '💫',
     tags: [], heritageSynergy: [HeritageRoute.SKULL],
+    traits: ['일반 공격 전용', '확률 기반 추가 타격'],
     buildEffect: (t) => ({
       type: PassiveType.MULTI_HIT, chance: td('multi_hit', t).chance,
     }),
@@ -75,6 +81,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
   {
     id: 'crit_mastery', name: '치명타 마스터리', icon: '🎯',
     tags: [], heritageSynergy: [HeritageRoute.RANGER],
+    traits: ['물리 공격에만 적용', '높은 폭발력'],
     buildEffect: (t) => ({
       type: PassiveType.STAT_MODIFIER, stat: StatType.CRIT, value: td('crit_mastery', t).value, isPercentage: false,
     }),
@@ -83,6 +90,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
   {
     id: 'rage_mastery', name: '분노 마스터리', icon: '💢',
     tags: [SkillTag.RAGE], heritageSynergy: [HeritageRoute.SKULL, HeritageRoute.KNIGHT],
+    traits: ['분노 공격 강화 전용', '분노 빌드 핵심'],
     buildEffect: (t) => ({
       type: PassiveType.STAT_MODIFIER, stat: 'RAGE_POWER' as const, value: td('rage_mastery', t).value, isPercentage: true,
     }),
@@ -91,6 +99,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
   {
     id: 'lightning_mastery', name: '번개 마스터리', icon: '⚡',
     tags: [SkillTag.LIGHTNING], heritageSynergy: [HeritageRoute.GHOST],
+    traits: ['번개 스킬 전용', '마법 빌드 시너지'],
     buildEffect: (t) => ({
       type: PassiveType.SKILL_MODIFIER,
       targetTag: SkillTag.LIGHTNING,
@@ -101,6 +110,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
   {
     id: 'shuriken_mastery', name: '수리검 마스터리', icon: '🌀',
     tags: [SkillTag.SHURIKEN], heritageSynergy: [HeritageRoute.RANGER],
+    traits: ['수리검 스킬 전용', '물리 빌드 시너지'],
     buildEffect: (t) => ({
       type: PassiveType.SKILL_MODIFIER,
       targetTag: SkillTag.SHURIKEN,
@@ -111,6 +121,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
   {
     id: 'lance_mastery', name: '광창 마스터리', icon: '🔱',
     tags: [SkillTag.LANCE], heritageSynergy: [HeritageRoute.KNIGHT],
+    traits: ['광창 스킬 전용', '마법 빌드 시너지'],
     buildEffect: (t) => ({
       type: PassiveType.SKILL_MODIFIER,
       targetTag: SkillTag.LANCE,
@@ -121,6 +132,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
   {
     id: 'revive', name: '부활', icon: '✨',
     tags: [], heritageSynergy: [],
+    traits: ['사망 시 1회 부활', '보험형 패시브'],
     buildEffect: (t) => ({
       type: PassiveType.REVIVE, hpPercent: td('revive', t).hpPercent, maxUses: 1,
     }),
@@ -129,6 +141,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
   {
     id: 'magic_mastery', name: '마법 마스터리', icon: '🔮',
     tags: [SkillTag.MAGIC], heritageSynergy: [HeritageRoute.GHOST],
+    traits: ['모든 마법 공격 강화', '마법 빌드 핵심'],
     buildEffect: (t) => ({
       type: PassiveType.STAT_MODIFIER, stat: 'MAGIC_COEFFICIENT' as const, value: td('magic_mastery', t).value, isPercentage: false,
     }),
@@ -137,6 +150,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
   {
     id: 'hp_fortify', name: '체력 강화', icon: '❤️',
     tags: [SkillTag.HP_RECOVERY], heritageSynergy: [HeritageRoute.KNIGHT],
+    traits: ['최대 체력 증가', '방어막/재생과 시너지'],
     buildEffect: (t) => ({
       type: PassiveType.STAT_MODIFIER, stat: StatType.HP, value: td('hp_fortify', t).value, isPercentage: true,
     }),
@@ -145,6 +159,7 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
   {
     id: 'angel_power', name: '천사의 힘', icon: '😇',
     tags: [], heritageSynergy: [],
+    traits: ['공격력 직접 증가', '모든 빌드 범용'],
     buildEffect: (t) => ({
       type: PassiveType.STAT_MODIFIER, stat: StatType.ATK, value: (td('angel_power', t) ?? td('angel_power', 4)).value, isPercentage: true,
     }),

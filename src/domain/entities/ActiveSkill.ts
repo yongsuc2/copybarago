@@ -66,6 +66,7 @@ export interface AttackEffect {
   attackType: AttackType;
   coefficient: number;
   duration?: number;
+  isAoe?: boolean;
 }
 
 export interface TriggerSkillEffect {

@@ -29,6 +29,7 @@ interface ActiveSkillFamilyDef {
   hierarchy: SkillHierarchy;
   tags: SkillTag[];
   heritageSynergy: HeritageRoute[];
+  traits: string[];
   buildTrigger: (tier: number) => CompoundTrigger;
   buildEffects: (tier: number) => ActiveSkillEffect[];
   buildDescription: (tier: number) => string;
@@ -48,6 +49,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.BUILTIN,
     tags: [SkillTag.PHYSICAL],
     heritageSynergy: [],
+    traits: [],
     buildTrigger: () => trigger(everyNTurns(1)),
     buildEffects: (t) => [
       { type: SkillEffectType.ATTACK, attackType: AttackType.PHYSICAL, coefficient: td('ilban_attack', t).coefficient },
@@ -60,6 +62,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.BUILTIN,
     tags: [SkillTag.RAGE, SkillTag.PHYSICAL],
     heritageSynergy: [],
+    traits: [],
     buildTrigger: () => trigger(everyNTurns(1), prob(1.0), rageFull()),
     buildEffects: (t) => [
       { type: SkillEffectType.CONSUME_RAGE, amount: 100 },
@@ -73,6 +76,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.LOWEST,
     tags: [SkillTag.RAGE],
     heritageSynergy: [],
+    traits: [],
     buildTrigger: () => trigger(onSkillActivation('ilban_attack')),
     buildEffects: (t) => [
       { type: SkillEffectType.ADD_RAGE, amount: td('rage_accumulate', t).amount },
@@ -84,6 +88,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.LOWEST,
     tags: [SkillTag.HP_RECOVERY],
     heritageSynergy: [],
+    traits: [],
     buildTrigger: () => trigger(everyNTurns(1)),
     buildEffects: (t) => [
       { type: SkillEffectType.HEAL_HP, amount: td('hp_recovery', t).amount },
@@ -95,6 +100,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.LOWEST,
     tags: [SkillTag.LIGHTNING, SkillTag.MAGIC],
     heritageSynergy: [HeritageRoute.GHOST],
+    traits: [],
     buildTrigger: () => trigger(everyNTurns(1)),
     buildEffects: (t) => [
       { type: SkillEffectType.ATTACK, attackType: AttackType.MAGIC, coefficient: td('lightning_summon', t).coefficient },
@@ -106,6 +112,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.LOWEST,
     tags: [SkillTag.LANCE, SkillTag.MAGIC],
     heritageSynergy: [HeritageRoute.KNIGHT],
+    traits: [],
     buildTrigger: () => trigger(everyNTurns(1)),
     buildEffects: (t) => [
       { type: SkillEffectType.ATTACK, attackType: AttackType.MAGIC, coefficient: td('lance_summon', t).coefficient },
@@ -117,17 +124,19 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.LOWEST,
     tags: [SkillTag.SWORD_AURA, SkillTag.PHYSICAL],
     heritageSynergy: [HeritageRoute.SKULL],
+    traits: [],
     buildTrigger: () => trigger(everyNTurns(1)),
     buildEffects: (t) => [
-      { type: SkillEffectType.ATTACK, attackType: AttackType.PHYSICAL, coefficient: td('sword_aura_summon', t).coefficient },
+      { type: SkillEffectType.ATTACK, attackType: AttackType.PHYSICAL, coefficient: td('sword_aura_summon', t).coefficient, isAoe: true },
     ],
-    buildDescription: (t) => `검기 물리 공격 (계수 ${td('sword_aura_summon', t).coefficient})`,
+    buildDescription: (t) => `검기 광역 물리 공격 (계수 ${td('sword_aura_summon', t).coefficient})`,
   },
   {
     id: 'poison_inject', name: '독 주입', icon: '🧪',
     hierarchy: SkillHierarchy.LOWEST,
     tags: [SkillTag.POISON],
     heritageSynergy: [],
+    traits: [],
     buildTrigger: () => trigger(everyNTurns(1)),
     buildEffects: (t) => {
       const d = td('poison_inject', t);
@@ -145,6 +154,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.LOWEST,
     tags: [SkillTag.FLAME, SkillTag.MAGIC],
     heritageSynergy: [],
+    traits: [],
     buildTrigger: () => trigger(everyNTurns(1)),
     buildEffects: (t) => {
       const d = td('flame_summon', t);
@@ -163,6 +173,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.LOWER,
     tags: [SkillTag.SHURIKEN, SkillTag.PHYSICAL],
     heritageSynergy: [HeritageRoute.RANGER],
+    traits: [],
     buildTrigger: () => trigger(everyNTurns(1)),
     buildEffects: (t) => [
       { type: SkillEffectType.ATTACK, attackType: AttackType.PHYSICAL, coefficient: td('shuriken_summon', t).coefficient },
@@ -175,6 +186,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.SHURIKEN, SkillTag.LIGHTNING],
     heritageSynergy: [HeritageRoute.RANGER, HeritageRoute.GHOST],
+    traits: ['수리검+번개 복합', '확률 기반 추가 피해'],
     buildTrigger: () => trigger(everyNTurns(2)),
     buildEffects: (t) => {
       const p = td('thunder_shuriken', t).injectedProbability;
@@ -196,6 +208,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.SHURIKEN, SkillTag.RAGE],
     heritageSynergy: [HeritageRoute.RANGER],
+    traits: ['수리검+분노 복합', '분노 게이지 빠른 축적'],
     buildTrigger: () => trigger(everyNTurns(2)),
     buildEffects: (t) => {
       const p = td('rage_shuriken', t).injectedProbability;
@@ -216,6 +229,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.SHURIKEN, SkillTag.HP_RECOVERY],
     heritageSynergy: [HeritageRoute.RANGER],
+    traits: ['수리검+회복 복합', '공격과 회복 동시'],
     buildTrigger: () => trigger(everyNTurns(2)),
     buildEffects: (t) => {
       const p = td('recovery_shuriken', t).injectedProbability;
@@ -237,6 +251,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.LIGHTNING],
     heritageSynergy: [HeritageRoute.GHOST],
+    traits: ['일반 공격 연계', '마법 공격 (방어 관통 높음)'],
     buildTrigger: () => trigger(onSkillActivation('ilban_attack')),
     buildEffects: (t) => [
       { type: SkillEffectType.TRIGGER_SKILL, targetSkillId: 'lightning_summon', count: td('thunder_strike', t).count },
@@ -248,6 +263,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.LANCE],
     heritageSynergy: [HeritageRoute.KNIGHT],
+    traits: ['매턴 자동 발동', '마법 공격 (방어 관통 높음)'],
     buildTrigger: () => trigger(everyNTurns(1)),
     buildEffects: (t) => [
       { type: SkillEffectType.TRIGGER_SKILL, targetSkillId: 'lance_summon', count: td('lance_strike', t).count },
@@ -259,6 +275,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.SWORD_AURA],
     heritageSynergy: [HeritageRoute.SKULL],
+    traits: ['일반 공격 연계', '광역 물리 공격', '단일 계수 낮음'],
     buildTrigger: () => trigger(onSkillActivation('ilban_attack')),
     buildEffects: (t) => [
       { type: SkillEffectType.TRIGGER_SKILL, targetSkillId: 'sword_aura_summon', count: td('aura_strike', t).count },
@@ -270,6 +287,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.RAGE, SkillTag.LIGHTNING],
     heritageSynergy: [HeritageRoute.GHOST],
+    traits: ['분노 공격 연계', '마법 공격 (방어 관통 높음)'],
     buildTrigger: () => trigger(onSkillActivation('bunno_attack')),
     buildEffects: (t) => [
       { type: SkillEffectType.TRIGGER_SKILL, targetSkillId: 'lightning_summon', count: td('bunno_thunder', t).count },
@@ -281,6 +299,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.RAGE, SkillTag.LANCE],
     heritageSynergy: [HeritageRoute.KNIGHT],
+    traits: ['분노 공격 연계', '마법 공격 (방어 관통 높음)'],
     buildTrigger: () => trigger(onSkillActivation('bunno_attack')),
     buildEffects: (t) => [
       { type: SkillEffectType.TRIGGER_SKILL, targetSkillId: 'lance_summon', count: td('bunno_lance', t).count },
@@ -292,6 +311,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.RAGE, SkillTag.FLAME],
     heritageSynergy: [],
+    traits: ['분노 공격 연계', '도트 데미지'],
     buildTrigger: () => trigger(onSkillActivation('bunno_attack')),
     buildEffects: (t) => [
       { type: SkillEffectType.TRIGGER_SKILL, targetSkillId: 'flame_summon', count: td('bunno_flame', t).count },
@@ -303,6 +323,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.NORMAL_ATTACK, SkillTag.RAGE],
     heritageSynergy: [],
+    traits: ['일반 공격 연계', '분노 게이지 빠른 축적'],
     buildTrigger: () => trigger(onSkillActivation('ilban_attack')),
     buildEffects: (t) => [
       { type: SkillEffectType.ADD_RAGE, amount: td('rage_gauge_boost', t).amount },
@@ -314,6 +335,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.NORMAL_ATTACK, SkillTag.POISON],
     heritageSynergy: [],
+    traits: ['일반 공격 연계', '고정 피해 (방어 무시)'],
     buildTrigger: () => trigger(onSkillActivation('ilban_attack')),
     buildEffects: () => [
       { type: SkillEffectType.TRIGGER_SKILL, targetSkillId: 'poison_inject', count: 1 },
@@ -325,6 +347,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.PHYSICAL],
     heritageSynergy: [HeritageRoute.SKULL],
+    traits: ['일반 공격 연계', '물리 추가 타격'],
     buildTrigger: () => trigger(onSkillActivation('ilban_attack')),
     buildEffects: (t) => [
       { type: SkillEffectType.ATTACK, attackType: AttackType.PHYSICAL, coefficient: td('tyrant', t).coefficient },
@@ -336,6 +359,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.DEBUFF],
     heritageSynergy: [],
+    traits: ['매턴 자동 발동', '적 약화 디버프'],
     buildTrigger: () => trigger(everyNTurns(1)),
     buildEffects: (t) => {
       const d = td('shrink_magic', t);
@@ -353,6 +377,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.MAGIC],
     heritageSynergy: [],
+    traits: ['일반 공격 연계', '마법 추가 타격'],
     buildTrigger: () => trigger(onSkillActivation('ilban_attack')),
     buildEffects: (t) => [
       { type: SkillEffectType.ATTACK, attackType: AttackType.MAGIC, coefficient: (td('demon_power', t) ?? td('demon_power', 4)).coefficient },

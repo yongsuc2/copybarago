@@ -1,7 +1,7 @@
 {
   "damage": {
-    "defenseReduction": 0.5,
-    "magicDefenseReduction": 0.3,
+    "defenseConstant": 100,
+    "magicDefenseConstant": 150,
     "baseMagicCoefficient": 0.5,
     "varianceMin": 0.9,
     "varianceMax": 1.1,
