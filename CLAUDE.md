@@ -88,13 +88,46 @@
 | 작업 목록 | `docs/91_작업목록_{담당자}.md` | 작업 완료/추가 시 **본인 파일만** 업데이트 |
 | 개발일지 | `docs/99_개발일지_{담당자}.md` | 매 세션 종료 시 **본인 파일만** 업데이트. **버그 수정은 기록하지 않음** |
 
-### 2인 분할 관리
+### 담당자별 문서
 
 - **yongsuc2**: `91_작업목록_yongsuc2.md` / `99_개발일지_yongsuc2.md`
 - **kkwndud**: `91_작업목록_kkwndud.md` / `99_개발일지_kkwndud.md`
 - 기존 `91_작업목록.md`, `99_개발일지.md`는 마스터 아카이브로 유지
 
 **빠뜨리지 않도록 커밋 전에 문서 동기화 체크리스트를 확인할 것.**
+
+---
+
+## 병렬 작업 환경
+
+같은 repo를 2개 디렉토리에서 동시에 작업한다:
+
+```
+C:\copybarago\copybarago\    ← 세션 1
+C:\copybarago\copybarago-2\  ← 세션 2
+```
+
+### Git 동기화 규칙
+
+- 각 세션은 **자기 디렉토리에서만** 작업한다
+- 커밋/푸시 전에 반드시 `git pull --rebase` 실행
+- 푸시 실패 시(다른 세션이 먼저 푸시): `git pull --rebase && git push`
+- 충돌 발생 시 수동 해결 후 `git rebase --continue`
+
+### 작업 시작 시
+
+```bash
+git pull --rebase
+```
+
+### 커밋 & 푸시
+
+```bash
+git add <파일들>
+git commit -m "메시지"
+git pull --rebase
+git push
+```
 
 ---
 
