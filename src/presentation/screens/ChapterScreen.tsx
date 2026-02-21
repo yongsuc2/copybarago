@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useGame } from '../GameContext';
-import { ChapterType, EncounterType, BattleState, SkillGrade, ResourceType } from '../../domain/enums';
+import { ChapterType, EncounterType, BattleState, SkillGrade, ResourceType, PassiveType, StatType } from '../../domain/enums';
 import type { Encounter } from '../../domain/chapter/Encounter';
 import { BattleUnit } from '../../domain/battle/BattleUnit';
 import { Battle } from '../../domain/battle/Battle';
@@ -748,6 +748,21 @@ export function ChapterScreen() {
 
   const playerStats = game.player.computeStats();
 
+  let effectiveAtk = playerStats.atk;
+  let effectiveDef = playerStats.def;
+  if (chapter) {
+    for (const skill of chapter.getSessionPassiveSkills()) {
+      if (skill.effect.type === PassiveType.STAT_MODIFIER) {
+        const { stat, value, isPercentage } = skill.effect;
+        if (stat === StatType.ATK) {
+          effectiveAtk = isPercentage ? Math.floor(effectiveAtk * (1 + value)) : effectiveAtk + value;
+        } else if (stat === StatType.DEF) {
+          effectiveDef = isPercentage ? Math.floor(effectiveDef * (1 + value)) : effectiveDef + value;
+        }
+      }
+    }
+  }
+
   return (
     <div className="screen">
       <h2>모험</h2>
@@ -887,8 +902,8 @@ export function ChapterScreen() {
             <PlayerStatsBar
               hp={chapter ? chapter.sessionCurrentHp : playerStats.hp}
               maxHp={chapter ? chapter.sessionMaxHp : playerStats.maxHp}
-              atk={playerStats.atk}
-              def={playerStats.def}
+              atk={effectiveAtk}
+              def={effectiveDef}
             />
           )}
 
