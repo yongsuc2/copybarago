@@ -1359,3 +1359,49 @@ body {
 .settings-skill-desc { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
 .settings-empty { color: var(--color-text-muted); font-size: var(--font-base); text-align: center; padding: 16px; }
 .settings-actions { display: flex; flex-direction: column; gap: var(--gap-md); }
+
+.sd-stats-wrap { position: relative; }
+.sd-detail-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 2px 10px;
+  font-size: var(--font-sm);
+  border-radius: var(--radius-sm);
+}
+.sd-popup {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  max-width: 400px;
+  width: 100%;
+  margin: auto;
+}
+.sd-popup h3 {
+  text-align: center;
+  color: var(--color-accent);
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+.sd-section {
+  margin-bottom: 14px;
+}
+.sd-section h5 {
+  color: var(--color-text-secondary);
+  font-size: var(--font-sm);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+}
+.sd-stat-group {
+  margin-bottom: 6px;
+}
+.sd-total {
+  font-weight: bold;
+}
+.sd-sub {
+  padding-left: 16px;
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+}

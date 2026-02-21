@@ -1,4 +1,4 @@
-import { EquipmentGrade, ResourceType, SlotType, TalentGrade } from '../enums';
+import { EffectType, EquipmentGrade, ResourceType, SlotType, StatusEffectType, TalentGrade } from '../enums';
 import { Stats } from '../value-objects/Stats';
 import { Talent } from './Talent';
 import { Heritage } from './Heritage';
@@ -7,6 +7,7 @@ import { EquipmentSlot } from './EquipmentSlot';
 import { Pet } from './Pet';
 import { Resources } from './Resources';
 import { ChapterTreasureTable } from '../data/ChapterTreasureTable';
+import { BattleDataTable } from '../data/BattleDataTable';
 
 const SELL_PRICES: Record<EquipmentGrade, number> = {
   [EquipmentGrade.COMMON]: 10,
@@ -17,7 +18,31 @@ const SELL_PRICES: Record<EquipmentGrade, number> = {
   [EquipmentGrade.MYTHIC]: 3000,
 };
 
-const BASE_STATS = Stats.create({ hp: 100, maxHp: 100, atk: 10, def: 5, crit: 0 });
+export const BASE_STATS = Stats.create({ hp: 100, maxHp: 100, atk: 10, def: 5, crit: 0 });
+
+export interface StatsBreakdown {
+  base: Stats;
+  talent: Stats;
+  equipment: Stats;
+  heritage: Stats;
+  pet: Stats;
+  total: Stats;
+}
+
+export interface CombatPassives {
+  critDamage: number;
+  lifestealRate: number;
+  evasionRate: number;
+  shieldPercent: number;
+  multiHitChance: number;
+  regenPercent: number;
+  counterChance: number;
+  atkUpBuff: number;
+  critUpBuff: number;
+  defUpBuff: number;
+  magicBoost: number;
+  rageBoost: number;
+}
 
 export class Player {
   talent: Talent;
@@ -82,6 +107,89 @@ export class Player {
     stats = stats.withHp(stats.maxHp);
 
     return stats;
+  }
+
+  getStatsBreakdown(): StatsBreakdown {
+    const base = BASE_STATS.clone();
+    const talent = this.talent.getStats();
+
+    let equipment = Stats.ZERO;
+    for (const slot of this.equipmentSlots.values()) {
+      equipment = equipment.add(slot.getTotalStats());
+    }
+
+    const heritage = this.isHeritageUnlocked() ? this.heritage.getPassiveBonus() : Stats.ZERO;
+
+    let pet = Stats.ZERO;
+    if (this.activePet) {
+      pet = pet.add(this.activePet.getGlobalBonus());
+    }
+    for (const p of this.ownedPets) {
+      if (p !== this.activePet) {
+        pet = pet.add(Stats.create({
+          atk: Math.floor(p.getGlobalBonus().atk * 0.1),
+          maxHp: Math.floor(p.getGlobalBonus().maxHp * 0.1),
+        }));
+      }
+    }
+
+    let total = base.add(talent).add(equipment).add(heritage).add(pet);
+    total = total.withHp(total.maxHp);
+
+    return { base, talent, equipment, heritage, pet, total };
+  }
+
+  getCombatPassives(): CombatPassives {
+    const result: CombatPassives = {
+      critDamage: BattleDataTable.damage.critMultiplier,
+      lifestealRate: 0,
+      evasionRate: 0,
+      shieldPercent: 0,
+      multiHitChance: 0,
+      regenPercent: 0,
+      counterChance: 0,
+      atkUpBuff: 0,
+      critUpBuff: 0,
+      defUpBuff: 0,
+      magicBoost: 0,
+      rageBoost: 0,
+    };
+
+    for (const slot of this.equipmentSlots.values()) {
+      for (const eq of slot.getEquipped()) {
+        const passive = eq.getPassive();
+        if (!passive) continue;
+
+        switch (passive.effectType) {
+          case EffectType.SHIELD:
+            result.shieldPercent += passive.value;
+            break;
+          case EffectType.MULTI_HIT:
+            result.multiHitChance += passive.value;
+            break;
+          case EffectType.HOT:
+            result.regenPercent += passive.value;
+            break;
+          case EffectType.MAGIC_BOOST:
+            result.magicBoost += passive.value;
+            break;
+          case EffectType.RAGE_BOOST:
+            result.rageBoost += passive.value;
+            break;
+          case EffectType.BUFF:
+            if (passive.statusEffectType === StatusEffectType.ATK_UP) {
+              result.atkUpBuff += passive.value;
+            } else if (passive.statusEffectType === StatusEffectType.CRIT_UP) {
+              result.critUpBuff += passive.value;
+            } else if (passive.statusEffectType === StatusEffectType.DEF_UP) {
+              result.defUpBuff += passive.value;
+            }
+            break;
+        }
+      }
+    }
+
+    return result;
   }
 
   isHeritageUnlocked(): boolean {

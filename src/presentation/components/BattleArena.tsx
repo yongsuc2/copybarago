@@ -132,7 +132,9 @@ export function BattleArena({ playerUnit, enemyUnits, attackPhase, damageEntries
   const attackerIsPlayer = attackPhase.startsWith('player-');
   const attackerIsEnemy = attackPhase.startsWith('enemy-');
 
-  const projectileEntry = damageEntries.find(e => e.type === BattleLogType.SKILL_DAMAGE && e.skillIcon);
+  const projectileEntry = damageEntries.find(e =>
+    (e.type === BattleLogType.SKILL_DAMAGE || e.type === BattleLogType.CRIT) && e.skillIcon && e.skillName !== '일반 공격',
+  );
   const hasProjectile = !!projectileEntry;
   const isApproachPhase = attackPhase === 'player-approach' || attackPhase === 'enemy-approach';
 

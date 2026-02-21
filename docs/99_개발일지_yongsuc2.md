@@ -618,3 +618,37 @@ docs/90_OOP설계문서.md (SkillCategory 설명 정리)
 ### 누적 현황
 - 테스트: 21개 파일, 228개 테스트 전부 통과
 - tsc 타입 체크 통과
+
+---
+
+## 2026-02-21 (Day 10)
+
+### 완료 작업
+- **스킬 연출 순서 그룹화** (Y-19)
+  - reorderBySkillType() 함수 추가: 같은 skillName끼리 묶어서 연속 연출
+  - ATTACK/RAGE_ATTACK 경계 기준 배치 분리 (연타 배치는 별도 유지)
+  - 투사체 이펙트: CRIT 타입도 감지하도록 확장, approach 시점에 damageEntries 선설정
+
+- **로비 상세 스탯 팝업** (Y-20)
+  - Player.getStatsBreakdown(): 기본 스탯을 출처별(기본/재능/장비/유산/펫) 분해 반환
+  - Player.getCombatPassives(): 장비 패시브 기반 전투 스탯(방어막/연타/재생/버프/마법강화/분노충전) + 고정 전투 스탯(치명타 데미지/흡혈/회피/반격) 반환
+  - MainScreen에 [상세] 버튼 + modal-overlay 팝업 UI
+  - 기본 스탯 섹션: 총합 + 0이 아닌 출처만 하위 표시
+  - 전투 스탯 섹션: 0이어도 전부 표시 (향후 확장 대비)
+  - 장비 패시브 섹션: 장착 장비 패시브 합산값 표시
+
+### 생성된 파일
+```
+docs/화면기획문서/로비화면_기획서.md
+```
+
+### 수정된 파일
+```
+src/domain/entities/Player.ts (BASE_STATS export, StatsBreakdown/CombatPassives 인터페이스, getStatsBreakdown/getCombatPassives 메서드)
+src/presentation/screens/MainScreen.tsx (상세 스탯 팝업 UI)
+src/presentation/screens/ChapterScreen.tsx (reorderBySkillType, 투사체 타이밍 수정)
+src/presentation/components/BattleArena.tsx (CRIT 투사체 감지 확장)
+src/index.css (sd-popup/sd-section/sd-total/sd-sub 스타일)
+docs/01_전투시스템.md (reorderBySkillType 규칙, 투사체 이펙트 업데이트)
+docs/91_작업목록_yongsuc2.md (Y-19, Y-20 추가)
+```

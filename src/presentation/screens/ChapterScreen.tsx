@@ -53,18 +53,61 @@ function isDamageOrHeal(type: BattleLogType): boolean {
     || type === BattleLogType.REVIVE;
 }
 
-function splitToAnimationGroups(entries: BattleLogEntry[]): BattleLogEntry[][] {
-  const groups: BattleLogEntry[][] = [];
+function reorderBySkillType(entries: BattleLogEntry[]): BattleLogEntry[] {
+  const reordered: BattleLogEntry[] = [];
+  let skillBuffer: BattleLogEntry[] = [];
+  let lifestealBuffer: BattleLogEntry[] = [];
+
+  function flushBuffers() {
+    if (skillBuffer.length > 0) {
+      const byName = new Map<string, BattleLogEntry[]>();
+      const order: string[] = [];
+      for (const e of skillBuffer) {
+        const key = e.skillName ?? '';
+        if (!byName.has(key)) {
+          byName.set(key, []);
+          order.push(key);
+        }
+        byName.get(key)!.push(e);
+      }
+      for (const name of order) {
+        reordered.push(...byName.get(name)!);
+      }
+      skillBuffer = [];
+    }
+    reordered.push(...lifestealBuffer);
+    lifestealBuffer = [];
+  }
 
   for (const entry of entries) {
+    const isBoundary = entry.type === BattleLogType.ATTACK
+      || entry.type === BattleLogType.RAGE_ATTACK
+      || (entry.type === BattleLogType.CRIT && entry.skillName === '일반 공격');
+    if (isBoundary) {
+      flushBuffers();
+      reordered.push(entry);
+    } else if (entry.type === BattleLogType.LIFESTEAL) {
+      lifestealBuffer.push(entry);
+    } else {
+      skillBuffer.push(entry);
+    }
+  }
+  flushBuffers();
+
+  return reordered;
+}
+
+function splitToAnimationGroups(entries: BattleLogEntry[]): BattleLogEntry[][] {
+  const reordered = reorderBySkillType(entries);
+  const groups: BattleLogEntry[][] = [];
+
+  for (const entry of reordered) {
     if (entry.type === BattleLogType.LIFESTEAL) {
       if (groups.length > 0) {
         groups[groups.length - 1].push(entry);
       } else {
         groups.push([entry]);
       }
-    } else if (entry.type === BattleLogType.RAGE_ATTACK) {
-      groups.push([entry]);
     } else {
       groups.push([entry]);
     }
@@ -425,11 +468,20 @@ export function ChapterScreen() {
 
     const speed = battleSpeedRef.current;
 
+    const hasSkillProjectile = hitGroup.some(e =>
+      (e.type === BattleLogType.SKILL_DAMAGE || e.type === BattleLogType.CRIT) && e.skillIcon && e.skillName !== '일반 공격',
+    );
+    if (hasSkillProjectile) {
+      setDamageEntries(hitGroup);
+    }
+
     setAttackPhase(`${side}-approach`);
     await delay(PHASE_DURATION.approach / speed);
     if (cancelledRef.current) return { hps: newHps, player: prevPlayerUnit, enemies: prevEnemyUnits };
 
-    setDamageEntries(hitGroup);
+    if (!hasSkillProjectile) {
+      setDamageEntries(hitGroup);
+    }
     const midPlayer = cloneUnit(prevPlayerUnit);
     midPlayer.currentHp = newHps.playerHp;
 
