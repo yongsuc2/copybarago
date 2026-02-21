@@ -47,6 +47,7 @@ export class Chapter {
   sessionMaxHp: number;
   jungbakCount: number;
   daebakCount: number;
+  optionalEliteTriggered: boolean;
 
   private encounterGenerator: EncounterGenerator;
   private rng: SeededRandom;
@@ -66,6 +67,7 @@ export class Chapter {
     this.sessionMaxHp = 0;
     this.jungbakCount = 0;
     this.daebakCount = 0;
+    this.optionalEliteTriggered = false;
     this.encounterGenerator = new EncounterGenerator(seed);
     this.rng = new SeededRandom(seed + 1);
   }
@@ -86,6 +88,7 @@ export class Chapter {
   advanceDay(): Encounter | null {
     if (this.state !== ChapterState.IN_PROGRESS) return null;
 
+    this.optionalEliteTriggered = false;
     this.currentDay += 1;
 
     if (this.currentDay >= this.totalDays) {
@@ -93,7 +96,7 @@ export class Chapter {
       return null;
     }
 
-    if (this.isEliteDay() || this.isMidBossDay()) {
+    if (this.isEliteDay() || this.isMidBossDay() || this.rollOptionalElite()) {
       this.currentEncounter = null;
       return null;
     }
@@ -276,6 +279,18 @@ export class Chapter {
   isMidBossDay(): boolean {
     const days = EncounterDataTable.forcedBattleDays;
     return this.type === ChapterType.SIXTY_DAY && this.currentDay === days.midBoss;
+  }
+
+  isOptionalEliteDay(): boolean {
+    return this.optionalEliteTriggered;
+  }
+
+  private rollOptionalElite(): boolean {
+    if (this.type !== ChapterType.SIXTY_DAY) return false;
+    const entry = EncounterDataTable.optionalEliteDays.find(e => e.day === this.currentDay);
+    if (!entry) return false;
+    this.optionalEliteTriggered = this.rng.next() < entry.chance;
+    return this.optionalEliteTriggered;
   }
 
   isBossDay(): boolean {

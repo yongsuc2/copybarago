@@ -33,6 +33,17 @@ const PHASE_DURATION = {
   pause: 200,
 };
 
+const CONSECUTIVE_SKILL_BOOST = 1.7;
+
+function getGroupSkillKey(group: BattleLogEntry[]): string | null {
+  const primary = group[0];
+  if (!primary) return null;
+  if (primary.type === BattleLogType.SKILL_DAMAGE || primary.type === BattleLogType.CRIT) {
+    return primary.skillName ?? null;
+  }
+  return null;
+}
+
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -147,6 +158,7 @@ export function ChapterScreen() {
 
   const [battleSpeed, setBattleSpeed] = useState<1 | 2>(() => (localStorage.getItem('battleSpeed') === '2' ? 2 : 1));
   const battleSpeedRef = useRef<1 | 2>(localStorage.getItem('battleSpeed') === '2' ? 2 : 1);
+  const [animSpeed, setAnimSpeed] = useState<number>(() => (localStorage.getItem('battleSpeed') === '2' ? 2 : 1));
 
   const [showSettings, setShowSettings] = useState(false);
   const [selectedSkillIndex, setSelectedSkillIndex] = useState<number | null>(null);
@@ -365,6 +377,11 @@ export function ChapterScreen() {
       return;
     }
 
+    if (!enc && game.currentChapter.isOptionalEliteDay()) {
+      startEliteBattle();
+      return;
+    }
+
     if (!enc && game.currentChapter.isBossDay()) {
       startBossBattle();
       return;
@@ -458,6 +475,7 @@ export function ChapterScreen() {
     enemyNames: string[],
     prevPlayerUnit: BattleUnit,
     prevEnemyUnits: BattleUnit[],
+    consecutiveBoost: number = 1,
   ): Promise<{ hps: RunningHps; player: BattleUnit; enemies: BattleUnit[] }> {
     const newHps = computeMidTurnHp(
       runningHps, hitGroup, playerName,
@@ -466,7 +484,7 @@ export function ChapterScreen() {
       enemyNames,
     );
 
-    const speed = battleSpeedRef.current;
+    const speed = battleSpeedRef.current * consecutiveBoost;
 
     const hasSkillProjectile = hitGroup.some(e =>
       (e.type === BattleLogType.SKILL_DAMAGE || e.type === BattleLogType.CRIT) && e.skillIcon && e.skillName !== '일반 공격',
@@ -590,14 +608,19 @@ export function ChapterScreen() {
       if (targetIdx >= 0) setActiveEnemyIndex(targetIdx);
 
       const groups = splitToAnimationGroups(playerEntries);
+      let prevKey: string | null = null;
       for (const group of groups) {
         if (cancelledRef.current) break;
         const targetHpIdx = enemyNames.indexOf(group[0]?.target ?? '');
         if (targetHpIdx >= 0 && running.enemyHps[targetHpIdx] <= 0) break;
-        const res = await animateHitGroup(group, 'player', running, b, playerName, enemyNames, curPlayer, curEnemies);
+        const skillKey = getGroupSkillKey(group);
+        const boost = (skillKey !== null && skillKey === prevKey) ? CONSECUTIVE_SKILL_BOOST : 1;
+        setAnimSpeed(battleSpeedRef.current * boost);
+        const res = await animateHitGroup(group, 'player', running, b, playerName, enemyNames, curPlayer, curEnemies, boost);
         running = res.hps;
         curPlayer = res.player;
         curEnemies = res.enemies;
+        prevKey = skillKey;
       }
     }
 
@@ -607,12 +630,17 @@ export function ChapterScreen() {
       if (eIdx >= 0) setActiveEnemyIndex(eIdx);
 
       const groups = splitToAnimationGroups(entries);
+      let prevEKey: string | null = null;
       for (const group of groups) {
         if (cancelledRef.current || running.playerHp <= 0) break;
-        const res = await animateHitGroup(group, 'enemy', running, b, playerName, enemyNames, curPlayer, curEnemies);
+        const skillKey = getGroupSkillKey(group);
+        const boost = (skillKey !== null && skillKey === prevEKey) ? CONSECUTIVE_SKILL_BOOST : 1;
+        setAnimSpeed(battleSpeedRef.current * boost);
+        const res = await animateHitGroup(group, 'enemy', running, b, playerName, enemyNames, curPlayer, curEnemies, boost);
         running = res.hps;
         curPlayer = res.player;
         curEnemies = res.enemies;
+        prevEKey = skillKey;
       }
     }
 
@@ -909,7 +937,7 @@ export function ChapterScreen() {
             encounterType={encounter?.type}
             encounterOptionLabel={encounter?.options[0]?.label}
             skills={chapter?.sessionSkills}
-            speedMultiplier={battleSpeed}
+            speedMultiplier={animSpeed}
           />
 
           {isBattling && playerUnit ? (
@@ -929,6 +957,7 @@ export function ChapterScreen() {
                     const next = battleSpeed === 1 ? 2 : 1;
                     setBattleSpeed(next);
                     battleSpeedRef.current = next;
+                    setAnimSpeed(next);
                     localStorage.setItem('battleSpeed', String(next));
                   }}
                   title="배속"

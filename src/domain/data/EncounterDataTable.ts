@@ -53,6 +53,7 @@ export const EncounterDataTable = {
   combat: data.combat,
   counterThreshold: data.counterThreshold,
   forcedBattleDays: data.forcedBattleDays,
+  optionalEliteDays: data.optionalEliteDays as { day: number; chance: number }[],
   chapterClearReward: data.chapterClearReward,
   getChapterClearGold(chapterId: number): number {
     return data.chapterClearReward.goldBase + data.chapterClearReward.goldPerChapter * chapterId;

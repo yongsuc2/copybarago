@@ -80,6 +80,10 @@
     "elite": 20,
     "midBoss": 30
   },
+  "optionalEliteDays": [
+    { "day": 40, "chance": 0.5 },
+    { "day": 50, "chance": 0.5 }
+  ],
   "chapterBossAssignment": [
     { "elite": "elite_wolf", "midBoss": "boss_demon", "boss": "boss_dragon" },
     { "elite": "elite_mage", "midBoss": "boss_golem", "boss": "boss_demon" },
