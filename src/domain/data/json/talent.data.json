@@ -6,7 +6,7 @@
     "CRIT": 0
   },
   "baseUpgradeCost": 100,
-  "costGrowthRate": 1.15,
+  "costGrowthRate": 1.10,
   "gradeThresholds": [
     { "grade": "DISCIPLE", "totalLevel": 0 },
     { "grade": "ADVENTURER", "totalLevel": 30 },
