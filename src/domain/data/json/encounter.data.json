@@ -43,7 +43,13 @@
     "blessingGoldBase": 50,
     "blessingGoldPerChapter": 100,
     "blessingLabel": "축복",
-    "blessingDescription": "챕터에 따른 랜덤 골드 획득"
+    "blessingDescription": "챕터에 따른 랜덤 골드 획득",
+    "subWeights": {
+      "skillBox": 35,
+      "spring": 30,
+      "blessing": 25,
+      "skillSwap": 10
+    }
   },
   "jungbakRoulette": {
     "healPercent": 0.5,

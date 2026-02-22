@@ -199,8 +199,15 @@ export class EncounterGenerator {
   private createChanceEncounter(ownedSkills: SessionSkill[], chapterId: number): Encounter {
     const tier1Owned = ownedSkills.filter(s => s.tier === 1 && !isSpecialSkill(s.id));
     const canSwap = tier1Owned.length > 0;
-    const roll = this.rng.nextInt(0, canSwap ? 3 : 2);
     const d = EncounterDataTable.chance;
+    const w = d.subWeights;
+    const entries = [
+      { item: 0, weight: w.skillBox },
+      { item: 1, weight: w.spring },
+      { item: 2, weight: w.blessing },
+    ];
+    if (canSwap) entries.push({ item: 3, weight: w.skillSwap });
+    const roll = this.rng.weightedPick(entries);
     const options: EncounterOption[] = [];
 
     switch (roll) {
