@@ -812,16 +812,14 @@ export function ChapterScreen() {
   let effectiveAtk = playerStats.atk;
   let effectiveDef = playerStats.def;
   if (chapter) {
-    for (const skill of chapter.getSessionPassiveSkills()) {
-      if (skill.effect.type === PassiveType.STAT_MODIFIER) {
-        const { stat, value, isPercentage } = skill.effect;
-        if (stat === StatType.ATK) {
-          effectiveAtk = isPercentage ? Math.floor(effectiveAtk * (1 + value)) : effectiveAtk + value;
-        } else if (stat === StatType.DEF) {
-          effectiveDef = isPercentage ? Math.floor(effectiveDef * (1 + value)) : effectiveDef + value;
-        }
-      }
-    }
+    const battleStats = Stats.create({ maxHp: chapter.sessionMaxHp, hp: chapter.sessionCurrentHp, atk: playerStats.atk, def: playerStats.def, crit: playerStats.crit });
+    const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
+    const petAbility = game.battleManager.getPetAbilitySkill(game.player);
+    const allPassives = [...chapter.getBattlePassiveSkills(), ...equipPassives];
+    if (petAbility) allPassives.push(petAbility);
+    const tempUnit = new BattleUnit('temp', battleStats, [], allPassives, true);
+    effectiveAtk = tempUnit.baseAtk;
+    effectiveDef = tempUnit.baseDef;
   }
 
   return (
