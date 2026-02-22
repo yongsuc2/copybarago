@@ -89,6 +89,15 @@ export class EncounterGenerator {
     }
   }
 
+  regenerate(type: EncounterType, ownedSkills: SessionSkill[], chapterId: number): Encounter {
+    switch (type) {
+      case EncounterType.ANGEL: return this.createAngelEncounter(ownedSkills);
+      case EncounterType.DEMON: return this.createDemonEncounter(ownedSkills);
+      case EncounterType.CHANCE: return this.createChanceEncounter(ownedSkills, chapterId);
+      default: return this.createCombatEncounter();
+    }
+  }
+
   generateJungbakRoulette(ownedSkills: SessionSkill[]): Encounter {
     return this.createJungbakRouletteEncounter(ownedSkills);
   }

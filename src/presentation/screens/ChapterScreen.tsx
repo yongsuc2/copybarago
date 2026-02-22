@@ -983,6 +983,18 @@ export function ChapterScreen() {
                   </div>
                 ))}
               </div>
+              {chapter && chapter.sessionRerollsRemaining > 0 && encounter.options.some(o => o.reward.skills.length > 0) && (
+                <button
+                  className="btn btn-secondary"
+                  style={{ marginTop: 8, width: '100%' }}
+                  onClick={() => {
+                    const newEnc = chapter.rerollEncounter();
+                    if (newEnc) { setEncounter(newEnc); refresh(); }
+                  }}
+                >
+                  🔄 리롤 ({chapter.sessionRerollsRemaining}회 남음)
+                </button>
+              )}
             </>
           )}
 

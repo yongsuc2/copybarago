@@ -72,6 +72,7 @@
     "avoidLabel": "회피",
     "avoidDescription": "이번 전투 건너뛰기"
   },
+  "rerollsPerSession": 2,
   "skillSwap": {
     "skipLabel": "건너뛰기",
     "skipDescription": "교환하지 않기"

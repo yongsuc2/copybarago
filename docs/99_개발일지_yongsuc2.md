@@ -332,3 +332,4 @@
 - **40·50일차 확률적 엘리트 전투** (Y-24) — optionalEliteDays 데이터 테이블 추가, Chapter.rollOptionalElite() 확률 판정(30%), isOptionalEliteDay() 플래그, ChapterScreen에서 엘리트 전투 트리거
 - **재능 UI 레벨당 증가분 표시** (Y-25) — TalentScreen에 각 스탯의 레벨당 증가량 표시 (TalentTable.getStatPerLevel 참조)
 - **스킬 교환 인카운터** (Y-26) — CHANCE 하위 이벤트로 스킬 교환 추가, 보유 T1 스킬 1개를 랜덤 선택하고 새 T1 스킬 3개 중 1개로 교환, EncounterReward에 skillIdsToRemove 필드 추가
+- **스킬 리롤 기능** (Y-27) — 스킬 선택 인카운터에서 리롤 버튼 추가, 세션당 2회 제한, Chapter.rerollEncounter()로 같은 타입 재생성

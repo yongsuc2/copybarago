@@ -49,6 +49,7 @@ export class Chapter {
   jungbakCount: number;
   daebakCount: number;
   optionalEliteTriggered: boolean;
+  sessionRerollsRemaining: number;
 
   private encounterGenerator: EncounterGenerator;
   private rng: SeededRandom;
@@ -70,6 +71,7 @@ export class Chapter {
     this.jungbakCount = 0;
     this.daebakCount = 0;
     this.optionalEliteTriggered = false;
+    this.sessionRerollsRemaining = EncounterDataTable.rerollsPerSession;
     this.encounterGenerator = new EncounterGenerator(seed);
     this.rng = new SeededRandom(seed + 1);
   }
@@ -122,6 +124,15 @@ export class Chapter {
       this.type, this.currentDay, this.sessionSkills, this.id
     );
 
+    return this.currentEncounter;
+  }
+
+  rerollEncounter(): Encounter | null {
+    if (!this.currentEncounter || this.sessionRerollsRemaining <= 0) return null;
+    this.sessionRerollsRemaining--;
+    this.currentEncounter = this.encounterGenerator.regenerate(
+      this.currentEncounter.type, this.sessionSkills, this.id
+    );
     return this.currentEncounter;
   }
 
