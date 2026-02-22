@@ -32,6 +32,10 @@
 | Y-20 | 로비 상세 스탯 팝업 | 중 | 완료 | Player.getStatsBreakdown()/getCombatPassives() 추가, 출처별 기본 스탯 분해 + 전투 스탯 + 장비 패시브 팝업 UI |
 | Y-21 | 전투 시스템 확장 (패시브/AoE/방어공식/세션HP) | 상 | 완료 | hp_fortify·magic_mastery 패시브, 검기 AoE, 방어 퍼센트 감소 공식, 세션 maxHp 연동, 연속 연출 속도 조정, 전투 시작 함수 통합 |
 | Y-22 | 스킬 특징(traits) 필드 추가 | 하 | 완료 | ActiveSkillFamilyDef·PassiveSkillFamilyDef에 traits 필드, 기획/개발 참고용(UI 미표시), 04_스킬시스템.md 문서화 |
+| Y-23 | 인카운터 UI 세션 스탯 반영 | 하 | 완료 | PlayerStatsBar에 세션 패시브 스킬 STAT_MODIFIER 버프 반영 (effectiveAtk/effectiveDef 계산) |
+| Y-24 | 40·50일차 확률적 엘리트 전투 | 하 | 완료 | optionalEliteDays 데이터 테이블, Chapter.rollOptionalElite() 확률 판정, 30% 확률 |
+| Y-25 | 재능 UI 레벨당 증가분 표시 | 하 | 완료 | TalentScreen에 레벨당 스탯 증가량(+3/+15/+2) 표시 |
+| Y-26 | 스킬 교환 인카운터 | 중 | 완료 | SKILL_SWAP 인카운터 타입, T1 보유 스킬 1개 → 새 T1 스킬 3개 중 선택 교환, skillIdsToRemove 메카닉 |
 
 ---
 

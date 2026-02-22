@@ -322,3 +322,13 @@
 - **전투 시작 함수 통합** — startEliteBattle/startMidBossBattle/startBossBattle → startSpecialBattle(type)
 - **테스트 코드 추가** — BattleUnit(hp_fortify/magic_mastery/STAT_MODIFIER 순서/방어막), Chapter(세션HP/비율보존/getBattlePassiveSkills), SkillExecutionEngine(AoE/방어공식)
 - **스킬 특징(traits) 필드 추가** (Y-22) — ActiveSkillFamilyDef·PassiveSkillFamilyDef에 traits: string[] 필드 추가, 기획/개발 참고용(UI 미표시), 04_스킬시스템.md에 스킬 특징 테이블 문서화
+
+---
+
+## 2026-02-22 (Day 11)
+
+### 완료 작업
+- **인카운터 UI 세션 스탯 반영** (Y-23) — PlayerStatsBar에 세션 패시브 스킬의 STAT_MODIFIER 효과 반영, 기본 스탯 대신 버프 적용된 effectiveAtk/effectiveDef 표시
+- **40·50일차 확률적 엘리트 전투** (Y-24) — optionalEliteDays 데이터 테이블 추가, Chapter.rollOptionalElite() 확률 판정(30%), isOptionalEliteDay() 플래그, ChapterScreen에서 엘리트 전투 트리거
+- **재능 UI 레벨당 증가분 표시** (Y-25) — TalentScreen에 각 스탯의 레벨당 증가량 표시 (TalentTable.getStatPerLevel 참조)
+- **스킬 교환 인카운터** (Y-26) — SKILL_SWAP 인카운터 타입 추가, 보유 T1 스킬 1개를 랜덤 선택하고 새 T1 스킬 3개 중 1개로 교환, EncounterReward에 skillIdsToRemove 필드 추가, 60일(5%)/30일(5%) 가중치

@@ -1,6 +1,7 @@
 import { useGame } from '../GameContext';
 import { StatType, ResourceType } from '../../domain/enums';
 import { StatsDisplay } from '../components/StatsDisplay';
+import { TalentTable } from '../../domain/data/TalentTable';
 
 export function TalentScreen() {
   const { game, refresh } = useGame();
@@ -61,7 +62,7 @@ export function TalentScreen() {
           <div className="talent-row" key={row.stat}>
             <div>
               <div style={{ fontWeight: 'bold' }}>{row.label}</div>
-              <div style={{ fontSize: 12, color: '#888' }}>{row.level}레벨</div>
+              <div style={{ fontSize: 12, color: '#888' }}>{row.level}레벨 (레벨당 +{TalentTable.getStatPerLevel(row.stat)})</div>
             </div>
             <button
               className="btn btn-primary"

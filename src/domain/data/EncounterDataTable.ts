@@ -51,6 +51,7 @@ export const EncounterDataTable = {
   jungbakRoulette: JUNGBAK_ROULETTE,
   daebakRoulette: data.daebakRoulette,
   combat: data.combat,
+  skillSwap: data.skillSwap,
   counterThreshold: data.counterThreshold,
   forcedBattleDays: data.forcedBattleDays,
   optionalEliteDays: data.optionalEliteDays as { day: number; chance: number }[],

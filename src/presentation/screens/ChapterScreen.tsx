@@ -774,7 +774,9 @@ export function ChapterScreen() {
     const ch = game.currentChapter;
     const result = ch.resolveEncounter(index, ch.sessionCurrentHp, ch.sessionMaxHp);
     if (result) {
-      if (result.skillsGained.length > 0) {
+      if (result.skillsRemoved.length > 0 && result.skillsGained.length > 0) {
+        setLog(prev => [...prev, `  교환: ${result.skillsRemoved.map(s => `${s.icon} ${s.name}`).join(', ')} → ${result.skillsGained.map(s => `${s.icon} ${s.name}`).join(', ')}`]);
+      } else if (result.skillsGained.length > 0) {
         setLog(prev => [...prev, `  획득: ${result.skillsGained.map(s => `${s.icon} ${s.name}`).join(', ')}`]);
       }
       if (result.hpChange !== 0) {

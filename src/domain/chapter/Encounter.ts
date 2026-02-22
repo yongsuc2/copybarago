@@ -15,12 +15,14 @@ export interface EncounterReward {
   skills: SessionSkill[];
   healPercent: number;
   reward: Reward;
+  skillIdsToRemove: string[];
 }
 
 export interface EncounterResult {
   chosen: EncounterOption;
   success: boolean;
   skillsGained: SessionSkill[];
+  skillsRemoved: SessionSkill[];
   hpChange: number;
   goldChange: number;
   reward: Reward;
@@ -44,6 +46,7 @@ export class Encounter {
         chosen,
         success: false,
         skillsGained: [],
+        skillsRemoved: [],
         hpChange: -hpCost,
         goldChange: -goldCost,
         reward: Reward.empty(),
@@ -56,6 +59,7 @@ export class Encounter {
       chosen,
       success: true,
       skillsGained: chosen.reward.skills,
+      skillsRemoved: [],
       hpChange: healAmount - hpCost,
       goldChange: -goldCost,
       reward: chosen.reward.reward,

@@ -143,6 +143,15 @@ export class Chapter {
       choiceIndex, playerCurrentHp, playerMaxHp, this.sessionGold, roll
     );
 
+    const idsToRemove = result.chosen.reward.skillIdsToRemove;
+    for (const id of idsToRemove) {
+      const idx = this.sessionSkills.findIndex(s => s.id === id);
+      if (idx >= 0) {
+        result.skillsRemoved.push(this.sessionSkills[idx]);
+        this.sessionSkills.splice(idx, 1);
+      }
+    }
+
     for (const skill of result.skillsGained) {
       const existingIdx = this.sessionSkills.findIndex(s => s.id === skill.id);
       if (existingIdx >= 0) {
@@ -152,7 +161,7 @@ export class Chapter {
       }
     }
 
-    if (result.skillsGained.length > 0) {
+    if (result.skillsGained.length > 0 || result.skillsRemoved.length > 0) {
       this.recalcSessionMaxHp();
     }
 
