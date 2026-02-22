@@ -39,6 +39,7 @@ export class BattleUnit implements SkillExecutionUnit {
   shield: number;
   usedOnceConditions: Set<string>;
   skillTagBonuses: Map<SkillTag, number>;
+  lowHpModifiers: { stat: StatType; maxBonus: number }[];
 
   constructor(
     name: string,
@@ -69,6 +70,7 @@ export class BattleUnit implements SkillExecutionUnit {
     this.shield = 0;
     this.usedOnceConditions = new Set();
     this.skillTagBonuses = new Map();
+    this.lowHpModifiers = [];
 
     this.applyPassiveSkills();
   }
@@ -127,11 +129,21 @@ export class BattleUnit implements SkillExecutionUnit {
         }
         break;
       }
+      case PassiveType.LOW_HP_MODIFIER: {
+        this.lowHpModifiers.push({ stat: skill.effect.stat, maxBonus: skill.effect.maxBonus });
+        break;
+      }
     }
   }
 
   getEffectiveAtk(): number {
     let atk = this.baseAtk;
+    const missingHpRatio = 1 - this.getHpPercent();
+    for (const mod of this.lowHpModifiers) {
+      if (mod.stat === StatType.ATK) {
+        atk = Math.floor(atk * (1 + mod.maxBonus * missingHpRatio));
+      }
+    }
     for (const effect of this.statusEffects) {
       if (effect.type === StatusEffectType.ATK_UP) {
         atk = Math.floor(atk * (1 + effect.value));
@@ -145,6 +157,12 @@ export class BattleUnit implements SkillExecutionUnit {
 
   getEffectiveDef(): number {
     let def = this.baseDef;
+    const missingHpRatio = 1 - this.getHpPercent();
+    for (const mod of this.lowHpModifiers) {
+      if (mod.stat === StatType.DEF) {
+        def = Math.floor(def * (1 + mod.maxBonus * missingHpRatio));
+      }
+    }
     for (const effect of this.statusEffects) {
       if (effect.type === StatusEffectType.DEF_UP) {
         def = Math.floor(def * (1 + effect.value));

@@ -349,3 +349,4 @@
 - **방어 강화 패시브** (Y-34) — def_fortify T1~T4 (8%→18%→32%→48%), STAT_MODIFIER DEF %, KNIGHT 시너지
 - **독 수리검 스킬** (Y-35) — 2턴마다 수리검에 확률적 독 주입, INJECT_EFFECT poison_inject, SHURIKEN+POISON 태그, RANGER 시너지
 - **인카운터 정리** (Y-36) — ANGEL 타입 제거→우연(CHANCE) 통합, T2 이하 제한 해제, DEMON 가중치 10→7%, CHANCE 가중치 53%, 하위 가중치 skillBox 60/spring 15/blessing 15/skillSwap 10, 중박/대박 카운터 증가 비활성화(시스템 유지), 카운터 바 UI 제거
+- **체력 비례 공격/방어 패시브** (Y-37) — LOW_HP_MODIFIER 타입 신규 추가, 배수진(low_hp_atk: 체력 낮을수록 ATK 증가, 최대 T4 +120%), 불굴(low_hp_def: 체력 낮을수록 DEF 증가, 최대 T4 +120%), getEffectiveAtk/Def에서 매 공격/방어 시 HP 비율 기반 실시간 보정

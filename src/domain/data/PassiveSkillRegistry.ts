@@ -175,6 +175,24 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
     buildDescription: (t) => `방어력 +${pct(td('def_fortify', t).value)}`,
   },
   {
+    id: 'low_hp_atk', name: '배수진', icon: '🔥',
+    tags: [], heritageSynergy: [HeritageRoute.SKULL],
+    traits: ['체력 낮을수록 공격력 증가', '실시간 적용', '하이리스크 하이리턴'],
+    buildEffect: (t) => ({
+      type: PassiveType.LOW_HP_MODIFIER, stat: StatType.ATK, maxBonus: td('low_hp_atk', t).maxBonus,
+    }),
+    buildDescription: (t) => `체력이 낮을수록 공격력 증가 (최대 +${pct(td('low_hp_atk', t).maxBonus)})`,
+  },
+  {
+    id: 'low_hp_def', name: '불굴', icon: '🏔️',
+    tags: [], heritageSynergy: [HeritageRoute.KNIGHT],
+    traits: ['체력 낮을수록 방어력 증가', '실시간 적용', '생존력 향상'],
+    buildEffect: (t) => ({
+      type: PassiveType.LOW_HP_MODIFIER, stat: StatType.DEF, maxBonus: td('low_hp_def', t).maxBonus,
+    }),
+    buildDescription: (t) => `체력이 낮을수록 방어력 증가 (최대 +${pct(td('low_hp_def', t).maxBonus)})`,
+  },
+  {
     id: 'angel_power', name: '천사의 힘', icon: '😇',
     tags: [], heritageSynergy: [],
     traits: ['공격력 직접 증가', '모든 빌드 범용'],

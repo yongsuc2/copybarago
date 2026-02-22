@@ -16,7 +16,8 @@ export type PassiveSkillId =
   | 'multi_hit' | 'crit_mastery' | 'rage_mastery'
   | 'lightning_mastery' | 'shuriken_mastery' | 'lance_mastery'
   | 'revive' | 'angel_power' | 'hp_fortify' | 'magic_mastery'
-  | 'atk_fortify' | 'def_fortify';
+  | 'atk_fortify' | 'def_fortify'
+  | 'low_hp_atk' | 'low_hp_def';
 
 export function getPassiveTierData(id: string, tier: number): Record<string, number> | undefined {
   const family = NESTED[id];

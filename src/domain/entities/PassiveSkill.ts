@@ -53,6 +53,12 @@ export interface SkillModifierEffect {
   };
 }
 
+export interface LowHpModifierEffect {
+  type: PassiveType.LOW_HP_MODIFIER;
+  stat: StatType.ATK | StatType.DEF;
+  maxBonus: number;
+}
+
 export type PassiveEffect =
   | StatModifierEffect
   | CounterEffect
@@ -61,7 +67,8 @@ export type PassiveEffect =
   | ReviveEffect
   | RegenEffect
   | MultiHitEffect
-  | SkillModifierEffect;
+  | SkillModifierEffect
+  | LowHpModifierEffect;
 
 const TIER_TO_GRADE: Record<number, SkillGrade> = {
   1: SkillGrade.NORMAL,
