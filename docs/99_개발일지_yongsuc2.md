@@ -335,3 +335,4 @@
 - **스킬 리롤 기능** (Y-27) — 스킬 선택 인카운터에서 리롤 버튼 추가, 세션당 2회 제한, Chapter.rerollEncounter()로 같은 타입 재생성
 - **장비 부스탯 시스템** (Y-28) — 등급별 0~5개 랜덤 부스탯 시스템 추가, 슬롯별 후보 풀(메인 스탯 제외), 뽑기 시 등급 맞게 생성, 합성 등급 업 시 기존 유지+1개 추가, equipment-substats.data.json 데이터 테이블, EquipmentSubStatTable 래퍼, Equipment/Forge/TreasureChest/SaveSerializer/EquipmentScreen 수정
 - **장비 % 패시브 가산 처리** — 장비 간 동일 스탯 % 패시브를 곱연산에서 가산으로 변경 (BattleManager.mergePercentageStatModifiers), 세션 스킬과는 별도 곱연산 유지
+- **공격 강화 패시브 스킬** (Y-29) — atk_fortify T1~T4 (6%/10%/14%/18%), STAT_MODIFIER ATK %, SKULL 시너지

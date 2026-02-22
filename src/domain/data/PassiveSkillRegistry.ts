@@ -157,6 +157,15 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
     buildDescription: (t) => `최대 체력 +${pct(td('hp_fortify', t).value)}`,
   },
   {
+    id: 'atk_fortify', name: '공격 강화', icon: '⚔️',
+    tags: [], heritageSynergy: [HeritageRoute.SKULL],
+    traits: ['공격력 직접 증가', '모든 빌드 범용'],
+    buildEffect: (t) => ({
+      type: PassiveType.STAT_MODIFIER, stat: StatType.ATK, value: td('atk_fortify', t).value, isPercentage: true,
+    }),
+    buildDescription: (t) => `공격력 +${pct(td('atk_fortify', t).value)}`,
+  },
+  {
     id: 'angel_power', name: '천사의 힘', icon: '😇',
     tags: [], heritageSynergy: [],
     traits: ['공격력 직접 증가', '모든 빌드 범용'],

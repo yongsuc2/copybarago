@@ -64,5 +64,10 @@
   { "skill": "hp_fortify", "tier": 1, "value": 0.05 },
   { "skill": "hp_fortify", "tier": 2, "value": 0.08 },
   { "skill": "hp_fortify", "tier": 3, "value": 0.11 },
-  { "skill": "hp_fortify", "tier": 4, "value": 0.15 }
+  { "skill": "hp_fortify", "tier": 4, "value": 0.15 },
+
+  { "skill": "atk_fortify", "tier": 1, "value": 0.06 },
+  { "skill": "atk_fortify", "tier": 2, "value": 0.10 },
+  { "skill": "atk_fortify", "tier": 3, "value": 0.14 },
+  { "skill": "atk_fortify", "tier": 4, "value": 0.18 }
 ]
