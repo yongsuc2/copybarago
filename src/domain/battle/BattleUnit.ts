@@ -136,14 +136,21 @@ export class BattleUnit implements SkillExecutionUnit {
     }
   }
 
+  private getLowHpBonus(stat: StatType): number {
+    const hpRatio = this.getHpPercent();
+    if (hpRatio >= 0.5) return 0;
+    const r = (0.5 - hpRatio) / 0.5;
+    let bonus = 0;
+    for (const mod of this.lowHpModifiers) {
+      if (mod.stat === stat) bonus += mod.maxBonus * r * r;
+    }
+    return bonus;
+  }
+
   getEffectiveAtk(): number {
     let atk = this.baseAtk;
-    const missingHpRatio = 1 - this.getHpPercent();
-    for (const mod of this.lowHpModifiers) {
-      if (mod.stat === StatType.ATK) {
-        atk = Math.floor(atk * (1 + mod.maxBonus * missingHpRatio));
-      }
-    }
+    const lowHpBonus = this.getLowHpBonus(StatType.ATK);
+    if (lowHpBonus > 0) atk = Math.floor(atk * (1 + lowHpBonus));
     for (const effect of this.statusEffects) {
       if (effect.type === StatusEffectType.ATK_UP) {
         atk = Math.floor(atk * (1 + effect.value));
@@ -157,12 +164,8 @@ export class BattleUnit implements SkillExecutionUnit {
 
   getEffectiveDef(): number {
     let def = this.baseDef;
-    const missingHpRatio = 1 - this.getHpPercent();
-    for (const mod of this.lowHpModifiers) {
-      if (mod.stat === StatType.DEF) {
-        def = Math.floor(def * (1 + mod.maxBonus * missingHpRatio));
-      }
-    }
+    const lowHpBonus = this.getLowHpBonus(StatType.DEF);
+    if (lowHpBonus > 0) def = Math.floor(def * (1 + lowHpBonus));
     for (const effect of this.statusEffects) {
       if (effect.type === StatusEffectType.DEF_UP) {
         def = Math.floor(def * (1 + effect.value));
