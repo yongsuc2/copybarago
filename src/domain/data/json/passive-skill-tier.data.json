@@ -76,13 +76,13 @@
   { "skill": "def_fortify", "tier": 3, "value": 0.32 },
   { "skill": "def_fortify", "tier": 4, "value": 0.48 },
 
-  { "skill": "low_hp_atk", "tier": 1, "maxBonus": 0.2 },
-  { "skill": "low_hp_atk", "tier": 2, "maxBonus": 0.46 },
-  { "skill": "low_hp_atk", "tier": 3, "maxBonus": 0.8 },
-  { "skill": "low_hp_atk", "tier": 4, "maxBonus": 1.2 },
+  { "skill": "low_hp_atk", "tier": 1, "maxBonus": 0.4 },
+  { "skill": "low_hp_atk", "tier": 2, "maxBonus": 0.92 },
+  { "skill": "low_hp_atk", "tier": 3, "maxBonus": 1.6 },
+  { "skill": "low_hp_atk", "tier": 4, "maxBonus": 2.4 },
 
-  { "skill": "low_hp_def", "tier": 1, "maxBonus": 0.2 },
-  { "skill": "low_hp_def", "tier": 2, "maxBonus": 0.46 },
-  { "skill": "low_hp_def", "tier": 3, "maxBonus": 0.8 },
-  { "skill": "low_hp_def", "tier": 4, "maxBonus": 1.2 }
+  { "skill": "low_hp_def", "tier": 1, "maxBonus": 0.4 },
+  { "skill": "low_hp_def", "tier": 2, "maxBonus": 0.92 },
+  { "skill": "low_hp_def", "tier": 3, "maxBonus": 1.6 },
+  { "skill": "low_hp_def", "tier": 4, "maxBonus": 2.4 }
 ]
