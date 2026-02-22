@@ -69,5 +69,10 @@
   { "skill": "atk_fortify", "tier": 1, "value": 0.06 },
   { "skill": "atk_fortify", "tier": 2, "value": 0.14 },
   { "skill": "atk_fortify", "tier": 3, "value": 0.24 },
-  { "skill": "atk_fortify", "tier": 4, "value": 0.36 }
+  { "skill": "atk_fortify", "tier": 4, "value": 0.36 },
+
+  { "skill": "def_fortify", "tier": 1, "value": 0.08 },
+  { "skill": "def_fortify", "tier": 2, "value": 0.18 },
+  { "skill": "def_fortify", "tier": 3, "value": 0.32 },
+  { "skill": "def_fortify", "tier": 4, "value": 0.48 }
 ]

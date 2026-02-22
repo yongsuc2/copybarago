@@ -190,7 +190,7 @@ export class SkillExecutionEngine {
         }
 
         case SkillEffectType.ADD_RAGE: {
-          source.rage = Math.min(source.rage + effect.amount, source.maxRage);
+          source.rage = source.rage + effect.amount;
           results.push({
             skillName: skill.name, skillIcon: skill.icon,
             damage: 0, isCrit: false, healAmount: 0, rageChange: effect.amount, debuffApplied: false,

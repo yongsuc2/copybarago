@@ -247,6 +247,40 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     buildDescription: (t) => `2턴마다 수리검 소환, 수리검이 ${pct(td('recovery_shuriken', t).injectedProbability)} 확률로 HP 회복`,
   },
   {
+    id: 'poison_shuriken', name: '독 수리검', icon: '☠️🌀',
+    hierarchy: SkillHierarchy.UPPER,
+    tags: [SkillTag.SHURIKEN, SkillTag.POISON],
+    heritageSynergy: [HeritageRoute.RANGER],
+    traits: ['수리검+독 복합', '확률 기반 지속 피해'],
+    buildTrigger: () => trigger(everyNTurns(2)),
+    buildEffects: (t) => {
+      const p = td('poison_shuriken', t).injectedProbability;
+      return [
+        { type: SkillEffectType.TRIGGER_SKILL, targetSkillId: 'shuriken_summon', count: 1 },
+        {
+          type: SkillEffectType.INJECT_EFFECT, targetSkillId: 'shuriken_summon',
+          injectedEffects: [{
+            type: SkillEffectType.TRIGGER_SKILL, targetSkillId: 'poison_inject', count: 1,
+            triggerConditions: trigger(onSkillActivation('shuriken_summon'), prob(p)),
+          }],
+        },
+      ];
+    },
+    buildDescription: (t) => `2턴마다 수리검 소환, 수리검이 ${pct(td('poison_shuriken', t).injectedProbability)} 확률로 독 주입`,
+  },
+  {
+    id: 'shuriken_strike', name: '수리검 강타', icon: '🌀',
+    hierarchy: SkillHierarchy.UPPER,
+    tags: [SkillTag.SHURIKEN],
+    heritageSynergy: [HeritageRoute.RANGER],
+    traits: ['일반 공격 연계', '물리 공격'],
+    buildTrigger: () => trigger(onSkillActivation('ilban_attack')),
+    buildEffects: (t) => [
+      { type: SkillEffectType.TRIGGER_SKILL, targetSkillId: 'shuriken_summon', count: td('shuriken_strike', t).count },
+    ],
+    buildDescription: (t) => `일반 공격 시 수리검 소환 ${td('shuriken_strike', t).count}회`,
+  },
+  {
     id: 'thunder_strike', name: '번개 강타', icon: '⚡',
     hierarchy: SkillHierarchy.UPPER,
     tags: [SkillTag.LIGHTNING],

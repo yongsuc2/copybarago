@@ -64,6 +64,16 @@
   { "skill": "recovery_shuriken", "tier": 3, "injectedProbability": 0.68 },
   { "skill": "recovery_shuriken", "tier": 4, "injectedProbability": 1.0 },
 
+  { "skill": "shuriken_strike", "tier": 1, "count": 1 },
+  { "skill": "shuriken_strike", "tier": 2, "count": 2 },
+  { "skill": "shuriken_strike", "tier": 3, "count": 4 },
+  { "skill": "shuriken_strike", "tier": 4, "count": 6 },
+
+  { "skill": "poison_shuriken", "tier": 1, "injectedProbability": 0.17 },
+  { "skill": "poison_shuriken", "tier": 2, "injectedProbability": 0.39 },
+  { "skill": "poison_shuriken", "tier": 3, "injectedProbability": 0.68 },
+  { "skill": "poison_shuriken", "tier": 4, "injectedProbability": 1.0 },
+
   { "skill": "thunder_strike", "tier": 1, "count": 1 },
   { "skill": "thunder_strike", "tier": 2, "count": 2 },
   { "skill": "thunder_strike", "tier": 3, "count": 4 },

@@ -166,6 +166,15 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
     buildDescription: (t) => `공격력 +${pct(td('atk_fortify', t).value)}`,
   },
   {
+    id: 'def_fortify', name: '방어 강화', icon: '🛡️',
+    tags: [], heritageSynergy: [HeritageRoute.KNIGHT],
+    traits: ['방어력 직접 증가', '모든 빌드 범용'],
+    buildEffect: (t) => ({
+      type: PassiveType.STAT_MODIFIER, stat: StatType.DEF, value: td('def_fortify', t).value, isPercentage: true,
+    }),
+    buildDescription: (t) => `방어력 +${pct(td('def_fortify', t).value)}`,
+  },
+  {
     id: 'angel_power', name: '천사의 힘', icon: '😇',
     tags: [], heritageSynergy: [],
     traits: ['공격력 직접 증가', '모든 빌드 범용'],

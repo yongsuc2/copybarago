@@ -629,6 +629,7 @@ export function ChapterScreen() {
     for (const [source, entries] of enemyEntriesBySource) {
       if (cancelledRef.current || running.playerHp <= 0) break;
       const eIdx = enemyNames.indexOf(source);
+      if (eIdx >= 0 && running.enemyHps[eIdx] <= 0) continue;
       if (eIdx >= 0) setActiveEnemyIndex(eIdx);
 
       const groups = splitToAnimationGroups(entries);

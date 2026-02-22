@@ -16,8 +16,8 @@ export type ActiveSkillId =
   | 'rage_accumulate' | 'hp_recovery'
   | 'lightning_summon' | 'lance_summon' | 'sword_aura_summon'
   | 'poison_inject' | 'flame_summon' | 'shuriken_summon'
-  | 'thunder_shuriken' | 'rage_shuriken' | 'recovery_shuriken'
-  | 'thunder_strike' | 'lance_strike' | 'aura_strike'
+  | 'thunder_shuriken' | 'rage_shuriken' | 'recovery_shuriken' | 'poison_shuriken'
+  | 'shuriken_strike' | 'thunder_strike' | 'lance_strike' | 'aura_strike'
   | 'bunno_thunder' | 'bunno_lance' | 'bunno_flame'
   | 'rage_gauge_boost' | 'venom_sword'
   | 'tyrant' | 'shrink_magic' | 'demon_power';

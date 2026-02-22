@@ -338,3 +338,13 @@
 - **공격 강화 패시브 스킬** (Y-29) — atk_fortify T1~T4 (6%/10%/14%/18%), STAT_MODIFIER ATK %, SKULL 시너지
 - **재능 등급업 보상** (Y-30) — 등급별 스탯 % 보너스 (ATK%/DEF%/HP%) 자동 적용, gradeRewards 데이터 테이블, Player.computeStats()에서 누적 % 계산, 등급업 팝업 UI, StatsBreakdown에 talentGrade 항목 추가
 - **스킬 티어 스케일링 가속 곡선** (Y-31) — 전 스킬 티어별 수치를 1:2.3:4:6 비율로 재조정, 증가분이 티어마다 커지는 가속 곡선 적용, 확률 캡(1.0) 스킬은 T1 역산 조정 (revive/shuriken 3종), duration/count/단일티어 스킬 별도 처리
+
+---
+
+## 2026-02-23 (Day 12)
+
+### 완료 작업
+- **분노 초과분 유지** (Y-32) — 분노 100 소모 후 초과분을 버리지 않고 유지하도록 변경, SkillExecutionEngine에서 Math.min 캡 제거
+- **수리검 강타 스킬** (Y-33) — 매 일반 공격 시 수리검 소환하는 UPPER 스킬, onSkillActivation('ilban_attack') 트리거, count 1→2→4→6
+- **방어 강화 패시브** (Y-34) — def_fortify T1~T4 (8%→18%→32%→48%), STAT_MODIFIER DEF %, KNIGHT 시너지
+- **독 수리검 스킬** (Y-35) — 2턴마다 수리검에 확률적 독 주입, INJECT_EFFECT poison_inject, SHURIKEN+POISON 태그, RANGER 시너지

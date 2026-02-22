@@ -41,6 +41,10 @@
 | Y-29 | 공격 강화 패시브 스킬 추가 | 하 | 완료 | atk_fortify T1~T4 (6%~18%), STAT_MODIFIER ATK % |
 | Y-30 | 재능 등급업 보상 시스템 | 중 | 완료 | 등급별 스탯 % 보너스 (ATK%/DEF%/HP%), Player.computeStats() 누적 적용, 등급업 팝업 UI, StatsBreakdown 등급 보너스 항목 |
 | Y-31 | 스킬 티어 스케일링 가속 곡선 | 중 | 완료 | 전 스킬 1:2.3:4:6 비율 재조정, 확률 캡 스킬 T1 역산, duration/count 별도 처리 |
+| Y-32 | 분노 초과분 유지 | 하 | 완료 | 분노 100 소모 후 초과분 버리지 않고 유지, Math.min 캡 제거 |
+| Y-33 | 수리검 강타 스킬 추가 | 하 | 완료 | 매 일반 공격 시 수리검 소환, count 1→2→4→6, SHURIKEN 태그 |
+| Y-34 | 방어 강화 패시브 스킬 추가 | 하 | 완료 | def_fortify T1~T4 (8%~48%), STAT_MODIFIER DEF %, KNIGHT 시너지 |
+| Y-35 | 독 수리검 스킬 추가 | 하 | 완료 | 2턴마다 수리검+확률적 독 주입, INJECT_EFFECT poison_inject, SHURIKEN+POISON 태그 |
 
 ---
 
