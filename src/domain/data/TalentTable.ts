@@ -5,6 +5,14 @@ const STAT_PER_LEVEL = data.statPerLevel as Record<StatType, number>;
 const GRADE_THRESHOLDS = data.gradeThresholds as { grade: TalentGrade; totalLevel: number }[];
 const GRADE_ORDER = data.gradeOrder as TalentGrade[];
 
+export interface TalentGradeReward {
+  atkPercent: number;
+  defPercent: number;
+  hpPercent: number;
+}
+
+const GRADE_REWARDS = data.gradeRewards as Record<string, TalentGradeReward>;
+
 export const TalentTable = {
   getStatPerLevel(statType: StatType): number {
     return STAT_PER_LEVEL[statType];
@@ -38,5 +46,19 @@ export const TalentTable = {
     const nextGrade = GRADE_ORDER[idx + 1];
     const threshold = GRADE_THRESHOLDS.find(t => t.grade === nextGrade);
     return threshold?.totalLevel ?? null;
+  },
+
+  getGradeReward(grade: TalentGrade): TalentGradeReward | null {
+    return GRADE_REWARDS[grade] ?? null;
+  },
+
+  getCumulativeGradeBonus(grade: TalentGrade): TalentGradeReward {
+    let atk = 0, def = 0, hp = 0;
+    const idx = GRADE_ORDER.indexOf(grade);
+    for (let i = 0; i <= idx; i++) {
+      const r = GRADE_REWARDS[GRADE_ORDER[i]];
+      if (r) { atk += r.atkPercent; def += r.defPercent; hp += r.hpPercent; }
+    }
+    return { atkPercent: atk, defPercent: def, hpPercent: hp };
   },
 };

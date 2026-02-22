@@ -10,6 +10,7 @@ import { formatNumber } from '../components/PlayerStatsBar';
 const SOURCE_LABELS: { key: Exclude<keyof StatsBreakdown, 'total'>; label: string }[] = [
   { key: 'base', label: '기본' },
   { key: 'talent', label: '재능' },
+  { key: 'talentGrade', label: '등급 보너스' },
   { key: 'equipment', label: '장비' },
   { key: 'heritage', label: '유산' },
   { key: 'pet', label: '펫' },

@@ -1,12 +1,24 @@
+import { useState } from 'react';
 import { useGame } from '../GameContext';
-import { StatType, ResourceType } from '../../domain/enums';
+import { StatType, ResourceType, TalentGrade } from '../../domain/enums';
 import { StatsDisplay } from '../components/StatsDisplay';
 import { TalentTable } from '../../domain/data/TalentTable';
+import type { TalentGradeReward } from '../../domain/data/TalentTable';
+
+const GRADE_LABELS: Record<TalentGrade, string> = {
+  [TalentGrade.DISCIPLE]: '수련생',
+  [TalentGrade.ADVENTURER]: '모험가',
+  [TalentGrade.ELITE]: '정예',
+  [TalentGrade.MASTER]: '달인',
+  [TalentGrade.WARRIOR]: '전사',
+  [TalentGrade.HERO]: '영웅',
+};
 
 export function TalentScreen() {
   const { game, refresh } = useGame();
   const talent = game.player.talent;
   const stats = game.player.computeStats();
+  const [gradeUpReward, setGradeUpReward] = useState<{ grade: TalentGrade; reward: TalentGradeReward } | null>(null);
 
   function upgradeStat(stat: StatType) {
     const cost = talent.getUpgradeCost(stat);
@@ -15,6 +27,14 @@ export function TalentScreen() {
     const result = talent.upgrade(stat, game.player.resources.gold);
     if (result.isOk() && result.data) {
       game.player.resources.spend(ResourceType.GOLD, result.data.cost);
+
+      if (result.data.gradeChanged) {
+        const reward = TalentTable.getGradeReward(talent.grade);
+        if (reward) {
+          setGradeUpReward({ grade: talent.grade, reward });
+        }
+      }
+
       game.saveGame();
     }
     refresh();
@@ -35,7 +55,7 @@ export function TalentScreen() {
       <div className="card">
         <div className="stat-row">
           <span>등급</span>
-          <span>{talent.grade}</span>
+          <span>{GRADE_LABELS[talent.grade] ?? talent.grade}</span>
         </div>
         <div className="stat-row">
           <span>총 레벨</span>
@@ -87,6 +107,37 @@ export function TalentScreen() {
           <div className="stat-row">
             <span>레벨</span>
             <span>{game.player.heritage.level}</span>
+          </div>
+        </div>
+      )}
+
+      {gradeUpReward && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100,
+        }}>
+          <div style={{
+            background: '#1a1020', border: '2px solid #ffd700', borderRadius: 12,
+            padding: 24, minWidth: 280, textAlign: 'center',
+          }}>
+            <div style={{ fontSize: 18, fontWeight: 'bold', color: '#ffd700', marginBottom: 16 }}>
+              등급 승급!
+            </div>
+            <div style={{ fontSize: 16, marginBottom: 16 }}>
+              {GRADE_LABELS[gradeUpReward.grade] ?? gradeUpReward.grade}
+            </div>
+            <div style={{ fontSize: 13, color: '#ccc', marginBottom: 16, lineHeight: 1.8 }}>
+              {gradeUpReward.reward.atkPercent > 0 && <div>공격력 +{(gradeUpReward.reward.atkPercent * 100).toFixed(0)}%</div>}
+              {gradeUpReward.reward.defPercent > 0 && <div>방어력 +{(gradeUpReward.reward.defPercent * 100).toFixed(0)}%</div>}
+              {gradeUpReward.reward.hpPercent > 0 && <div>체력 +{(gradeUpReward.reward.hpPercent * 100).toFixed(0)}%</div>}
+            </div>
+            <button
+              className="btn btn-primary"
+              style={{ width: '100%' }}
+              onClick={() => { setGradeUpReward(null); refresh(); }}
+            >
+              확인
+            </button>
           </div>
         </div>
       )}

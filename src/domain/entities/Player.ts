@@ -8,6 +8,7 @@ import { Pet } from './Pet';
 import { Resources } from './Resources';
 import { ChapterTreasureTable } from '../data/ChapterTreasureTable';
 import { BattleDataTable } from '../data/BattleDataTable';
+import { TalentTable } from '../data/TalentTable';
 
 const SELL_PRICES: Record<EquipmentGrade, number> = {
   [EquipmentGrade.COMMON]: 10,
@@ -26,6 +27,7 @@ export interface StatsBreakdown {
   equipment: Stats;
   heritage: Stats;
   pet: Stats;
+  talentGrade: Stats;
   total: Stats;
 }
 
@@ -104,6 +106,15 @@ export class Player {
       }
     }
 
+    const gradeBonus = TalentTable.getCumulativeGradeBonus(this.talent.grade);
+    stats = Stats.create({
+      hp: stats.hp,
+      maxHp: Math.floor(stats.maxHp * (1 + gradeBonus.hpPercent)),
+      atk: Math.floor(stats.atk * (1 + gradeBonus.atkPercent)),
+      def: Math.floor(stats.def * (1 + gradeBonus.defPercent)),
+      crit: stats.crit,
+    });
+
     stats = stats.withHp(stats.maxHp);
 
     return stats;
@@ -133,10 +144,19 @@ export class Player {
       }
     }
 
-    let total = base.add(talent).add(equipment).add(heritage).add(pet);
+    let flatTotal = base.add(talent).add(equipment).add(heritage).add(pet);
+
+    const gradeBonus = TalentTable.getCumulativeGradeBonus(this.talent.grade);
+    const talentGrade = Stats.create({
+      maxHp: Math.floor(flatTotal.maxHp * gradeBonus.hpPercent),
+      atk: Math.floor(flatTotal.atk * gradeBonus.atkPercent),
+      def: Math.floor(flatTotal.def * gradeBonus.defPercent),
+    });
+
+    let total = flatTotal.add(talentGrade);
     total = total.withHp(total.maxHp);
 
-    return { base, talent, equipment, heritage, pet, total };
+    return { base, talent, equipment, heritage, pet, talentGrade, total };
   }
 
   getCombatPassives(): CombatPassives {
