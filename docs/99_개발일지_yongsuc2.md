@@ -337,3 +337,4 @@
 - **장비 % 패시브 가산 처리** — 장비 간 동일 스탯 % 패시브를 곱연산에서 가산으로 변경 (BattleManager.mergePercentageStatModifiers), 세션 스킬과는 별도 곱연산 유지
 - **공격 강화 패시브 스킬** (Y-29) — atk_fortify T1~T4 (6%/10%/14%/18%), STAT_MODIFIER ATK %, SKULL 시너지
 - **재능 등급업 보상** (Y-30) — 등급별 스탯 % 보너스 (ATK%/DEF%/HP%) 자동 적용, gradeRewards 데이터 테이블, Player.computeStats()에서 누적 % 계산, 등급업 팝업 UI, StatsBreakdown에 talentGrade 항목 추가
+- **스킬 티어 스케일링 가속 곡선** (Y-31) — 전 스킬 티어별 수치를 1:2.3:4:6 비율로 재조정, 증가분이 티어마다 커지는 가속 곡선 적용, 확률 캡(1.0) 스킬은 T1 역산 조정 (revive/shuriken 3종), duration/count/단일티어 스킬 별도 처리
