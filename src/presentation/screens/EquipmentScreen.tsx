@@ -14,6 +14,15 @@ const SLOT_LABELS = EquipmentDataTable.slotLabels;
 const GRADE_LABELS = EquipmentDataTable.gradeLabels;
 const SELL_PRICES = EquipmentDataTable.sellPrices;
 
+const SUBSTAT_LABELS: Record<string, string> = {
+  ATK: 'ATK', maxHp: 'HP', DEF: 'DEF', CRIT: 'CRIT',
+};
+
+function formatSubStatValue(stat: string, value: number): string {
+  if (stat === 'CRIT') return `+${(value * 100).toFixed(1)}%`;
+  return `+${Math.floor(value)}`;
+}
+
 const SLOTS = [SlotType.WEAPON, SlotType.ARMOR, SlotType.RING, SlotType.NECKLACE, SlotType.SHOES, SlotType.GLOVES, SlotType.HAT];
 
 type Tab = 'equip' | 'forge';
@@ -170,7 +179,7 @@ export function EquipmentScreen() {
 
   function mergeEquipment(group: Equipment[]) {
     const required = EquipmentTable.getMergeCount(group[0].grade);
-    const result = game.forge.merge(group.slice(0, required));
+    const result = game.forge.merge(group.slice(0, required), game.rng);
     if (result.isFail() || !result.data) return;
 
     for (const eq of group.slice(0, required)) {
@@ -190,7 +199,7 @@ export function EquipmentScreen() {
       const required = EquipmentTable.getMergeCount(group[0].grade);
       if (group.length < required) continue;
 
-      const mergeResult = game.forge.merge(group.slice(0, required));
+      const mergeResult = game.forge.merge(group.slice(0, required), game.rng);
       if (mergeResult.isFail() || !mergeResult.data) continue;
 
       for (const eq of group.slice(0, required)) {
@@ -392,6 +401,15 @@ export function EquipmentScreen() {
             {stats.atk > 0 && <span style={{ marginRight: 12 }}>ATK +{stats.atk}</span>}
             {stats.maxHp > 0 && <span>HP +{stats.maxHp}</span>}
           </div>
+          {eq.subStats.length > 0 && (
+            <div style={{ fontSize: 11, color: '#b0b0ff', marginBottom: 6 }}>
+              {eq.subStats.map((s, i) => (
+                <span key={i} style={{ marginRight: 10 }}>
+                  {SUBSTAT_LABELS[s.stat] ?? s.stat} {formatSubStatValue(s.stat, s.value)}
+                </span>
+              ))}
+            </div>
+          )}
           <div style={{ fontSize: 11, color: '#aaa', marginBottom: 8 }}>
             {getPassiveTypeName(eq)}
           </div>
@@ -439,6 +457,15 @@ export function EquipmentScreen() {
             {stats.atk > 0 && <span style={{ marginRight: 12 }}>ATK +{stats.atk}</span>}
             {stats.maxHp > 0 && <span>HP +{stats.maxHp}</span>}
           </div>
+          {eq.subStats.length > 0 && (
+            <div style={{ fontSize: 11, color: '#b0b0ff', marginBottom: 6 }}>
+              {eq.subStats.map((s, i) => (
+                <span key={i} style={{ marginRight: 10 }}>
+                  {SUBSTAT_LABELS[s.stat] ?? s.stat} {formatSubStatValue(s.stat, s.value)}
+                </span>
+              ))}
+            </div>
+          )}
           <div style={{ fontSize: 11, color: '#aaa', marginBottom: 8 }}>
             {getPassiveTypeName(eq)}
           </div>

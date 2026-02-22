@@ -20,17 +20,40 @@ export interface BattleResult {
 
 export class BattleManager {
   getEquipmentPassiveSkills(player: Player): PassiveSkill[] {
-    const skills: PassiveSkill[] = [];
+    const raw: PassiveSkill[] = [];
     for (const [, slot] of player.equipmentSlots.entries()) {
       for (const eq of slot.equipped) {
         if (!eq) continue;
         const passive = eq.getPassive();
         if (!passive) continue;
         const converted = this.passiveToPassiveSkill(passive, eq.id);
-        if (converted) skills.push(converted);
+        if (converted) raw.push(converted);
       }
     }
-    return skills;
+    return this.mergePercentageStatModifiers(raw);
+  }
+
+  private mergePercentageStatModifiers(skills: PassiveSkill[]): PassiveSkill[] {
+    const merged = new Map<string, number>();
+    const nonMergeable: PassiveSkill[] = [];
+
+    for (const skill of skills) {
+      if (skill.effect.type === PassiveType.STAT_MODIFIER && skill.effect.isPercentage) {
+        const key = String(skill.effect.stat);
+        merged.set(key, (merged.get(key) ?? 0) + skill.effect.value);
+      } else {
+        nonMergeable.push(skill);
+      }
+    }
+
+    for (const [stat, value] of merged) {
+      nonMergeable.push(new PassiveSkill(
+        `eq_merged_${stat}`, '', '', 1, [], [],
+        { type: PassiveType.STAT_MODIFIER, stat: stat as any, value, isPercentage: true },
+      ));
+    }
+
+    return nonMergeable;
   }
 
   private passiveToPassiveSkill(passive: EquipmentPassiveDef, eqId: string): PassiveSkill | null {

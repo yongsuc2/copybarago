@@ -4,6 +4,7 @@ import { Result } from '../value-objects/Result';
 import { EquipmentTable } from '../data/EquipmentTable';
 import { EquipmentPassiveTable } from '../data/EquipmentPassiveTable';
 import type { EquipmentPassiveDef } from '../data/EquipmentPassiveTable';
+import type { SubStat } from '../data/EquipmentSubStatTable';
 
 export interface UniqueEffect {
   description: string;
@@ -22,6 +23,7 @@ export class Equipment {
     public readonly uniqueEffect: UniqueEffect | null = null,
     public readonly weaponSubType: WeaponSubType | null = null,
     public mergeLevel: number = 0,
+    public readonly subStats: SubStat[] = [],
   ) {}
 
   getPassive(): EquipmentPassiveDef | null {
@@ -38,6 +40,9 @@ export class Equipment {
     let stats = baseStats.add(bonus);
     if (this.uniqueEffect) {
       stats = stats.add(this.uniqueEffect.statBonus);
+    }
+    for (const sub of this.subStats) {
+      stats = stats.add(Stats.create({ [sub.stat]: sub.value }));
     }
     return stats;
   }

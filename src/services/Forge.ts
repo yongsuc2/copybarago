@@ -2,6 +2,8 @@ import { Equipment } from '../domain/entities/Equipment';
 import { EquipmentGrade, SlotType } from '../domain/enums';
 import { Result } from '../domain/value-objects/Result';
 import { EquipmentTable } from '../domain/data/EquipmentTable';
+import { EquipmentSubStatTable } from '../domain/data/EquipmentSubStatTable';
+import type { SeededRandom } from '../infrastructure/SeededRandom';
 
 export class Forge {
   canMerge(equipments: Equipment[]): boolean {
@@ -26,7 +28,7 @@ export class Forge {
     return equipments.length >= required;
   }
 
-  merge(equipments: Equipment[]): Result<{ result: Equipment }> {
+  merge(equipments: Equipment[], rng?: SeededRandom): Result<{ result: Equipment }> {
     if (!this.canMerge(equipments)) {
       return Result.fail('Cannot merge these equipments');
     }
@@ -51,6 +53,7 @@ export class Forge {
           null,
           source.weaponSubType,
           source.mergeLevel + 1,
+          [...source.subStats],
         );
         return Result.ok({ result: resultEquipment });
       }
@@ -58,6 +61,10 @@ export class Forge {
       const nextGrade = EquipmentTable.getNextGrade(source.grade);
       if (!nextGrade) {
         return Result.fail('Already at max grade');
+      }
+      const newSubStats = [...source.subStats];
+      if (rng) {
+        newSubStats.push(EquipmentSubStatTable.rollSubStat(source.slot, nextGrade, rng));
       }
       const resultEquipment = new Equipment(
         `merged_${Date.now()}`,
@@ -70,6 +77,7 @@ export class Forge {
         null,
         source.weaponSubType,
         0,
+        newSubStats,
       );
       return Result.ok({ result: resultEquipment });
     }
@@ -79,6 +87,10 @@ export class Forge {
       return Result.fail('Already at max grade');
     }
 
+    const newSubStats = [...source.subStats];
+    if (rng) {
+      newSubStats.push(EquipmentSubStatTable.rollSubStat(source.slot, nextGrade, rng));
+    }
     const resultEquipment = new Equipment(
       `merged_${Date.now()}`,
       `${nextGrade} ${source.slot}`,
@@ -90,6 +102,7 @@ export class Forge {
       null,
       source.weaponSubType,
       0,
+      newSubStats,
     );
 
     return Result.ok({ result: resultEquipment });

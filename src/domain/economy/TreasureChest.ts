@@ -2,6 +2,7 @@ import { ChestType, EquipmentGrade, ResourceType, SlotType, WeaponSubType } from
 import { Equipment } from '../entities/Equipment';
 import type { SeededRandom } from '../../infrastructure/SeededRandom';
 import { EquipmentDataTable } from '../data/EquipmentDataTable';
+import { EquipmentSubStatTable } from '../data/EquipmentSubStatTable';
 import gachaData from '../data/json/gacha.data.json';
 
 interface ChestConfig {
@@ -92,6 +93,7 @@ export class TreasureChest {
       ? `${EquipmentDataTable.getGradeLabel(grade)} ${EquipmentDataTable.getWeaponSubTypeLabel(subType)}`
       : `${EquipmentDataTable.getGradeLabel(grade)} ${EquipmentDataTable.getSlotLabel(slot)}`;
 
+    const subStats = EquipmentSubStatTable.rollNewSubStats(slot, grade, rng);
     const equipment = new Equipment(
       `chest_${Date.now()}_${rng.nextInt(0, 9999)}`,
       name,
@@ -100,6 +102,8 @@ export class TreasureChest {
       isS,
       0, 0, null,
       subType,
+      0,
+      subStats,
     );
 
     return { equipment, resources: [], isPity: false };
@@ -119,6 +123,7 @@ export class TreasureChest {
     const slotLabel = slot === SlotType.WEAPON && subType
       ? EquipmentDataTable.getWeaponSubTypeLabel(subType)
       : EquipmentDataTable.getSlotLabel(slot);
+    const subStats = EquipmentSubStatTable.rollNewSubStats(slot, EquipmentGrade.MYTHIC, rng);
     const equipment = new Equipment(
       `pity_${Date.now()}`,
       `신화 ${slotLabel}`,
@@ -127,6 +132,8 @@ export class TreasureChest {
       false,
       0, 0, null,
       subType,
+      0,
+      subStats,
     );
     return { equipment, resources: [], isPity: true };
   }
