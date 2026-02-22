@@ -85,7 +85,6 @@ export class EncounterGenerator {
       case EncounterType.DEMON: return this.createDemonEncounter(ownedSkills);
       case EncounterType.COMBAT: return this.createCombatEncounter();
       case EncounterType.CHANCE: return this.createChanceEncounter(ownedSkills, chapterId);
-      case EncounterType.SKILL_SWAP: return this.createSkillSwapEncounter(ownedSkills);
       default: return this.createCombatEncounter();
     }
   }
@@ -189,7 +188,9 @@ export class EncounterGenerator {
   }
 
   private createChanceEncounter(ownedSkills: SessionSkill[], chapterId: number): Encounter {
-    const roll = this.rng.nextInt(0, 2);
+    const tier1Owned = ownedSkills.filter(s => s.tier === 1 && !isSpecialSkill(s.id));
+    const canSwap = tier1Owned.length > 0;
+    const roll = this.rng.nextInt(0, canSwap ? 3 : 2);
     const d = EncounterDataTable.chance;
     const options: EncounterOption[] = [];
 
@@ -227,6 +228,41 @@ export class EncounterGenerator {
           goldCost: 0,
           successRate: 1.0,
           reward: resourceReward(ResourceType.GOLD, goldAmount),
+        });
+        break;
+      }
+      case 3: {
+        const newSkills = this.getRandomSkills(3, ownedSkills, 1);
+        if (newSkills.length === 0) {
+          options.push({
+            label: d.springLabel,
+            description: d.springDescription,
+            hpCostPercent: 0,
+            goldCost: 0,
+            successRate: 1.0,
+            reward: healReward(d.springHealPercent),
+          });
+          break;
+        }
+        const oldSkill = this.rng.pick(tier1Owned);
+        const sw = EncounterDataTable.skillSwap;
+        for (const newSkill of newSkills) {
+          options.push({
+            label: `${oldSkill.icon} ${oldSkill.name} → ${newSkill.icon} ${newSkill.name}`,
+            description: newSkill.description,
+            hpCostPercent: 0,
+            goldCost: 0,
+            successRate: 1.0,
+            reward: swapReward(newSkill, oldSkill.id),
+          });
+        }
+        options.push({
+          label: sw.skipLabel,
+          description: sw.skipDescription,
+          hpCostPercent: 0,
+          goldCost: 0,
+          successRate: 1.0,
+          reward: emptyReward(),
         });
         break;
       }
@@ -272,40 +308,6 @@ export class EncounterGenerator {
     });
 
     return new Encounter(EncounterType.JUNGBAK_ROULETTE, options);
-  }
-
-  private createSkillSwapEncounter(ownedSkills: SessionSkill[]): Encounter {
-    const tier1Owned = ownedSkills.filter(s => s.tier === 1 && !isSpecialSkill(s.id));
-    if (tier1Owned.length === 0) return this.createCombatEncounter();
-
-    const newSkills = this.getRandomSkills(3, ownedSkills, 1);
-    if (newSkills.length === 0) return this.createCombatEncounter();
-
-    const oldSkill = this.rng.pick(tier1Owned);
-    const d = EncounterDataTable.skillSwap;
-
-    const options: EncounterOption[] = [];
-    for (const newSkill of newSkills) {
-      options.push({
-        label: `${oldSkill.icon} ${oldSkill.name} → ${newSkill.icon} ${newSkill.name}`,
-        description: newSkill.description,
-        hpCostPercent: 0,
-        goldCost: 0,
-        successRate: 1.0,
-        reward: swapReward(newSkill, oldSkill.id),
-      });
-    }
-
-    options.push({
-      label: d.skipLabel,
-      description: d.skipDescription,
-      hpCostPercent: 0,
-      goldCost: 0,
-      successRate: 1.0,
-      reward: emptyReward(),
-    });
-
-    return new Encounter(EncounterType.SKILL_SWAP, options);
   }
 
   private createDaebakRouletteEncounter(ownedSkills: SessionSkill[]): Encounter {

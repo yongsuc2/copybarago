@@ -82,7 +82,6 @@ export enum EncounterType {
   COMBAT = 'COMBAT',
   JUNGBAK_ROULETTE = 'JUNGBAK_ROULETTE',
   DAEBAK_ROULETTE = 'DAEBAK_ROULETTE',
-  SKILL_SWAP = 'SKILL_SWAP',
 }
 
 export enum ChapterType {

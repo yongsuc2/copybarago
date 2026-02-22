@@ -19,7 +19,6 @@ const ENCOUNTER_EMOJI: Record<EncounterType, string> = {
   [EncounterType.CHANCE]: '🎁',
   [EncounterType.JUNGBAK_ROULETTE]: '🎲',
   [EncounterType.DAEBAK_ROULETTE]: '⭐',
-  [EncounterType.SKILL_SWAP]: '🔄',
 };
 
 function getChanceEmoji(optionLabel?: string): string {

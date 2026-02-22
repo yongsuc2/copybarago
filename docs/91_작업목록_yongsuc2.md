@@ -35,7 +35,7 @@
 | Y-23 | 인카운터 UI 세션 스탯 반영 | 하 | 완료 | PlayerStatsBar에 세션 패시브 스킬 STAT_MODIFIER 버프 반영 (effectiveAtk/effectiveDef 계산) |
 | Y-24 | 40·50일차 확률적 엘리트 전투 | 하 | 완료 | optionalEliteDays 데이터 테이블, Chapter.rollOptionalElite() 확률 판정, 30% 확률 |
 | Y-25 | 재능 UI 레벨당 증가분 표시 | 하 | 완료 | TalentScreen에 레벨당 스탯 증가량(+3/+15/+2) 표시 |
-| Y-26 | 스킬 교환 인카운터 | 중 | 완료 | SKILL_SWAP 인카운터 타입, T1 보유 스킬 1개 → 새 T1 스킬 3개 중 선택 교환, skillIdsToRemove 메카닉 |
+| Y-26 | 스킬 교환 인카운터 | 중 | 완료 | CHANCE 하위 이벤트로 T1 스킬 교환, T1 보유 스킬 1개 → 새 T1 스킬 3개 중 선택 교환, skillIdsToRemove 메카닉 |
 
 ---
 
