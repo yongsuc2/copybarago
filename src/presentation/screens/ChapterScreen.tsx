@@ -14,7 +14,7 @@ import { EncounterDataTable } from '../../domain/data/EncounterDataTable';
 import { ActiveSkillRegistry } from '../../domain/data/ActiveSkillRegistry';
 import { PassiveSkillRegistry } from '../../domain/data/PassiveSkillRegistry';
 import type { SessionSkill } from '../../domain/battle/BattleUnit';
-import { Package, Home, Swords, Zap, Star, BarChart3, FastForward, Coins, Settings } from 'lucide-react';
+import { Package, Home, Swords, BarChart3, FastForward, Coins, Settings } from 'lucide-react';
 import { BattleDataTable } from '../../domain/data/BattleDataTable';
 import { Stats } from '../../domain/value-objects/Stats';
 
@@ -887,20 +887,6 @@ export function ChapterScreen() {
                   <span>{chapter.sessionSkills.length}</span>
                 </div>
               )}
-              <div className="counter-bars">
-                <div className="counter-bar-item">
-                  <span className="counter-bar-label"><Zap size={11} /> 중박 {chapter.jungbakCount}/{EncounterDataTable.counterThreshold.jungbak}</span>
-                  <div className="counter-bar-track jungbak">
-                    <div className="counter-bar-fill jungbak" style={{ width: `${(chapter.jungbakCount / EncounterDataTable.counterThreshold.jungbak) * 100}%` }} />
-                  </div>
-                </div>
-                <div className="counter-bar-item">
-                  <span className="counter-bar-label"><Star size={11} /> 대박 {chapter.daebakCount}/{EncounterDataTable.counterThreshold.daebak}</span>
-                  <div className="counter-bar-track daebak">
-                    <div className="counter-bar-fill daebak" style={{ width: `${(chapter.daebakCount / EncounterDataTable.counterThreshold.daebak) * 100}%` }} />
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 

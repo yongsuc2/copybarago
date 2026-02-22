@@ -198,7 +198,7 @@ describe('PassiveSkillRegistry', () => {
     const lifesteal4 = PassiveSkillRegistry.getById('lifesteal', 4);
     expect(lifesteal4).toBeDefined();
     if (lifesteal4!.effect.type === PassiveType.LIFESTEAL) {
-      expect(lifesteal4!.effect.rate).toBe(0.21);
+      expect(lifesteal4!.effect.rate).toBe(0.48);
     }
   });
 
@@ -223,7 +223,7 @@ describe('PassiveSkillRegistry', () => {
     const revive = PassiveSkillRegistry.getById('revive', 1)!;
     expect(revive.effect.type).toBe(PassiveType.REVIVE);
     if (revive.effect.type === PassiveType.REVIVE) {
-      expect(revive.effect.hpPercent).toBe(0.3);
+      expect(revive.effect.hpPercent).toBe(0.17);
       expect(revive.effect.maxUses).toBe(1);
     }
   });

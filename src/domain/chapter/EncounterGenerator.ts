@@ -81,7 +81,6 @@ export class EncounterGenerator {
     );
 
     switch (type) {
-      case EncounterType.ANGEL: return this.createAngelEncounter(ownedSkills);
       case EncounterType.DEMON: return this.createDemonEncounter(ownedSkills);
       case EncounterType.COMBAT: return this.createCombatEncounter();
       case EncounterType.CHANCE: return this.createChanceEncounter(ownedSkills, chapterId);
@@ -91,7 +90,6 @@ export class EncounterGenerator {
 
   regenerate(type: EncounterType, ownedSkills: SessionSkill[], chapterId: number): Encounter {
     switch (type) {
-      case EncounterType.ANGEL: return this.createAngelEncounter(ownedSkills);
       case EncounterType.DEMON: return this.createDemonEncounter(ownedSkills);
       case EncounterType.CHANCE: return this.createChanceEncounter(ownedSkills, chapterId);
       default: return this.createCombatEncounter();
@@ -120,26 +118,6 @@ export class EncounterGenerator {
       candidates.splice(idx, 1);
     }
     return result;
-  }
-
-  private createAngelEncounter(ownedSkills: SessionSkill[]): Encounter {
-    const skills = this.getRandomSkills(3, ownedSkills, 2);
-    const d = EncounterDataTable.angel;
-
-    const options: EncounterOption[] = [];
-
-    for (const skill of skills) {
-      options.push({
-        label: d.skillLabel(skill.icon, skill.name),
-        description: d.skillDescription(skill.description),
-        hpCostPercent: 0,
-        goldCost: 0,
-        successRate: 1.0,
-        reward: skillReward([skill]),
-      });
-    }
-
-    return new Encounter(EncounterType.ANGEL, options);
   }
 
   private createDemonEncounter(ownedSkills: SessionSkill[]): Encounter {

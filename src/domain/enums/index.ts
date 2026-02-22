@@ -76,7 +76,6 @@ export enum PetGrade {
 }
 
 export enum EncounterType {
-  ANGEL = 'ANGEL',
   DEMON = 'DEMON',
   CHANCE = 'CHANCE',
   COMBAT = 'COMBAT',

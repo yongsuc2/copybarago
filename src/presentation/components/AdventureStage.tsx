@@ -14,7 +14,6 @@ const SKILL_GRADE_COLORS: Record<SkillGrade, string> = {
 
 const ENCOUNTER_EMOJI: Record<EncounterType, string> = {
   [EncounterType.COMBAT]: '⚔️',
-  [EncounterType.ANGEL]: '😇',
   [EncounterType.DEMON]: '😈',
   [EncounterType.CHANCE]: '🎁',
   [EncounterType.JUNGBAK_ROULETTE]: '🎲',

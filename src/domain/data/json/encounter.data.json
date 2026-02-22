@@ -1,35 +1,26 @@
 {
   "typeInfo": {
-    "ANGEL": { "label": "천사", "description": "천사가 나타나 스킬이나 회복을 제공합니다." },
     "DEMON": { "label": "악마", "description": "악마가 체력을 대가로 강력한 스킬을 제안합니다." },
     "CHANCE": { "label": "우연", "description": "행운의 이벤트가 발생했습니다!" },
     "COMBAT": { "label": "전투", "description": "적과 조우했습니다." },
-    "JUNGBAK_ROULETTE": { "label": "중박 룰렛", "description": "중박이 12회 누적되어 특별 보상 룰렛이 발동합니다!" },
-    "DAEBAK_ROULETTE": { "label": "대박 룰렛", "description": "대박이 7회 누적되어 전설적인 룰렛이 발동합니다!" }
+    "JUNGBAK_ROULETTE": { "label": "중박 룰렛", "description": "중박이 누적되어 특별 보상 룰렛이 발동합니다!" },
+    "DAEBAK_ROULETTE": { "label": "대박 룰렛", "description": "대박이 누적되어 전설적인 룰렛이 발동합니다!" }
   },
   "weights": {
     "SIXTY_DAY": [
       { "type": "COMBAT", "weight": 40 },
-      { "type": "ANGEL", "weight": 25 },
-      { "type": "DEMON", "weight": 10 },
-      { "type": "CHANCE", "weight": 25 }
+      { "type": "DEMON", "weight": 7 },
+      { "type": "CHANCE", "weight": 53 }
     ],
     "THIRTY_DAY": [
       { "type": "COMBAT", "weight": 40 },
-      { "type": "ANGEL", "weight": 25 },
-      { "type": "DEMON", "weight": 15 },
-      { "type": "CHANCE", "weight": 20 }
+      { "type": "DEMON", "weight": 7 },
+      { "type": "CHANCE", "weight": 53 }
     ],
     "FIVE_DAY": [
       { "type": "COMBAT", "weight": 70 },
-      { "type": "ANGEL", "weight": 20 },
-      { "type": "CHANCE", "weight": 10 }
+      { "type": "CHANCE", "weight": 30 }
     ]
-  },
-  "angel": {
-    "healPercent": 0.3,
-    "healLabel": "체력 30% 회복",
-    "healDescription": "전투 중 잃은 체력을 회복합니다"
   },
   "demon": {
     "hpCostPercent": 0.2,
@@ -45,9 +36,9 @@
     "blessingLabel": "축복",
     "blessingDescription": "챕터에 따른 랜덤 골드 획득",
     "subWeights": {
-      "skillBox": 35,
-      "spring": 30,
-      "blessing": 25,
+      "skillBox": 60,
+      "spring": 15,
+      "blessing": 15,
       "skillSwap": 10
     }
   },

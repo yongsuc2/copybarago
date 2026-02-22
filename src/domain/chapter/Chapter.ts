@@ -182,12 +182,6 @@ export class Chapter {
     }
     this.totalReward = this.totalReward.merge(result.reward);
 
-    if (encType === EncounterType.ANGEL) {
-      this.jungbakCount++;
-    } else if (encType === EncounterType.DEMON) {
-      this.daebakCount++;
-    }
-
     this.currentEncounter = null;
 
     this.sessionCurrentHp = Math.max(0, Math.min(

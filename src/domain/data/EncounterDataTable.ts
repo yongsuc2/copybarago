@@ -14,12 +14,6 @@ interface EncounterTypeInfo {
 const TYPE_INFO = data.typeInfo as Record<EncounterType, EncounterTypeInfo>;
 const WEIGHTS = data.weights as Record<ChapterType, EncounterWeight[]>;
 
-const ANGEL = {
-  ...data.angel,
-  skillLabel: (icon: string, name: string) => `${icon} ${name}`,
-  skillDescription: (desc: string) => desc,
-};
-
 const DEMON = {
   ...data.demon,
   skillLabel: (icon: string, name: string) => `${icon} ${name}`,
@@ -45,7 +39,6 @@ export const EncounterDataTable = {
   getWeights(chapterType: ChapterType): EncounterWeight[] {
     return WEIGHTS[chapterType];
   },
-  angel: ANGEL,
   demon: DEMON,
   chance: data.chance,
   jungbakRoulette: JUNGBAK_ROULETTE,

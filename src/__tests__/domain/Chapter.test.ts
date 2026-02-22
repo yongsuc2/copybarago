@@ -44,22 +44,22 @@ describe('Chapter', () => {
   });
 
   it('resolves non-combat encounter and gains skills', () => {
-    let angelFound = false;
+    let found = false;
 
     for (let attempt = 0; attempt < 50; attempt++) {
       const testChapter = new Chapter(1, ChapterType.SIXTY_DAY, attempt);
       const encounter = testChapter.advanceDay();
-      if (encounter && encounter.type === EncounterType.ANGEL) {
+      if (encounter && encounter.type === EncounterType.CHANCE) {
         const result = testChapter.resolveEncounter(0, 100, 100);
         if (result && result.skillsGained.length > 0) {
           expect(testChapter.sessionSkills.length).toBeGreaterThan(0);
-          angelFound = true;
+          found = true;
           break;
         }
       }
     }
 
-    expect(angelFound).toBe(true);
+    expect(found).toBe(true);
   });
 
   it('tracks progress correctly', () => {
