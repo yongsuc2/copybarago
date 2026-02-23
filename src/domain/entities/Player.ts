@@ -120,6 +120,11 @@ export class Player {
     return stats;
   }
 
+  getGoldMultiplier(): number {
+    const gradeBonus = TalentTable.getCumulativeGradeBonus(this.talent.grade);
+    return 1 + gradeBonus.goldPercent;
+  }
+
   getStatsBreakdown(): StatsBreakdown {
     const base = BASE_STATS.clone();
     const talent = this.talent.getStats();

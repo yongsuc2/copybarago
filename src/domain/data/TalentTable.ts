@@ -9,6 +9,7 @@ export interface TalentGradeReward {
   atkPercent: number;
   defPercent: number;
   hpPercent: number;
+  goldPercent: number;
 }
 
 const GRADE_REWARDS = data.gradeRewards as Record<string, TalentGradeReward>;
@@ -53,12 +54,12 @@ export const TalentTable = {
   },
 
   getCumulativeGradeBonus(grade: TalentGrade): TalentGradeReward {
-    let atk = 0, def = 0, hp = 0;
+    let atk = 0, def = 0, hp = 0, gold = 0;
     const idx = GRADE_ORDER.indexOf(grade);
     for (let i = 0; i <= idx; i++) {
       const r = GRADE_REWARDS[GRADE_ORDER[i]];
-      if (r) { atk += r.atkPercent; def += r.defPercent; hp += r.hpPercent; }
+      if (r) { atk += r.atkPercent; def += r.defPercent; hp += r.hpPercent; gold += r.goldPercent; }
     }
-    return { atkPercent: atk, defPercent: def, hpPercent: hp };
+    return { atkPercent: atk, defPercent: def, hpPercent: hp, goldPercent: gold };
   },
 };

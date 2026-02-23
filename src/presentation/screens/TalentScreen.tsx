@@ -130,6 +130,7 @@ export function TalentScreen() {
               {gradeUpReward.reward.atkPercent > 0 && <div>공격력 +{(gradeUpReward.reward.atkPercent * 100).toFixed(0)}%</div>}
               {gradeUpReward.reward.defPercent > 0 && <div>방어력 +{(gradeUpReward.reward.defPercent * 100).toFixed(0)}%</div>}
               {gradeUpReward.reward.hpPercent > 0 && <div>체력 +{(gradeUpReward.reward.hpPercent * 100).toFixed(0)}%</div>}
+              {gradeUpReward.reward.goldPercent > 0 && <div>획득 골드 +{(gradeUpReward.reward.goldPercent * 100).toFixed(0)}%</div>}
             </div>
             <button
               className="btn btn-primary"

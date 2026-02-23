@@ -352,3 +352,4 @@
 - **체력 비례 공격/방어 패시브** (Y-37) — LOW_HP_MODIFIER 타입 신규 추가, 배수진(low_hp_atk: 체력 낮을수록 ATK 증가, 최대 T4 +120%), 불굴(low_hp_def: 체력 낮을수록 DEF 증가, 최대 T4 +120%), getEffectiveAtk/Def에서 매 공격/방어 시 HP 비율 기반 실시간 보정
 - **최대 HP 비례 물리 추가 데미지 패시브** (Y-38) — MAX_HP_DAMAGE 타입 신규 추가, 압도(max_hp_damage): 물리 공격 시 maxHP×coefficient만큼 ATK에 추가(방어 적용), T1 2%~T4 12%, KNIGHT 시너지
 - **적 HP 비례 물리 공격 + 기절 스킬** (Y-39) — 분쇄(hp_crush): 적 maxHP 비례 물리 데미지(isTargetHpBased), SKULL 시너지 / 기절(stun_apply): LOWEST SkillEffectType.STUN(chance+duration), 강타(stun_strike): UPPER TRIGGER_SKILL→stun_apply, KNIGHT 시너지, processEnemyTurn 기절 체크
+- **재능 등급 골드 보상** (Y-40) — gradeRewards에 goldPercent 추가(2%~12%, 누적30%), Player.getGoldMultiplier(), 챕터 내 전투/인카운터/클리어 골드에만 적용, 등급업 팝업 표시

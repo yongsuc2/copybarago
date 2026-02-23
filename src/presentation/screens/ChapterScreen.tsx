@@ -264,7 +264,7 @@ export function ChapterScreen() {
         if (game.currentChapter) {
           game.player.clearedChapterMax = Math.max(game.player.clearedChapterMax, game.currentChapter.id);
           game.travel.maxClearedChapter = game.player.clearedChapterMax;
-          const clearGold = EncounterDataTable.getChapterClearGold(game.currentChapter.id);
+          const clearGold = Math.floor(EncounterDataTable.getChapterClearGold(game.currentChapter.id) * game.player.getGoldMultiplier());
           const clearGems = EncounterDataTable.getChapterClearGems(game.currentChapter.id);
           game.player.resources.add(ResourceType.GOLD, clearGold);
           game.player.resources.add(ResourceType.GEMS, clearGems);
@@ -298,7 +298,8 @@ export function ChapterScreen() {
       if (game.currentChapter && b.state === BattleState.VICTORY) {
         game.currentChapter.updateSessionHpAfterBattle(b.player.currentHp);
       }
-      const goldEarned = game.currentChapter?.onBattleEnd(b.state) ?? 0;
+      const goldBase = game.currentChapter?.onBattleEnd(b.state) ?? 0;
+      const goldEarned = Math.floor(goldBase * game.player.getGoldMultiplier());
       if (goldEarned > 0) {
         game.player.resources.add(ResourceType.GOLD, goldEarned);
       }
@@ -418,9 +419,11 @@ export function ChapterScreen() {
         if (result.hpChange !== 0) {
           setLog(prev => [...prev, `  체력 변화: ${result.hpChange > 0 ? '+' : ''}${result.hpChange}`]);
         }
+        const goldMult = game.player.getGoldMultiplier();
         for (const r of result.reward.resources) {
-          game.player.resources.add(r.type, r.amount);
-          setLog(prev => [...prev, `  보상: +${r.amount} ${r.type}`]);
+          const amount = r.type === ResourceType.GOLD ? Math.floor(r.amount * goldMult) : r.amount;
+          game.player.resources.add(r.type, amount);
+          setLog(prev => [...prev, `  보상: +${amount} ${r.type}`]);
         }
       }
       refresh();
@@ -783,9 +786,11 @@ export function ChapterScreen() {
       if (result.hpChange !== 0) {
         setLog(prev => [...prev, `  체력 변화: ${result.hpChange > 0 ? '+' : ''}${result.hpChange}`]);
       }
+      const goldMult = game.player.getGoldMultiplier();
       for (const r of result.reward.resources) {
-        game.player.resources.add(r.type, r.amount);
-        setLog(prev => [...prev, `  보상: +${r.amount} ${r.type}`]);
+        const amount = r.type === ResourceType.GOLD ? Math.floor(r.amount * goldMult) : r.amount;
+        game.player.resources.add(r.type, amount);
+        setLog(prev => [...prev, `  보상: +${amount} ${r.type}`]);
       }
     }
 

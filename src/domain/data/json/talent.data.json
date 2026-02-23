@@ -17,10 +17,10 @@
   ],
   "gradeOrder": ["DISCIPLE", "ADVENTURER", "ELITE", "MASTER", "WARRIOR", "HERO"],
   "gradeRewards": {
-    "ADVENTURER": { "atkPercent": 0.02, "defPercent": 0.02, "hpPercent": 0.02 },
-    "ELITE": { "atkPercent": 0.03, "defPercent": 0.03, "hpPercent": 0.03 },
-    "MASTER": { "atkPercent": 0.05, "defPercent": 0.05, "hpPercent": 0.05 },
-    "WARRIOR": { "atkPercent": 0.08, "defPercent": 0.08, "hpPercent": 0.08 },
-    "HERO": { "atkPercent": 0.12, "defPercent": 0.12, "hpPercent": 0.12 }
+    "ADVENTURER": { "atkPercent": 0.02, "defPercent": 0.02, "hpPercent": 0.02, "goldPercent": 0.02 },
+    "ELITE": { "atkPercent": 0.03, "defPercent": 0.03, "hpPercent": 0.03, "goldPercent": 0.03 },
+    "MASTER": { "atkPercent": 0.05, "defPercent": 0.05, "hpPercent": 0.05, "goldPercent": 0.05 },
+    "WARRIOR": { "atkPercent": 0.08, "defPercent": 0.08, "hpPercent": 0.08, "goldPercent": 0.08 },
+    "HERO": { "atkPercent": 0.12, "defPercent": 0.12, "hpPercent": 0.12, "goldPercent": 0.12 }
   }
 }
