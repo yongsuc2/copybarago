@@ -366,7 +366,7 @@ export class Battle {
   }
 
   private calculateBaseDamage(attacker: BattleUnit, defender: BattleUnit): number {
-    const atk = attacker.getEffectiveAtk();
+    const atk = attacker.getEffectiveAtk() + attacker.getHpBonusDamage();
     const def = defender.getEffectiveDef();
     const k = BattleDataTable.damage.defenseConstant;
     const raw = Math.max(1, Math.floor(atk * (k / (k + def))));

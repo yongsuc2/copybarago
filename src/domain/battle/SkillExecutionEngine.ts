@@ -23,6 +23,7 @@ export interface SkillExecutionUnit {
   getHpPercent(): number;
   usedOnceConditions: Set<string>;
   getSkillDamageMultiplier(tags: SkillTag[]): number;
+  getHpBonusDamage(): number;
 }
 
 export interface SkillDamageResult {
@@ -236,7 +237,7 @@ export class SkillExecutionEngine {
 
     switch (attackType) {
       case AttackType.PHYSICAL: {
-        const atk = source.getEffectiveAtk();
+        const atk = source.getEffectiveAtk() + source.getHpBonusDamage();
         const def = target.getEffectiveDef();
         const k = BattleDataTable.damage.defenseConstant;
         rawDamage = Math.max(1, Math.floor(atk * coefficient * (k / (k + def))));

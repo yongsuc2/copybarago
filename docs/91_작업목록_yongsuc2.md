@@ -47,6 +47,7 @@
 | Y-35 | 독 수리검 스킬 추가 | 하 | 완료 | 2턴마다 수리검+확률적 독 주입, INJECT_EFFECT poison_inject, SHURIKEN+POISON 태그 |
 | Y-36 | 인카운터 정리: 천사 제거 + 확률 조정 | 중 | 완료 | ANGEL 타입 제거→우연 통합, T2 제한 해제, 악마 7%, 우연 53%, 하위 가중치 재조정, 중/대박 카운터 증가 비활성화 |
 | Y-37 | 체력 비례 공격/방어 패시브 스킬 | 중 | 완료 | 배수진(low_hp_atk), 불굴(low_hp_def) — LOW_HP_MODIFIER 타입, getEffectiveAtk/Def 실시간 HP 비례 보정 |
+| Y-38 | 최대 HP 비례 물리 추가 데미지 패시브 | 중 | 완료 | 압도(max_hp_damage) — MAX_HP_DAMAGE 타입, 물리 공격 시 maxHP×coefficient 추가 ATK, 방어 적용 |
 
 ---
 

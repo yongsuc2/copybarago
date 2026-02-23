@@ -40,6 +40,7 @@ export class BattleUnit implements SkillExecutionUnit {
   usedOnceConditions: Set<string>;
   skillTagBonuses: Map<SkillTag, number>;
   lowHpModifiers: { stat: StatType; maxBonus: number }[];
+  hpDamageCoefficient: number;
 
   constructor(
     name: string,
@@ -71,6 +72,7 @@ export class BattleUnit implements SkillExecutionUnit {
     this.usedOnceConditions = new Set();
     this.skillTagBonuses = new Map();
     this.lowHpModifiers = [];
+    this.hpDamageCoefficient = 0;
 
     this.applyPassiveSkills();
   }
@@ -133,6 +135,10 @@ export class BattleUnit implements SkillExecutionUnit {
         this.lowHpModifiers.push({ stat: skill.effect.stat, maxBonus: skill.effect.maxBonus });
         break;
       }
+      case PassiveType.MAX_HP_DAMAGE: {
+        this.hpDamageCoefficient += skill.effect.coefficient;
+        break;
+      }
     }
   }
 
@@ -145,6 +151,11 @@ export class BattleUnit implements SkillExecutionUnit {
       if (mod.stat === stat) bonus += mod.maxBonus * r * r;
     }
     return bonus;
+  }
+
+  getHpBonusDamage(): number {
+    if (this.hpDamageCoefficient <= 0) return 0;
+    return Math.floor(this.maxHp * this.hpDamageCoefficient);
   }
 
   getEffectiveAtk(): number {

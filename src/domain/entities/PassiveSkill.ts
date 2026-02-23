@@ -59,6 +59,11 @@ export interface LowHpModifierEffect {
   maxBonus: number;
 }
 
+export interface MaxHpDamageEffect {
+  type: PassiveType.MAX_HP_DAMAGE;
+  coefficient: number;
+}
+
 export type PassiveEffect =
   | StatModifierEffect
   | CounterEffect
@@ -68,7 +73,8 @@ export type PassiveEffect =
   | RegenEffect
   | MultiHitEffect
   | SkillModifierEffect
-  | LowHpModifierEffect;
+  | LowHpModifierEffect
+  | MaxHpDamageEffect;
 
 const TIER_TO_GRADE: Record<number, SkillGrade> = {
   1: SkillGrade.NORMAL,

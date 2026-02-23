@@ -193,6 +193,15 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
     buildDescription: (t) => `체력이 낮을수록 방어력 증가 (최대 +${pct(td('low_hp_def', t).maxBonus)})`,
   },
   {
+    id: 'max_hp_damage', name: '압도', icon: '💪',
+    tags: [SkillTag.PHYSICAL], heritageSynergy: [HeritageRoute.KNIGHT],
+    traits: ['최대 체력 비례 추가 데미지', '물리 공격 전용', '탱크 빌드 시너지'],
+    buildEffect: (t) => ({
+      type: PassiveType.MAX_HP_DAMAGE, coefficient: td('max_hp_damage', t).coefficient,
+    }),
+    buildDescription: (t) => `물리 공격 시 최대 체력의 ${pct(td('max_hp_damage', t).coefficient)}만큼 추가 데미지`,
+  },
+  {
     id: 'angel_power', name: '천사의 힘', icon: '😇',
     tags: [], heritageSynergy: [],
     traits: ['공격력 직접 증가', '모든 빌드 범용'],
