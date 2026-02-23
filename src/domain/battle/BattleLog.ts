@@ -13,6 +13,7 @@ export enum BattleLogType {
   DEATH = 'DEATH',
   TURN_START = 'TURN_START',
   RAGE_ATTACK = 'RAGE_ATTACK',
+  STUN = 'STUN',
 }
 
 export interface BattleLogEntry {

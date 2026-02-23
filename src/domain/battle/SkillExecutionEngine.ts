@@ -135,14 +135,21 @@ export class SkillExecutionEngine {
 
           for (const t of targets) {
             const { damage: baseDamage, isCrit } = this.calculateSkillDamage(
-              source, t, effect.attackType, effect.coefficient,
+              source, t, effect.attackType, effect.coefficient, effect.isTargetHpBased,
             );
             const tagMult = source.getSkillDamageMultiplier(skill.tags);
             const damage = Math.max(1, Math.floor(baseDamage * tagMult));
             const dealt = t.takeDamage(damage);
+
+            let stunApplied = false;
+            if (effect.stunChance && effect.stunDuration && t.isAlive() && this.rng.chance(effect.stunChance)) {
+              t.addStatusEffect(new StatusEffect(StatusEffectType.STUN, effect.stunDuration, 0));
+              stunApplied = true;
+            }
+
             results.push({
               skillName: skill.name, skillIcon: skill.icon,
-              damage: dealt, isCrit, healAmount: 0, rageChange: 0, debuffApplied: false,
+              damage: dealt, isCrit, healAmount: 0, rageChange: 0, debuffApplied: stunApplied,
               targetName: (effect.isAoe && allTargets) ? t.name : undefined,
             });
 
@@ -232,15 +239,20 @@ export class SkillExecutionEngine {
     target: SkillExecutionUnit,
     attackType: AttackType,
     coefficient: number,
+    isTargetHpBased: boolean = false,
   ): { damage: number; isCrit: boolean } {
     let rawDamage: number;
 
     switch (attackType) {
       case AttackType.PHYSICAL: {
-        const atk = source.getEffectiveAtk() + source.getHpBonusDamage();
         const def = target.getEffectiveDef();
         const k = BattleDataTable.damage.defenseConstant;
-        rawDamage = Math.max(1, Math.floor(atk * coefficient * (k / (k + def))));
+        if (isTargetHpBased) {
+          rawDamage = Math.max(1, Math.floor(target.maxHp * coefficient * (k / (k + def))));
+        } else {
+          const atk = source.getEffectiveAtk() + source.getHpBonusDamage();
+          rawDamage = Math.max(1, Math.floor(atk * coefficient * (k / (k + def))));
+        }
         break;
       }
       case AttackType.MAGIC: {

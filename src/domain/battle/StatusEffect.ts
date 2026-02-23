@@ -33,6 +33,10 @@ export class StatusEffect {
     );
   }
 
+  isStun(): boolean {
+    return this.type === StatusEffectType.STUN;
+  }
+
   isDot(): boolean {
     return (
       this.type === StatusEffectType.POISON ||

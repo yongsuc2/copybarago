@@ -124,5 +124,15 @@
   { "skill": "shrink_magic", "tier": 3, "reduction": 0.4, "duration": 4 },
   { "skill": "shrink_magic", "tier": 4, "reduction": 0.6, "duration": 5 },
 
-  { "skill": "demon_power", "tier": 4, "coefficient": 0.5 }
+  { "skill": "demon_power", "tier": 4, "coefficient": 0.5 },
+
+  { "skill": "hp_crush", "tier": 1, "coefficient": 0.04 },
+  { "skill": "hp_crush", "tier": 2, "coefficient": 0.092 },
+  { "skill": "hp_crush", "tier": 3, "coefficient": 0.16 },
+  { "skill": "hp_crush", "tier": 4, "coefficient": 0.24 },
+
+  { "skill": "stun_strike", "tier": 1, "coefficient": 0.8, "stunChance": 0.15, "stunDuration": 1 },
+  { "skill": "stun_strike", "tier": 2, "coefficient": 0.8, "stunChance": 0.25, "stunDuration": 1 },
+  { "skill": "stun_strike", "tier": 3, "coefficient": 0.8, "stunChance": 0.35, "stunDuration": 1 },
+  { "skill": "stun_strike", "tier": 4, "coefficient": 0.8, "stunChance": 0.45, "stunDuration": 1 }
 ]

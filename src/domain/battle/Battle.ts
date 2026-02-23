@@ -203,6 +203,16 @@ export class Battle {
   private processEnemyTurn(enemy: BattleUnit, target: BattleUnit): void {
     if (!target.isAlive()) return;
 
+    const stunEffect = enemy.statusEffects.find(e => e.isStun());
+    if (stunEffect) {
+      this.log.add({
+        turn: this.turnCount, type: BattleLogType.STUN,
+        source: enemy.name, target: enemy.name, value: 0,
+        message: `${enemy.name} is stunned`,
+      });
+      return;
+    }
+
     const baseDamage = this.calculateBaseDamage(enemy, target);
     const isCrit = this.rng.chance(enemy.getEffectiveCrit());
     const finalDamage = isCrit ? Math.floor(baseDamage * BattleDataTable.damage.critMultiplier) : baseDamage;

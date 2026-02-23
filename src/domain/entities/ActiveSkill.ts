@@ -67,6 +67,9 @@ export interface AttackEffect {
   coefficient: number;
   duration?: number;
   isAoe?: boolean;
+  isTargetHpBased?: boolean;
+  stunChance?: number;
+  stunDuration?: number;
 }
 
 export interface TriggerSkillEffect {

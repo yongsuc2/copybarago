@@ -146,6 +146,7 @@ export enum StatusEffectType {
   DEF_UP = 'DEF_UP',
   DEF_DOWN = 'DEF_DOWN',
   CRIT_UP = 'CRIT_UP',
+  STUN = 'STUN',
 }
 
 export enum BattleState {

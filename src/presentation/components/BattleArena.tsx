@@ -15,6 +15,7 @@ const STATUS_ICON: Record<StatusEffectType, string> = {
   [StatusEffectType.DEF_UP]: '🛡️',
   [StatusEffectType.DEF_DOWN]: '🛡️',
   [StatusEffectType.CRIT_UP]: '🎯',
+  [StatusEffectType.STUN]: '💫',
 };
 
 const STATUS_CLASS: Record<StatusEffectType, string> = {
@@ -26,6 +27,7 @@ const STATUS_CLASS: Record<StatusEffectType, string> = {
   [StatusEffectType.DEF_UP]: 'buff',
   [StatusEffectType.DEF_DOWN]: 'debuff',
   [StatusEffectType.CRIT_UP]: 'buff',
+  [StatusEffectType.STUN]: 'debuff',
 };
 
 interface StatusIconGroup {
