@@ -16,11 +16,30 @@
     { "grade": "HERO", "totalLevel": 700 }
   ],
   "gradeOrder": ["DISCIPLE", "ADVENTURER", "ELITE", "MASTER", "WARRIOR", "HERO"],
-  "gradeRewards": {
-    "ADVENTURER": { "atkPercent": 0.02, "defPercent": 0.02, "hpPercent": 0.02, "goldPercent": 0.02 },
-    "ELITE": { "atkPercent": 0.03, "defPercent": 0.03, "hpPercent": 0.03, "goldPercent": 0.03 },
-    "MASTER": { "atkPercent": 0.05, "defPercent": 0.05, "hpPercent": 0.05, "goldPercent": 0.05 },
-    "WARRIOR": { "atkPercent": 0.08, "defPercent": 0.08, "hpPercent": 0.08, "goldPercent": 0.08 },
-    "HERO": { "atkPercent": 0.12, "defPercent": 0.12, "hpPercent": 0.12, "goldPercent": 0.12 }
-  }
+  "gradeMilestones": [
+    { "fromGrade": "DISCIPLE", "percent": 25, "rewardType": "GOLD", "rewardAmount": 300 },
+    { "fromGrade": "DISCIPLE", "percent": 50, "rewardType": "GEMS", "rewardAmount": 20 },
+    { "fromGrade": "DISCIPLE", "percent": 75, "rewardType": "EQUIPMENT_STONE", "rewardAmount": 3 },
+    { "fromGrade": "DISCIPLE", "percent": 100, "rewardType": "GOLD", "rewardAmount": 1000 },
+
+    { "fromGrade": "ADVENTURER", "percent": 25, "rewardType": "GOLD", "rewardAmount": 800 },
+    { "fromGrade": "ADVENTURER", "percent": 50, "rewardType": "EQUIPMENT_STONE", "rewardAmount": 5 },
+    { "fromGrade": "ADVENTURER", "percent": 75, "rewardType": "GEMS", "rewardAmount": 50 },
+    { "fromGrade": "ADVENTURER", "percent": 100, "rewardType": "POWER_STONE", "rewardAmount": 3 },
+
+    { "fromGrade": "ELITE", "percent": 25, "rewardType": "GOLD", "rewardAmount": 1500 },
+    { "fromGrade": "ELITE", "percent": 50, "rewardType": "GEMS", "rewardAmount": 80 },
+    { "fromGrade": "ELITE", "percent": 75, "rewardType": "POWER_STONE", "rewardAmount": 5 },
+    { "fromGrade": "ELITE", "percent": 100, "rewardType": "EQUIPMENT_STONE", "rewardAmount": 15 },
+
+    { "fromGrade": "MASTER", "percent": 25, "rewardType": "GOLD", "rewardAmount": 3000 },
+    { "fromGrade": "MASTER", "percent": 50, "rewardType": "GEMS", "rewardAmount": 120 },
+    { "fromGrade": "MASTER", "percent": 75, "rewardType": "POWER_STONE", "rewardAmount": 8 },
+    { "fromGrade": "MASTER", "percent": 100, "rewardType": "GOLD", "rewardAmount": 8000 },
+
+    { "fromGrade": "WARRIOR", "percent": 25, "rewardType": "GOLD", "rewardAmount": 5000 },
+    { "fromGrade": "WARRIOR", "percent": 50, "rewardType": "GEMS", "rewardAmount": 200 },
+    { "fromGrade": "WARRIOR", "percent": 75, "rewardType": "POWER_STONE", "rewardAmount": 15 },
+    { "fromGrade": "WARRIOR", "percent": 100, "rewardType": "GEMS", "rewardAmount": 300 }
+  ]
 }

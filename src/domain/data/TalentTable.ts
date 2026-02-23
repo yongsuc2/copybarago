@@ -1,18 +1,18 @@
-import { StatType, TalentGrade } from '../enums';
+import { StatType, TalentGrade, ResourceType } from '../enums';
 import data from './json/talent.data.json';
 
 const STAT_PER_LEVEL = data.statPerLevel as Record<StatType, number>;
 const GRADE_THRESHOLDS = data.gradeThresholds as { grade: TalentGrade; totalLevel: number }[];
 const GRADE_ORDER = data.gradeOrder as TalentGrade[];
 
-export interface TalentGradeReward {
-  atkPercent: number;
-  defPercent: number;
-  hpPercent: number;
-  goldPercent: number;
+export interface TalentMilestone {
+  fromGrade: TalentGrade;
+  percent: number;
+  rewardType: ResourceType;
+  rewardAmount: number;
 }
 
-const GRADE_REWARDS = data.gradeRewards as Record<string, TalentGradeReward>;
+const MILESTONES = data.gradeMilestones as TalentMilestone[];
 
 export const TalentTable = {
   getStatPerLevel(statType: StatType): number {
@@ -49,17 +49,23 @@ export const TalentTable = {
     return threshold?.totalLevel ?? null;
   },
 
-  getGradeReward(grade: TalentGrade): TalentGradeReward | null {
-    return GRADE_REWARDS[grade] ?? null;
+  getGradeStartLevel(grade: TalentGrade): number {
+    const threshold = GRADE_THRESHOLDS.find(t => t.grade === grade);
+    return threshold?.totalLevel ?? 0;
   },
 
-  getCumulativeGradeBonus(grade: TalentGrade): TalentGradeReward {
-    let atk = 0, def = 0, hp = 0, gold = 0;
-    const idx = GRADE_ORDER.indexOf(grade);
-    for (let i = 0; i <= idx; i++) {
-      const r = GRADE_REWARDS[GRADE_ORDER[i]];
-      if (r) { atk += r.atkPercent; def += r.defPercent; hp += r.hpPercent; gold += r.goldPercent; }
-    }
-    return { atkPercent: atk, defPercent: def, hpPercent: hp, goldPercent: gold };
+  getMilestonesForGrade(grade: TalentGrade): TalentMilestone[] {
+    return MILESTONES.filter(m => m.fromGrade === grade);
+  },
+
+  getMilestoneLevel(fromGrade: TalentGrade, percent: number): number {
+    const start = this.getGradeStartLevel(fromGrade);
+    const end = this.getNextGradeThreshold(fromGrade);
+    if (end === null) return start;
+    return start + Math.ceil((end - start) * percent / 100);
+  },
+
+  getAllMilestones(): TalentMilestone[] {
+    return MILESTONES;
   },
 };

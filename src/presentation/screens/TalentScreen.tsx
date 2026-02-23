@@ -3,7 +3,7 @@ import { useGame } from '../GameContext';
 import { StatType, ResourceType, TalentGrade } from '../../domain/enums';
 import { StatsDisplay } from '../components/StatsDisplay';
 import { TalentTable } from '../../domain/data/TalentTable';
-import type { TalentGradeReward } from '../../domain/data/TalentTable';
+import type { TalentMilestone } from '../../domain/data/TalentTable';
 
 const GRADE_LABELS: Record<TalentGrade, string> = {
   [TalentGrade.DISCIPLE]: '수련생',
@@ -14,11 +14,31 @@ const GRADE_LABELS: Record<TalentGrade, string> = {
   [TalentGrade.HERO]: '영웅',
 };
 
+const RESOURCE_ICONS: Partial<Record<ResourceType, string>> = {
+  [ResourceType.GOLD]: '🪙',
+  [ResourceType.GEMS]: '💎',
+  [ResourceType.EQUIPMENT_STONE]: '⚒️',
+  [ResourceType.POWER_STONE]: '⚡',
+};
+
+const RESOURCE_LABELS: Partial<Record<ResourceType, string>> = {
+  [ResourceType.GOLD]: '골드',
+  [ResourceType.GEMS]: '보석',
+  [ResourceType.EQUIPMENT_STONE]: '장비석',
+  [ResourceType.POWER_STONE]: '강화석',
+};
+
+function formatRewardAmount(type: ResourceType, amount: number): string {
+  if (amount >= 10000) return `x${(amount / 1000).toFixed(1)}K`;
+  if (amount >= 1000) return `x${amount.toLocaleString()}`;
+  return `x${amount}`;
+}
+
 export function TalentScreen() {
   const { game, refresh } = useGame();
   const talent = game.player.talent;
   const stats = game.player.computeStats();
-  const [gradeUpReward, setGradeUpReward] = useState<{ grade: TalentGrade; reward: TalentGradeReward } | null>(null);
+  const [claimedReward, setClaimedReward] = useState<TalentMilestone | null>(null);
 
   function upgradeStat(stat: StatType) {
     const cost = talent.getUpgradeCost(stat);
@@ -27,16 +47,18 @@ export function TalentScreen() {
     const result = talent.upgrade(stat, game.player.resources.gold);
     if (result.isOk() && result.data) {
       game.player.resources.spend(ResourceType.GOLD, result.data.cost);
-
-      if (result.data.gradeChanged) {
-        const reward = TalentTable.getGradeReward(talent.grade);
-        if (reward) {
-          setGradeUpReward({ grade: talent.grade, reward });
-        }
-      }
-
       game.saveGame();
     }
+    refresh();
+  }
+
+  function claimMilestone(milestone: TalentMilestone) {
+    const key = talent.getMilestoneKey(milestone.fromGrade, milestone.percent);
+    if (game.player.claimedMilestones.has(key)) return;
+    game.player.claimedMilestones.add(key);
+    game.player.resources.add(milestone.rewardType, milestone.rewardAmount);
+    setClaimedReward(milestone);
+    game.saveGame();
     refresh();
   }
 
@@ -47,6 +69,24 @@ export function TalentScreen() {
   ];
 
   const nextThreshold = talent.getNextGradeThreshold();
+  const gradeOrder = TalentTable.getGradeOrder();
+
+  const activeGrade = talent.grade !== TalentGrade.HERO ? talent.grade : TalentGrade.WARRIOR;
+  const activeMilestones = TalentTable.getMilestonesForGrade(activeGrade);
+  const nextGradeIndex = TalentTable.getGradeIndex(activeGrade) + 1;
+  const nextGradeName = nextGradeIndex < gradeOrder.length
+    ? GRADE_LABELS[gradeOrder[nextGradeIndex]]
+    : '';
+
+  const gradeStart = TalentTable.getGradeStartLevel(activeGrade);
+  const gradeEnd = TalentTable.getNextGradeThreshold(activeGrade) ?? gradeStart;
+  const gradeRange = gradeEnd - gradeStart;
+  const localProgress = gradeRange > 0
+    ? Math.min(1, Math.max(0, (talent.getTotalLevel() - gradeStart) / gradeRange))
+    : 1;
+
+  const pastClaimable = talent.getClaimableMilestones(game.player.claimedMilestones)
+    .filter(m => m.fromGrade !== activeGrade);
 
   return (
     <div className="screen">
@@ -59,20 +99,65 @@ export function TalentScreen() {
         </div>
         <div className="stat-row">
           <span>총 레벨</span>
-          <span>{talent.getTotalLevel()}</span>
+          <span>{talent.getTotalLevel()}{nextThreshold ? ` / ${nextThreshold}` : ''}</span>
         </div>
-        {nextThreshold && (
-          <>
-            <div className="stat-row">
-              <span>다음 등급</span>
-              <span>{talent.getTotalLevel()} / {nextThreshold}</span>
-            </div>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: `${(talent.getTotalLevel() / nextThreshold) * 100}%` }} />
-            </div>
-          </>
-        )}
+
+        <div className="ms-track">
+          <div className="ms-markers">
+            {activeMilestones.map(m => {
+              const key = talent.getMilestoneKey(m.fromGrade, m.percent);
+              const claimed = game.player.claimedMilestones.has(key);
+              const reached = talent.isMilestoneReached(m.fromGrade, m.percent);
+              const state = claimed ? 'claimed' : reached ? 'claimable' : 'locked';
+
+              return (
+                <div key={key} className="ms-marker" style={{ left: `${m.percent}%` }}>
+                  <div
+                    className={`ms-icon ${state}`}
+                    onClick={state === 'claimable' ? () => claimMilestone(m) : undefined}
+                  >
+                    <span>{RESOURCE_ICONS[m.rewardType] ?? '?'}</span>
+                    {claimed && <span className="ms-check">✓</span>}
+                  </div>
+                  <div className={`ms-amount ${state}`}>
+                    {formatRewardAmount(m.rewardType, m.rewardAmount)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="ms-bar">
+            <div className="ms-fill" style={{ width: `${localProgress * 100}%` }} />
+          </div>
+          <div className="ms-labels">
+            <span>{GRADE_LABELS[activeGrade]}</span>
+            <span>{nextGradeName}</span>
+          </div>
+        </div>
       </div>
+
+      {pastClaimable.length > 0 && (
+        <div className="card" style={{ marginTop: 8 }}>
+          <div style={{ fontSize: 13, color: '#ffd700', marginBottom: 8 }}>미수령 보상</div>
+          {pastClaimable.map(m => {
+            const key = talent.getMilestoneKey(m.fromGrade, m.percent);
+            return (
+              <div key={key} className="talent-row">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 18 }}>{RESOURCE_ICONS[m.rewardType] ?? '?'}</span>
+                  <div>
+                    <div style={{ fontSize: 13 }}>{GRADE_LABELS[m.fromGrade]} {m.percent}%</div>
+                    <div style={{ fontSize: 12, color: '#aaa' }}>
+                      {RESOURCE_LABELS[m.rewardType] ?? m.rewardType} {formatRewardAmount(m.rewardType, m.rewardAmount)}
+                    </div>
+                  </div>
+                </div>
+                <button className="btn btn-primary" onClick={() => claimMilestone(m)}>수령</button>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {rows.map(row => {
         const cost = talent.getUpgradeCost(row.stat);
@@ -111,31 +196,25 @@ export function TalentScreen() {
         </div>
       )}
 
-      {gradeUpReward && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100,
-        }}>
+      {claimedReward && (
+        <div className="modal-overlay" onClick={() => setClaimedReward(null)}>
           <div style={{
             background: '#1a1020', border: '2px solid #ffd700', borderRadius: 12,
             padding: 24, minWidth: 280, textAlign: 'center',
-          }}>
-            <div style={{ fontSize: 18, fontWeight: 'bold', color: '#ffd700', marginBottom: 16 }}>
-              등급 승급!
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>
+              {RESOURCE_ICONS[claimedReward.rewardType] ?? '?'}
+            </div>
+            <div style={{ fontSize: 18, fontWeight: 'bold', color: '#ffd700', marginBottom: 8 }}>
+              보상 수령!
             </div>
             <div style={{ fontSize: 16, marginBottom: 16 }}>
-              {GRADE_LABELS[gradeUpReward.grade] ?? gradeUpReward.grade}
-            </div>
-            <div style={{ fontSize: 13, color: '#ccc', marginBottom: 16, lineHeight: 1.8 }}>
-              {gradeUpReward.reward.atkPercent > 0 && <div>공격력 +{(gradeUpReward.reward.atkPercent * 100).toFixed(0)}%</div>}
-              {gradeUpReward.reward.defPercent > 0 && <div>방어력 +{(gradeUpReward.reward.defPercent * 100).toFixed(0)}%</div>}
-              {gradeUpReward.reward.hpPercent > 0 && <div>체력 +{(gradeUpReward.reward.hpPercent * 100).toFixed(0)}%</div>}
-              {gradeUpReward.reward.goldPercent > 0 && <div>획득 골드 +{(gradeUpReward.reward.goldPercent * 100).toFixed(0)}%</div>}
+              {RESOURCE_LABELS[claimedReward.rewardType] ?? claimedReward.rewardType} {formatRewardAmount(claimedReward.rewardType, claimedReward.rewardAmount)}
             </div>
             <button
               className="btn btn-primary"
               style={{ width: '100%' }}
-              onClick={() => { setGradeUpReward(null); refresh(); }}
+              onClick={() => { setClaimedReward(null); refresh(); }}
             >
               확인
             </button>

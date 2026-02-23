@@ -233,6 +233,94 @@ body {
   margin: 6px 0;
 }
 
+.ms-track {
+  position: relative;
+  margin-top: 16px;
+  padding-top: 58px;
+}
+.ms-markers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 58px;
+}
+.ms-marker {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ms-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  position: relative;
+  background: var(--color-bg-dark);
+  border: 2px solid var(--color-border);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.ms-icon.locked { opacity: 0.35; }
+.ms-icon.claimable {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  cursor: pointer;
+  animation: ms-glow 1.5s ease-in-out infinite;
+}
+.ms-icon.claimed { border-color: var(--color-green); }
+.ms-check {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 15px;
+  height: 15px;
+  background: var(--color-green);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+.ms-amount {
+  font-size: var(--font-xs);
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+  white-space: nowrap;
+}
+.ms-amount.locked { color: var(--color-text-muted); }
+.ms-amount.claimable { color: var(--color-gold); font-weight: bold; }
+.ms-bar {
+  width: 100%;
+  height: 10px;
+  background: var(--color-border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.ms-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-gold), #ffb347);
+  border-radius: 5px;
+  transition: width 0.3s;
+}
+.ms-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+@keyframes ms-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(255, 215, 0, 0.3); }
+  50% { box-shadow: 0 0 12px rgba(255, 215, 0, 0.7); }
+}
+
 .equip-slot {
   background: var(--color-bg-card);
   border: 1px solid var(--color-border-light);

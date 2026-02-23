@@ -1,7 +1,7 @@
 import { StatType, TalentGrade } from '../enums';
 import { Stats } from '../value-objects/Stats';
 import { Result } from '../value-objects/Result';
-import { TalentTable } from '../data/TalentTable';
+import { TalentTable, type TalentMilestone } from '../data/TalentTable';
 
 export class Talent {
   atkLevel: number;
@@ -84,5 +84,28 @@ export class Talent {
 
   isMaxGrade(): boolean {
     return this.grade === TalentGrade.HERO;
+  }
+
+  getMilestoneKey(fromGrade: TalentGrade, percent: number): string {
+    return `${fromGrade}_${percent}`;
+  }
+
+  getClaimableMilestones(claimedMilestones: Set<string>): TalentMilestone[] {
+    const totalLevel = this.getTotalLevel();
+    const result: TalentMilestone[] = [];
+    for (const m of TalentTable.getAllMilestones()) {
+      const key = this.getMilestoneKey(m.fromGrade, m.percent);
+      if (claimedMilestones.has(key)) continue;
+      const requiredLevel = TalentTable.getMilestoneLevel(m.fromGrade, m.percent);
+      if (totalLevel >= requiredLevel) {
+        result.push(m);
+      }
+    }
+    return result;
+  }
+
+  isMilestoneReached(fromGrade: TalentGrade, percent: number): boolean {
+    const requiredLevel = TalentTable.getMilestoneLevel(fromGrade, percent);
+    return this.getTotalLevel() >= requiredLevel;
   }
 }
