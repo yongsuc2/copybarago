@@ -8,6 +8,7 @@ import { Pet } from './Pet';
 import { Resources } from './Resources';
 import { ChapterTreasureTable } from '../data/ChapterTreasureTable';
 import { BattleDataTable } from '../data/BattleDataTable';
+import { TalentTable } from '../data/TalentTable';
 
 const SELL_PRICES: Record<EquipmentGrade, number> = {
   [EquipmentGrade.COMMON]: 10,
@@ -23,6 +24,7 @@ export const BASE_STATS = Stats.create({ hp: 100, maxHp: 100, atk: 10, def: 5, c
 export interface StatsBreakdown {
   base: Stats;
   talent: Stats;
+  grade: Stats;
   equipment: Stats;
   heritage: Stats;
   pet: Stats;
@@ -73,6 +75,7 @@ export class Player {
     let stats = BASE_STATS.clone();
 
     stats = stats.add(this.talent.getStats());
+    stats = stats.add(TalentTable.getGradeStatBonus(this.talent.grade));
 
     for (const slot of this.equipmentSlots.values()) {
       stats = stats.add(slot.getTotalStats());
@@ -104,6 +107,7 @@ export class Player {
   getStatsBreakdown(): StatsBreakdown {
     const base = BASE_STATS.clone();
     const talent = this.talent.getStats();
+    const grade = TalentTable.getGradeStatBonus(this.talent.grade);
 
     let equipment = Stats.ZERO;
     for (const slot of this.equipmentSlots.values()) {
@@ -125,10 +129,19 @@ export class Player {
       }
     }
 
-    let total = base.add(talent).add(equipment).add(heritage).add(pet);
+    let total = base.add(talent).add(grade).add(equipment).add(heritage).add(pet);
     total = total.withHp(total.maxHp);
 
-    return { base, talent, equipment, heritage, pet, total };
+    return { base, talent, grade, equipment, heritage, pet, total };
+  }
+
+  getGoldMultiplier(): number {
+    let boost = 0;
+    for (const m of TalentTable.getAllMilestones()) {
+      if (m.rewardType !== 'GOLD_BOOST') continue;
+      if (this.claimedMilestones.has(`LV_${m.level}`)) boost += m.rewardAmount;
+    }
+    return 1 + boost / 100;
   }
 
   getCombatPassives(): CombatPassives {

@@ -353,4 +353,4 @@
 - **최대 HP 비례 물리 추가 데미지 패시브** (Y-38) — MAX_HP_DAMAGE 타입 신규 추가, 압도(max_hp_damage): 물리 공격 시 maxHP×coefficient만큼 ATK에 추가(방어 적용), T1 2%~T4 12%, KNIGHT 시너지
 - **적 HP 비례 물리 공격 + 기절 스킬** (Y-39) — 분쇄(hp_crush): 적 maxHP 비례 물리 데미지(isTargetHpBased), SKULL 시너지 / 기절(stun_apply): LOWEST SkillEffectType.STUN(chance+duration), 강타(stun_strike): UPPER TRIGGER_SKILL→stun_apply, KNIGHT 시너지, processEnemyTurn 기절 체크
 - **재능 등급 골드 보상** (Y-40) — gradeRewards에 goldPercent 추가(2%~12%, 누적30%), Player.getGoldMultiplier(), 챕터 내 전투/인카운터/클리어 골드에만 적용, 등급업 팝업 표시
-- **재능 등급 보상 마일스톤 재설계** (Y-41) — 기존 등급 스탯% 보너스(ATK%/DEF%/HP%/Gold%) 완전 삭제, 구간별(25%/50%/75%/100%) 단일 보상 마일스톤으로 교체, 5등급×4구간=총 20개, 보상 종류: 골드/보석/장비석/강화석, TalentScreen에 마일스톤 리스트+수령 UI, 미수령 소급 가능, Player.computeStats()/StatsBreakdown에서 등급 보너스 제거, ChapterScreen goldMultiplier 제거
+- **재능 등급 보상 마일스톤 재설계** (Y-41) — 기존 등급 스탯% 보너스 삭제 → 등급업 ATK/DEF 교대 보너스(10/15/30/60/120) + 레벨 10 간격 마일스톤(골드 일시/골드 획득량% 교대), 수직 타임라인 UI(등급 탭 선택+현재 위치 자동 스크롤), Player.getGoldMultiplier() 챕터 내 골드 적용

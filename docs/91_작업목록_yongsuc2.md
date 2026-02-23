@@ -50,7 +50,7 @@
 | Y-38 | 최대 HP 비례 물리 추가 데미지 패시브 | 중 | 완료 | 압도(max_hp_damage) — MAX_HP_DAMAGE 타입, 물리 공격 시 maxHP×coefficient 추가 ATK, 방어 적용 |
 | Y-39 | 적 HP 비례 물리 공격 + 기절 스킬 | 중 | 완료 | 분쇄(hp_crush): 적 maxHP 비례 물리 데미지, 강타(stun_strike): TRIGGER_SKILL→stun_apply, 기절(stun_apply): LOWEST SkillEffectType.STUN, STUN 상태효과 신규 |
 | Y-40 | 재능 등급 골드 보상 | 하 | 완료 | gradeRewards에 goldPercent 추가, 챕터 내 전투/인카운터/클리어 골드에만 적용, 퀘스트/아레나/여행 등 미적용 |
-| Y-41 | 재능 등급 보상 마일스톤 재설계 | 중 | 완료 | 등급 스탯% 보너스 → 구간별 단일 보상 마일스톤, 5등급×4구간=20개, 골드/보석/장비석/강화석, 수동 수령+소급 가능 |
+| Y-41 | 재능 등급 보상 마일스톤 재설계 | 중 | 완료 | 등급 스탯% 보너스 → 등급업 ATK/DEF 교대 보너스 + 레벨 10 간격 마일스톤(골드/골드획득량%), 수직 타임라인 UI, 등급 탭 선택, 수동 수령+소급 가능 |
 
 ---
 

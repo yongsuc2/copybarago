@@ -233,17 +233,55 @@ body {
   margin: 6px 0;
 }
 
+.ms-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+  overflow-x: auto;
+}
+.ms-tab {
+  position: relative;
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.ms-tab.active {
+  background: var(--color-gold);
+  color: #000;
+  border-color: var(--color-gold);
+  font-weight: bold;
+}
+.ms-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: var(--color-danger);
+  border-radius: 50%;
+}
+.ms-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 8px;
+}
 .ms-track {
   position: relative;
-  margin-top: 16px;
-  padding-top: 58px;
+  min-width: 100%;
+  padding: 52px 14px 0;
+  box-sizing: border-box;
 }
 .ms-markers {
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
-  height: 58px;
+  left: 14px;
+  right: 14px;
+  height: 52px;
 }
 .ms-marker {
   position: absolute;
@@ -253,13 +291,13 @@ body {
   align-items: center;
 }
 .ms-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 17px;
+  font-size: 13px;
   position: relative;
   background: var(--color-bg-dark);
   border: 2px solid var(--color-border);
@@ -275,38 +313,38 @@ body {
 .ms-icon.claimed { border-color: var(--color-green); }
 .ms-check {
   position: absolute;
-  top: -5px;
-  right: -5px;
-  width: 15px;
-  height: 15px;
+  top: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
   background: var(--color-green);
   color: #fff;
   border-radius: 50%;
-  font-size: 9px;
+  font-size: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
 }
 .ms-amount {
-  font-size: var(--font-xs);
+  font-size: 9px;
   color: var(--color-text-secondary);
-  margin-top: 2px;
+  margin-top: 1px;
   white-space: nowrap;
 }
 .ms-amount.locked { color: var(--color-text-muted); }
 .ms-amount.claimable { color: var(--color-gold); font-weight: bold; }
 .ms-bar {
   width: 100%;
-  height: 10px;
+  height: 8px;
   background: var(--color-border);
-  border-radius: 5px;
+  border-radius: 4px;
   overflow: hidden;
 }
 .ms-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--color-gold), #ffb347);
-  border-radius: 5px;
+  border-radius: 4px;
   transition: width 0.3s;
 }
 .ms-labels {

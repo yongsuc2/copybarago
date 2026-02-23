@@ -86,26 +86,18 @@ export class Talent {
     return this.grade === TalentGrade.HERO;
   }
 
-  getMilestoneKey(fromGrade: TalentGrade, percent: number): string {
-    return `${fromGrade}_${percent}`;
+  getMilestoneKey(level: number): string {
+    return `LV_${level}`;
   }
 
   getClaimableMilestones(claimedMilestones: Set<string>): TalentMilestone[] {
     const totalLevel = this.getTotalLevel();
-    const result: TalentMilestone[] = [];
-    for (const m of TalentTable.getAllMilestones()) {
-      const key = this.getMilestoneKey(m.fromGrade, m.percent);
-      if (claimedMilestones.has(key)) continue;
-      const requiredLevel = TalentTable.getMilestoneLevel(m.fromGrade, m.percent);
-      if (totalLevel >= requiredLevel) {
-        result.push(m);
-      }
-    }
-    return result;
+    return TalentTable.getAllMilestones().filter(m =>
+      totalLevel >= m.level && !claimedMilestones.has(`LV_${m.level}`),
+    );
   }
 
-  isMilestoneReached(fromGrade: TalentGrade, percent: number): boolean {
-    const requiredLevel = TalentTable.getMilestoneLevel(fromGrade, percent);
-    return this.getTotalLevel() >= requiredLevel;
+  isMilestoneReached(level: number): boolean {
+    return this.getTotalLevel() >= level;
   }
 }

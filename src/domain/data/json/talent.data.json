@@ -16,30 +16,17 @@
     { "grade": "HERO", "totalLevel": 700 }
   ],
   "gradeOrder": ["DISCIPLE", "ADVENTURER", "ELITE", "MASTER", "WARRIOR", "HERO"],
-  "gradeMilestones": [
-    { "fromGrade": "DISCIPLE", "percent": 25, "rewardType": "GOLD", "rewardAmount": 300 },
-    { "fromGrade": "DISCIPLE", "percent": 50, "rewardType": "GEMS", "rewardAmount": 20 },
-    { "fromGrade": "DISCIPLE", "percent": 75, "rewardType": "EQUIPMENT_STONE", "rewardAmount": 3 },
-    { "fromGrade": "DISCIPLE", "percent": 100, "rewardType": "GOLD", "rewardAmount": 1000 },
-
-    { "fromGrade": "ADVENTURER", "percent": 25, "rewardType": "GOLD", "rewardAmount": 800 },
-    { "fromGrade": "ADVENTURER", "percent": 50, "rewardType": "EQUIPMENT_STONE", "rewardAmount": 5 },
-    { "fromGrade": "ADVENTURER", "percent": 75, "rewardType": "GEMS", "rewardAmount": 50 },
-    { "fromGrade": "ADVENTURER", "percent": 100, "rewardType": "POWER_STONE", "rewardAmount": 3 },
-
-    { "fromGrade": "ELITE", "percent": 25, "rewardType": "GOLD", "rewardAmount": 1500 },
-    { "fromGrade": "ELITE", "percent": 50, "rewardType": "GEMS", "rewardAmount": 80 },
-    { "fromGrade": "ELITE", "percent": 75, "rewardType": "POWER_STONE", "rewardAmount": 5 },
-    { "fromGrade": "ELITE", "percent": 100, "rewardType": "EQUIPMENT_STONE", "rewardAmount": 15 },
-
-    { "fromGrade": "MASTER", "percent": 25, "rewardType": "GOLD", "rewardAmount": 3000 },
-    { "fromGrade": "MASTER", "percent": 50, "rewardType": "GEMS", "rewardAmount": 120 },
-    { "fromGrade": "MASTER", "percent": 75, "rewardType": "POWER_STONE", "rewardAmount": 8 },
-    { "fromGrade": "MASTER", "percent": 100, "rewardType": "GOLD", "rewardAmount": 8000 },
-
-    { "fromGrade": "WARRIOR", "percent": 25, "rewardType": "GOLD", "rewardAmount": 5000 },
-    { "fromGrade": "WARRIOR", "percent": 50, "rewardType": "GEMS", "rewardAmount": 200 },
-    { "fromGrade": "WARRIOR", "percent": 75, "rewardType": "POWER_STONE", "rewardAmount": 15 },
-    { "fromGrade": "WARRIOR", "percent": 100, "rewardType": "GEMS", "rewardAmount": 300 }
-  ]
+  "gradeStatBonuses": [
+    { "grade": "ADVENTURER", "stat": "ATK", "amount": 10 },
+    { "grade": "ELITE", "stat": "DEF", "amount": 15 },
+    { "grade": "MASTER", "stat": "ATK", "amount": 30 },
+    { "grade": "WARRIOR", "stat": "DEF", "amount": 60 },
+    { "grade": "HERO", "stat": "ATK", "amount": 120 }
+  ],
+  "milestoneConfig": {
+    "interval": 10,
+    "goldBase": 400,
+    "goldGrowthRate": 1.08,
+    "goldBoostPercent": 2
+  }
 }
