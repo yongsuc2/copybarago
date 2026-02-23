@@ -193,6 +193,7 @@ export enum SkillEffectType {
   ADD_RAGE = 'ADD_RAGE',
   CONSUME_RAGE = 'CONSUME_RAGE',
   DEBUFF = 'DEBUFF',
+  STUN = 'STUN',
 }
 
 export enum SpecialConditionType {

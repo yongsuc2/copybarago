@@ -419,22 +419,34 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     buildDescription: (t) => `일반 공격 시 적 최대 체력의 ${pct(td('hp_crush', t).coefficient)} 물리 데미지`,
   },
   {
-    id: 'stun_strike', name: '강타', icon: '🌟',
-    hierarchy: SkillHierarchy.UPPER,
-    tags: [SkillTag.PHYSICAL, SkillTag.DEBUFF],
-    heritageSynergy: [HeritageRoute.KNIGHT],
-    traits: ['일반 공격 연계', '확률 기절', '적 행동 봉쇄'],
-    buildTrigger: () => trigger(onSkillActivation('ilban_attack')),
+    id: 'stun_apply', name: '기절', icon: '💫',
+    hierarchy: SkillHierarchy.LOWEST,
+    tags: [SkillTag.DEBUFF],
+    heritageSynergy: [],
+    traits: [],
+    buildTrigger: () => trigger(everyNTurns(1)),
     buildEffects: (t) => {
-      const d = td('stun_strike', t);
+      const d = td('stun_apply', t);
       return [
-        { type: SkillEffectType.ATTACK, attackType: AttackType.PHYSICAL, coefficient: d.coefficient, stunChance: d.stunChance, stunDuration: d.stunDuration },
+        { type: SkillEffectType.STUN, chance: d.chance, duration: d.duration },
       ];
     },
     buildDescription: (t) => {
-      const d = td('stun_strike', t);
-      return `일반 공격 시 물리 공격 (계수 ${d.coefficient}) + ${pct(d.stunChance)} 확률로 ${d.stunDuration}턴 기절`;
+      const d = td('stun_apply', t);
+      return `${pct(d.chance)} 확률로 ${d.duration}턴 기절`;
     },
+  },
+  {
+    id: 'stun_strike', name: '강타', icon: '🌟',
+    hierarchy: SkillHierarchy.UPPER,
+    tags: [SkillTag.DEBUFF],
+    heritageSynergy: [HeritageRoute.KNIGHT],
+    traits: ['일반 공격 연계', '확률 기절', '적 행동 봉쇄'],
+    buildTrigger: () => trigger(onSkillActivation('ilban_attack')),
+    buildEffects: () => [
+      { type: SkillEffectType.TRIGGER_SKILL, targetSkillId: 'stun_apply', count: 1 },
+    ],
+    buildDescription: () => '일반 공격 시 기절 시도',
   },
   {
     id: 'demon_power', name: '악마의 힘', icon: '😈',

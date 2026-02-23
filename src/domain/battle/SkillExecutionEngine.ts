@@ -141,15 +141,9 @@ export class SkillExecutionEngine {
             const damage = Math.max(1, Math.floor(baseDamage * tagMult));
             const dealt = t.takeDamage(damage);
 
-            let stunApplied = false;
-            if (effect.stunChance && effect.stunDuration && t.isAlive() && this.rng.chance(effect.stunChance)) {
-              t.addStatusEffect(new StatusEffect(StatusEffectType.STUN, effect.stunDuration, 0));
-              stunApplied = true;
-            }
-
             results.push({
               skillName: skill.name, skillIcon: skill.icon,
-              damage: dealt, isCrit, healAmount: 0, rageChange: 0, debuffApplied: stunApplied,
+              damage: dealt, isCrit, healAmount: 0, rageChange: 0, debuffApplied: false,
               targetName: (effect.isAoe && allTargets) ? t.name : undefined,
             });
 
@@ -223,6 +217,17 @@ export class SkillExecutionEngine {
             skillName: skill.name, skillIcon: skill.icon,
             damage: 0, isCrit: false, healAmount: 0, rageChange: 0, debuffApplied: true,
           });
+          break;
+        }
+
+        case SkillEffectType.STUN: {
+          if (target.isAlive() && this.rng.chance(effect.chance)) {
+            target.addStatusEffect(new StatusEffect(StatusEffectType.STUN, effect.duration, 0));
+            results.push({
+              skillName: skill.name, skillIcon: skill.icon,
+              damage: 0, isCrit: false, healAmount: 0, rageChange: 0, debuffApplied: true,
+            });
+          }
           break;
         }
 

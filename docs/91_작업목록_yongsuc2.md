@@ -48,7 +48,7 @@
 | Y-36 | 인카운터 정리: 천사 제거 + 확률 조정 | 중 | 완료 | ANGEL 타입 제거→우연 통합, T2 제한 해제, 악마 7%, 우연 53%, 하위 가중치 재조정, 중/대박 카운터 증가 비활성화 |
 | Y-37 | 체력 비례 공격/방어 패시브 스킬 | 중 | 완료 | 배수진(low_hp_atk), 불굴(low_hp_def) — LOW_HP_MODIFIER 타입, getEffectiveAtk/Def 실시간 HP 비례 보정 |
 | Y-38 | 최대 HP 비례 물리 추가 데미지 패시브 | 중 | 완료 | 압도(max_hp_damage) — MAX_HP_DAMAGE 타입, 물리 공격 시 maxHP×coefficient 추가 ATK, 방어 적용 |
-| Y-39 | 적 HP 비례 물리 공격 + 기절 스킬 | 중 | 완료 | 분쇄(hp_crush): 적 maxHP 비례 물리 데미지, 강타(stun_strike): 물리 공격+확률 기절, STUN 상태효과 신규 |
+| Y-39 | 적 HP 비례 물리 공격 + 기절 스킬 | 중 | 완료 | 분쇄(hp_crush): 적 maxHP 비례 물리 데미지, 강타(stun_strike): TRIGGER_SKILL→stun_apply, 기절(stun_apply): LOWEST SkillEffectType.STUN, STUN 상태효과 신규 |
 
 ---
 

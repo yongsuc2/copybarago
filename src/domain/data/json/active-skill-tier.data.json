@@ -131,8 +131,13 @@
   { "skill": "hp_crush", "tier": 3, "coefficient": 0.16 },
   { "skill": "hp_crush", "tier": 4, "coefficient": 0.24 },
 
-  { "skill": "stun_strike", "tier": 1, "coefficient": 0.8, "stunChance": 0.15, "stunDuration": 1 },
-  { "skill": "stun_strike", "tier": 2, "coefficient": 0.8, "stunChance": 0.25, "stunDuration": 1 },
-  { "skill": "stun_strike", "tier": 3, "coefficient": 0.8, "stunChance": 0.35, "stunDuration": 1 },
-  { "skill": "stun_strike", "tier": 4, "coefficient": 0.8, "stunChance": 0.45, "stunDuration": 1 }
+  { "skill": "stun_apply", "tier": 1, "chance": 0.05, "duration": 1 },
+  { "skill": "stun_apply", "tier": 2, "chance": 0.115, "duration": 1 },
+  { "skill": "stun_apply", "tier": 3, "chance": 0.2, "duration": 1 },
+  { "skill": "stun_apply", "tier": 4, "chance": 0.3, "duration": 1 },
+
+  { "skill": "stun_strike", "tier": 1, "count": 1 },
+  { "skill": "stun_strike", "tier": 2, "count": 1 },
+  { "skill": "stun_strike", "tier": 3, "count": 1 },
+  { "skill": "stun_strike", "tier": 4, "count": 1 }
 ]

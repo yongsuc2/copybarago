@@ -68,8 +68,6 @@ export interface AttackEffect {
   duration?: number;
   isAoe?: boolean;
   isTargetHpBased?: boolean;
-  stunChance?: number;
-  stunDuration?: number;
 }
 
 export interface TriggerSkillEffect {
@@ -107,6 +105,12 @@ export interface DebuffEffect {
   duration: number;
 }
 
+export interface StunEffect {
+  type: SkillEffectType.STUN;
+  chance: number;
+  duration: number;
+}
+
 export type ActiveSkillEffect =
   | AttackEffect
   | TriggerSkillEffect
@@ -114,7 +118,8 @@ export type ActiveSkillEffect =
   | HealHpEffect
   | AddRageEffect
   | ConsumeRageEffect
-  | DebuffEffect;
+  | DebuffEffect
+  | StunEffect;
 
 const TIER_TO_GRADE: Record<number, SkillGrade> = {
   1: SkillGrade.NORMAL,
