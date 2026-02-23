@@ -2,8 +2,6 @@ import { EquipmentGrade, SlotType, WeaponSubType } from '../enums';
 import { Stats } from '../value-objects/Stats';
 import { Result } from '../value-objects/Result';
 import { EquipmentTable } from '../data/EquipmentTable';
-import { EquipmentPassiveTable } from '../data/EquipmentPassiveTable';
-import type { EquipmentPassiveDef } from '../data/EquipmentPassiveTable';
 import type { SubStat } from '../data/EquipmentSubStatTable';
 
 export interface UniqueEffect {
@@ -25,10 +23,6 @@ export class Equipment {
     public mergeLevel: number = 0,
     public readonly subStats: SubStat[] = [],
   ) {}
-
-  getPassive(): EquipmentPassiveDef | null {
-    return EquipmentPassiveTable.getPassive(this.slot, this.grade, this.weaponSubType);
-  }
 
   getStats(): Stats {
     const baseStats = EquipmentTable.getBaseStats(this.slot, this.grade);

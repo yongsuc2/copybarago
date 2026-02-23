@@ -1,4 +1,4 @@
-import { EffectType, EquipmentGrade, ResourceType, SlotType, StatusEffectType, TalentGrade } from '../enums';
+import { EquipmentGrade, ResourceType, SlotType, TalentGrade } from '../enums';
 import { Stats } from '../value-objects/Stats';
 import { Talent } from './Talent';
 import { Heritage } from './Heritage';
@@ -33,15 +33,7 @@ export interface CombatPassives {
   critDamage: number;
   lifestealRate: number;
   evasionRate: number;
-  shieldPercent: number;
-  multiHitChance: number;
-  regenPercent: number;
   counterChance: number;
-  atkUpBuff: number;
-  critUpBuff: number;
-  defUpBuff: number;
-  magicBoost: number;
-  rageBoost: number;
 }
 
 export class Player {
@@ -140,56 +132,12 @@ export class Player {
   }
 
   getCombatPassives(): CombatPassives {
-    const result: CombatPassives = {
+    return {
       critDamage: BattleDataTable.damage.critMultiplier,
       lifestealRate: 0,
       evasionRate: 0,
-      shieldPercent: 0,
-      multiHitChance: 0,
-      regenPercent: 0,
       counterChance: 0,
-      atkUpBuff: 0,
-      critUpBuff: 0,
-      defUpBuff: 0,
-      magicBoost: 0,
-      rageBoost: 0,
     };
-
-    for (const slot of this.equipmentSlots.values()) {
-      for (const eq of slot.getEquipped()) {
-        const passive = eq.getPassive();
-        if (!passive) continue;
-
-        switch (passive.effectType) {
-          case EffectType.SHIELD:
-            result.shieldPercent += passive.value;
-            break;
-          case EffectType.MULTI_HIT:
-            result.multiHitChance += passive.value;
-            break;
-          case EffectType.HOT:
-            result.regenPercent += passive.value;
-            break;
-          case EffectType.MAGIC_BOOST:
-            result.magicBoost += passive.value;
-            break;
-          case EffectType.RAGE_BOOST:
-            result.rageBoost += passive.value;
-            break;
-          case EffectType.BUFF:
-            if (passive.statusEffectType === StatusEffectType.ATK_UP) {
-              result.atkUpBuff += passive.value;
-            } else if (passive.statusEffectType === StatusEffectType.CRIT_UP) {
-              result.critUpBuff += passive.value;
-            } else if (passive.statusEffectType === StatusEffectType.DEF_UP) {
-              result.defUpBuff += passive.value;
-            }
-            break;
-        }
-      }
-    }
-
-    return result;
   }
 
   isHeritageUnlocked(): boolean {

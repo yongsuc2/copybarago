@@ -6,7 +6,6 @@ import { EquipmentTable } from '../../domain/data/EquipmentTable';
 import { EquipmentDataTable } from '../../domain/data/EquipmentDataTable';
 import type { Equipment } from '../../domain/entities/Equipment';
 import { EquipmentIcon } from '../components/EquipmentIcon';
-import { EquipmentPassiveTable } from '../../domain/data/EquipmentPassiveTable';
 import { CharacterSprite } from '../components/CharacterSprite';
 import { RotateCcw, ChevronsUp } from 'lucide-react';
 
@@ -234,11 +233,6 @@ export function EquipmentScreen() {
     return items;
   }
 
-  const ALL_GRADES: EquipmentGrade[] = [
-    EquipmentGrade.COMMON, EquipmentGrade.UNCOMMON, EquipmentGrade.RARE,
-    EquipmentGrade.EPIC, EquipmentGrade.LEGENDARY, EquipmentGrade.MYTHIC,
-  ];
-
   const GRADE_COLORS: Record<EquipmentGrade, string> = {
     [EquipmentGrade.COMMON]: '#aaa',
     [EquipmentGrade.UNCOMMON]: '#4caf50',
@@ -248,93 +242,6 @@ export function EquipmentScreen() {
     [EquipmentGrade.MYTHIC]: '#e94560',
   };
 
-  function getPassiveTypeName(eq: Equipment): string {
-    if (eq.slot === SlotType.WEAPON) {
-      if (eq.weaponSubType === WeaponSubType.SWORD) return '검 패시브 - 공격력 강화';
-      if (eq.weaponSubType === WeaponSubType.STAFF) return '지팡이 패시브 - 범위 공격';
-      if (eq.weaponSubType === WeaponSubType.BOW) return '활 패시브 - 분노 충전';
-    }
-    if (eq.slot === SlotType.ARMOR) return '방어구 패시브 - 방어막';
-    if (eq.slot === SlotType.RING) return '반지 패시브 - 치명타';
-    if (eq.slot === SlotType.NECKLACE) return '목걸이 패시브 - 공격력';
-    if (eq.slot === SlotType.SHOES) return '신발 패시브 - 재생';
-    if (eq.slot === SlotType.GLOVES) return '장갑 패시브 - 연타';
-    if (eq.slot === SlotType.HAT) return '모자 패시브 - 방어력';
-    return '패시브 능력';
-  }
-
-  function renderPassiveInfo(eq: Equipment) {
-    const currentGradeIndex = EquipmentTable.getGradeIndex(eq.grade);
-    const currentPassive = eq.getPassive();
-    if (!currentPassive) return null;
-
-    return (
-      <div style={{ background: '#0f1923', borderRadius: 6, padding: 12, fontSize: 13 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-          <EquipmentIcon slot={eq.slot} grade={eq.grade} size={36} weaponSubType={eq.weaponSubType} />
-          <div>
-            <div className={`grade-${eq.grade.toLowerCase()}`} style={{ fontWeight: 'bold', fontSize: 14 }}>
-              {eq.isS && <span className="grade-s">[S] </span>}
-              {eq.name}
-            </div>
-            <div style={{ fontSize: 11, color: '#aaa', marginTop: 2 }}>
-              {currentPassive.icon} {getPassiveTypeName(eq)}
-            </div>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {ALL_GRADES.map((grade, i) => {
-            const passive = EquipmentPassiveTable.getPassive(eq.slot, grade, eq.weaponSubType);
-            if (!passive) return null;
-            const isUnlocked = i <= currentGradeIndex;
-            const isCurrent = i === currentGradeIndex;
-            const color = GRADE_COLORS[grade];
-
-            return (
-              <div
-                key={grade}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '6px 8px',
-                  borderRadius: 4,
-                  background: isCurrent ? `${color}18` : '#12182a',
-                  border: isCurrent ? `1px solid ${color}` : '1px solid transparent',
-                  opacity: isUnlocked ? 1 : 0.4,
-                }}
-              >
-                <span style={{
-                  fontSize: 11,
-                  fontWeight: 'bold',
-                  color: isUnlocked ? color : '#555',
-                  minWidth: 28,
-                  textAlign: 'center',
-                }}>
-                  {GRADE_LABELS[grade]}
-                </span>
-
-                <span style={{ flex: 1, fontSize: 12, color: isUnlocked ? '#e0e0e0' : '#555' }}>
-                  {passive.description}
-                </span>
-
-                <span style={{ fontSize: 12, flexShrink: 0 }}>
-                  {isUnlocked ? (
-                    isCurrent
-                      ? <span style={{ color, fontWeight: 'bold', fontSize: 11 }}>활성</span>
-                      : <span style={{ color: '#666', fontSize: 11 }}>해제</span>
-                  ) : (
-                    <span style={{ color: '#555', fontSize: 11 }}>🔒</span>
-                  )}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
 
   function renderDetailPanel() {
     if (selectedSlotKey) {
@@ -410,9 +317,6 @@ export function EquipmentScreen() {
               ))}
             </div>
           )}
-          <div style={{ fontSize: 11, color: '#aaa', marginBottom: 8 }}>
-            {getPassiveTypeName(eq)}
-          </div>
           <div style={{ display: 'flex', gap: 6 }}>
             <button
               className="btn btn-secondary"
@@ -466,9 +370,6 @@ export function EquipmentScreen() {
               ))}
             </div>
           )}
-          <div style={{ fontSize: 11, color: '#aaa', marginBottom: 8 }}>
-            {getPassiveTypeName(eq)}
-          </div>
           <div style={{ display: 'flex', gap: 6 }}>
             <button
               className="btn btn-primary"
@@ -757,11 +658,7 @@ export function EquipmentScreen() {
                 const canMerge = group.length >= required;
                 const resultGrade = getMergeResultGrade(selectedSource);
                 const resultLabel = getMergeResultLabel(selectedSource);
-                const isEnhance = isEnhanceMerge(selectedSource);
                 const resultStats = resultGrade ? EquipmentTable.getBaseStats(selectedSource.slot, resultGrade) : null;
-                const nextPassive = (!isEnhance && resultGrade)
-                  ? EquipmentPassiveTable.getPassive(selectedSource.slot, resultGrade, selectedSource.weaponSubType)
-                  : null;
 
                 return (
                   <>
@@ -831,12 +728,6 @@ export function EquipmentScreen() {
                       <div style={{ textAlign: 'center', fontSize: 12, color: '#aaa', marginBottom: 4 }}>
                         {resultStats.atk > 0 && <span style={{ marginRight: 12 }}>ATK +{resultStats.atk}</span>}
                         {resultStats.maxHp > 0 && <span>HP +{resultStats.maxHp}</span>}
-                      </div>
-                    )}
-
-                    {nextPassive && (
-                      <div style={{ textAlign: 'center', fontSize: 12, color: '#ccc', marginBottom: 6 }}>
-                        {nextPassive.icon} {nextPassive.description}
                       </div>
                     )}
 

@@ -3,7 +3,7 @@ import { useGame } from '../GameContext';
 import { StatsDisplay } from '../components/StatsDisplay';
 import { Swords, Castle, TrendingUp, Gift } from 'lucide-react';
 import type { Player } from '../../domain/entities/Player';
-import type { StatsBreakdown, CombatPassives } from '../../domain/entities/Player';
+import type { StatsBreakdown } from '../../domain/entities/Player';
 import type { Stats } from '../../domain/value-objects/Stats';
 import { formatNumber } from '../components/PlayerStatsBar';
 
@@ -68,18 +68,6 @@ function StatsDetailPopup({ player, onClose }: { player: Player; onClose: () => 
           <CombatStatRow label="흡혈률" value={pct(combat.lifestealRate)} />
           <CombatStatRow label="회피율" value={pct(combat.evasionRate)} />
           <CombatStatRow label="반격 확률" value={pct(combat.counterChance)} />
-        </div>
-
-        <div className="sd-section">
-          <h5>장비 패시브</h5>
-          <CombatStatRow label="🛡️ 방어막 (HP%)" value={pct(combat.shieldPercent)} />
-          <CombatStatRow label="🧤 연타 확률" value={pct(combat.multiHitChance)} />
-          <CombatStatRow label="👟 재생 (턴당HP%)" value={pct(combat.regenPercent)} />
-          <CombatStatRow label="⚔️ 공격력 버프" value={pct(combat.atkUpBuff)} />
-          <CombatStatRow label="💍 치명타 버프" value={pct(combat.critUpBuff)} />
-          <CombatStatRow label="🎩 방어력 버프" value={pct(combat.defUpBuff)} />
-          <CombatStatRow label="🪄 마법 강화" value={pct(combat.magicBoost)} />
-          <CombatStatRow label="🏹 분노 충전" value={`+${combat.rageBoost}`} />
         </div>
 
         <button className="btn btn-primary w-full" onClick={onClose}>닫기</button>

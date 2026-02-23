@@ -148,7 +148,7 @@ export function ChapterScreen() {
   const [isBossFight, setIsBossFight] = useState(false);
   const [battleType, setBattleType] = useState<'normal' | 'elite' | 'midBoss' | 'boss'>('normal');
   const [eliteReward, setEliteReward] = useState<SessionSkill[] | null>(null);
-  const [chapterResult, setChapterResult] = useState<{ type: 'victory' | 'defeat'; chapterId: number; gold: number; gems?: number } | null>(null);
+  const [chapterResult, setChapterResult] = useState<{ type: 'victory' | 'defeat'; chapterId: number; gold: number; gems?: number; day?: number; totalDays?: number; enemyRemainingHp?: number; enemyMaxHp?: number } | null>(null);
   const [activeEnemyIndex, setActiveEnemyIndex] = useState(0);
 
   const [showDamageGraph, setShowDamageGraph] = useState(() => localStorage.getItem('showDamageGraph') === 'true');
@@ -259,6 +259,10 @@ export function ChapterScreen() {
   const finishBattle = useCallback((b: Battle, boss: boolean) => {
     if (boss) {
       const chId = game.currentChapter?.id ?? 0;
+      const chDay = game.currentChapter?.currentDay ?? 0;
+      const chTotalDays = game.currentChapter?.totalDays ?? 0;
+      const remainingEnemyHp = b.enemies.reduce((sum, e) => sum + Math.max(0, e.currentHp), 0);
+      const totalEnemyMaxHp = b.enemies.reduce((sum, e) => sum + e.maxHp, 0);
       if (b.state === BattleState.VICTORY) {
         game.currentChapter?.onBossDefeated();
         if (game.currentChapter) {
@@ -291,6 +295,10 @@ export function ChapterScreen() {
           chapterId: chId,
           gold: b.state === BattleState.VICTORY ? EncounterDataTable.getChapterClearGold(chId) : 0,
           gems: b.state === BattleState.VICTORY ? EncounterDataTable.getChapterClearGems(chId) : 0,
+          day: chDay,
+          totalDays: chTotalDays,
+          enemyRemainingHp: remainingEnemyHp,
+          enemyMaxHp: totalEnemyMaxHp,
         });
         refresh();
       }, 1500);
@@ -310,6 +318,10 @@ export function ChapterScreen() {
 
       if (b.state === BattleState.DEFEAT) {
         const chId = game.currentChapter?.id ?? 0;
+        const chDay = game.currentChapter?.currentDay ?? 0;
+        const chTotalDays = game.currentChapter?.totalDays ?? 0;
+        const remainingEnemyHp = b.enemies.reduce((sum, e) => sum + Math.max(0, e.currentHp), 0);
+        const totalEnemyMaxHp = b.enemies.reduce((sum, e) => sum + e.maxHp, 0);
         if (game.currentChapter) {
           game.player.updateBestSurvivalDay(
             game.currentChapter.id,
@@ -326,6 +338,10 @@ export function ChapterScreen() {
             type: 'defeat',
             chapterId: chId,
             gold: 0,
+            day: chDay,
+            totalDays: chTotalDays,
+            enemyRemainingHp: remainingEnemyHp,
+            enemyMaxHp: totalEnemyMaxHp,
           });
           refresh();
         }, 1500);
@@ -394,9 +410,8 @@ export function ChapterScreen() {
       const stats = game.player.computeStats();
       const ch = game.currentChapter;
       const battleStats = Stats.create({ maxHp: ch.sessionMaxHp, hp: ch.sessionCurrentHp, atk: stats.atk, def: stats.def, crit: stats.crit });
-      const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
       const petAbility = game.battleManager.getPetAbilitySkill(game.player);
-      const allPassives = [...ch.getBattlePassiveSkills(), ...equipPassives];
+      const allPassives = [...ch.getBattlePassiveSkills()];
       if (petAbility) allPassives.push(petAbility);
       const pu = new BattleUnit('Capybara', battleStats, ch.getSessionActiveSkills(), allPassives, true);
       const b = game.currentChapter.createCombatBattle(pu);
@@ -726,8 +741,10 @@ export function ChapterScreen() {
 
     const stats = game.player.computeStats();
     const battleStats = Stats.create({ maxHp: ch.sessionMaxHp, hp: ch.sessionCurrentHp, atk: stats.atk, def: stats.def, crit: stats.crit });
-    const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
-    const pu = new BattleUnit('Capybara', battleStats, ch.getSessionActiveSkills(), [...ch.getBattlePassiveSkills(), ...equipPassives], true);
+    const petAbility = game.battleManager.getPetAbilitySkill(game.player);
+    const specialPassives = [...ch.getBattlePassiveSkills()];
+    if (petAbility) specialPassives.push(petAbility);
+    const pu = new BattleUnit('Capybara', battleStats, ch.getSessionActiveSkills(), specialPassives, true);
 
     const b = type === 'elite' ? ch.createEliteBattle(pu)
       : type === 'midBoss' ? ch.createMidBossBattle(pu)
@@ -753,6 +770,8 @@ export function ChapterScreen() {
 
   function abandonChapter() {
     const chId = game.currentChapter?.id ?? 0;
+    const chDay = game.currentChapter?.currentDay ?? 0;
+    const chTotalDays = game.currentChapter?.totalDays ?? 0;
     cancelledRef.current = true;
     if (game.currentChapter) {
       game.player.updateBestSurvivalDay(
@@ -765,7 +784,7 @@ export function ChapterScreen() {
     clearBattleState();
     setEncounter(null);
     game.saveGame();
-    setChapterResult({ type: 'defeat', chapterId: chId, gold: 0 });
+    setChapterResult({ type: 'defeat', chapterId: chId, gold: 0, day: chDay, totalDays: chTotalDays });
     refresh();
   }
 
@@ -813,9 +832,8 @@ export function ChapterScreen() {
   let effectiveDef = playerStats.def;
   if (chapter) {
     const battleStats = Stats.create({ maxHp: chapter.sessionMaxHp, hp: chapter.sessionCurrentHp, atk: playerStats.atk, def: playerStats.def, crit: playerStats.crit });
-    const equipPassives = game.battleManager.getEquipmentPassiveSkills(game.player);
     const petAbility = game.battleManager.getPetAbilitySkill(game.player);
-    const allPassives = [...chapter.getBattlePassiveSkills(), ...equipPassives];
+    const allPassives = [...chapter.getBattlePassiveSkills()];
     if (petAbility) allPassives.push(petAbility);
     const tempUnit = new BattleUnit('temp', battleStats, [], allPassives, true);
     effectiveAtk = tempUnit.baseAtk;
@@ -1093,6 +1111,9 @@ export function ChapterScreen() {
             </div>
             <div className="chapter-result-sub">
               챕터 {chapterResult.chapterId}
+              {chapterResult.type === 'defeat' && chapterResult.day != null && (
+                <span> ({chapterResult.day}/{chapterResult.totalDays}일차)</span>
+              )}
             </div>
             {(chapterResult.gold > 0 || (chapterResult.gems ?? 0) > 0) && (
               <div className="chapter-result-reward">
@@ -1113,6 +1134,19 @@ export function ChapterScreen() {
                   <div style={{ marginTop: 8 }}>
                     <DamageGraph sources={damageSourcesSnapshot} />
                     <DamageGraph sources={healSourcesSnapshot} title="회복 그래프" variant="heal" />
+                    {chapterResult.type === 'defeat' && chapterResult.enemyRemainingHp != null && chapterResult.enemyMaxHp != null && chapterResult.enemyRemainingHp > 0 && (
+                      <div className="card" style={{ marginTop: 8, padding: '8px 12px' }}>
+                        <div style={{ fontSize: 12, color: '#aaa', marginBottom: 4 }}>적 남은 HP</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div className="progress-bar" style={{ flex: 1 }}>
+                            <div className="progress-fill" style={{ width: `${(chapterResult.enemyRemainingHp / chapterResult.enemyMaxHp) * 100}%`, background: '#e94560' }} />
+                          </div>
+                          <span style={{ fontSize: 12, color: '#e94560', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+                            {formatNumber(chapterResult.enemyRemainingHp)} / {formatNumber(chapterResult.enemyMaxHp)} ({((chapterResult.enemyRemainingHp / chapterResult.enemyMaxHp) * 100).toFixed(1)}%)
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

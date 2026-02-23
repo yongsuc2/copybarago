@@ -2,6 +2,24 @@
 
 ---
 
+## 2026-02-23
+
+### 장비 패시브 시스템 전체 삭제 (K-15)
+- `EquipmentPassiveTable.ts`, `equipment-passive.data.json` 파일 삭제
+- `Equipment.getPassive()` 메서드 제거
+- `Player.getCombatPassives()`에서 장비 패시브 필드 8개 제거 (shieldPercent, multiHitChance, regenPercent, atkUpBuff, critUpBuff, defUpBuff, magicBoost, rageBoost)
+- `BattleManager`에서 `getEquipmentPassiveSkills()`, `passiveToPassiveSkill()`, `mergePercentageStatModifiers()` 제거
+- `EquipmentScreen`에서 `getPassiveTypeName()`, `renderPassiveInfo()`, 패시브 표시 UI 전부 제거
+- `MainScreen` 상세 스탯 팝업에서 "장비 패시브" 섹션 제거
+- `ChapterScreen`, `ContentScreen`에서 전투 생성 시 장비 패시브 수집 로직 제거
+
+### 챕터 결과 화면 개선 (K-16)
+- 패배 시 실패 일차 표시: "챕터 N (현재일/총일일차)" 형태
+- 패배 결과의 딜그래프 아래에 적 남은 HP를 별도 카드로 표시 (프로그래스바 + 수치/퍼센트)
+- 모험 중 실시간 딜그래프에는 적 HP 미표시 (결과 화면 패배 시에만)
+
+---
+
 ## 2026-02-20
 
 ### UI 비주얼 개선 — ChapterScreen + CSS 디자인 토큰 (K-7 1단계)
