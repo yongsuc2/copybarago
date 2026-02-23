@@ -223,48 +223,36 @@ body {
 .menu-card .title { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
 .menu-card .sub { font-size: 11px; color: #888; }
 
-.talent-row {
+.talent-upgrades {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--color-bg-card);
-  padding: 10px 12px;
-  border-radius: 6px;
+  gap: 6px;
   margin: 6px 0;
 }
-
-.ms-tabs {
+.talent-btn {
+  flex: 1;
   display: flex;
-  gap: 4px;
-  margin-bottom: 10px;
-  overflow-x: auto;
-}
-.ms-tab {
-  position: relative;
-  padding: 4px 10px;
-  font-size: 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 14px;
-  background: transparent;
-  color: var(--color-text-secondary);
-  white-space: nowrap;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 4px;
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
   cursor: pointer;
+  color: var(--color-text);
+  font-family: inherit;
 }
-.ms-tab.active {
-  background: var(--color-gold);
-  color: #000;
-  border-color: var(--color-gold);
-  font-weight: bold;
+.talent-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
-.ms-dot {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 8px;
-  height: 8px;
-  background: var(--color-danger);
-  border-radius: 50%;
+.talent-btn:not(:disabled) {
+  border-color: var(--color-primary);
 }
+.talent-btn:not(:disabled):active {
+  background: var(--color-primary);
+}
+
 .ms-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -311,6 +299,16 @@ body {
   animation: ms-glow 1.5s ease-in-out infinite;
 }
 .ms-icon.claimed { border-color: var(--color-green); }
+.ms-icon.grade-up {
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+}
+.ms-icon.grade-up.reached {
+  background: var(--color-gold);
+  border-color: var(--color-gold);
+  color: #000;
+}
 .ms-check {
   position: absolute;
   top: -4px;
