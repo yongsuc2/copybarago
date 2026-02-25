@@ -96,6 +96,45 @@ const SPRITES: Record<string, { body: string; eyes: string; extra?: string }> = 
     eyes: `<circle cx="42" cy="32" r="5" fill="#76ff03"/>
            <circle cx="58" cy="32" r="5" fill="#76ff03"/>`,
   },
+  dungeon_dragon: {
+    body: `<ellipse cx="50" cy="58" rx="30" ry="24" fill="#00695c"/>
+           <circle cx="50" cy="36" r="20" fill="#00897b"/>
+           <polygon points="22,42 6,22 28,38" fill="#26a69a"/>
+           <polygon points="78,42 94,22 72,38" fill="#26a69a"/>
+           <polygon points="50,20 42,6 50,14 58,6" fill="#4db6ac"/>`,
+    eyes: `<circle cx="42" cy="34" r="4" fill="#ffd600"/>
+           <circle cx="58" cy="34" r="4" fill="#ffd600"/>
+           <ellipse cx="42" cy="34" rx="1.5" ry="4" fill="#222"/>
+           <ellipse cx="58" cy="34" rx="1.5" ry="4" fill="#222"/>`,
+    extra: `<path d="M40 48 Q50 56 60 48" stroke="#4db6ac" fill="none" stroke-width="2"/>`,
+  },
+  world_tree: {
+    body: `<rect x="42" y="50" width="16" height="30" rx="3" fill="#5d4037"/>
+           <rect x="38" y="55" width="6" height="12" rx="2" fill="#4e342e" transform="rotate(-20 41 61)"/>
+           <rect x="56" y="55" width="6" height="12" rx="2" fill="#4e342e" transform="rotate(20 59 61)"/>
+           <circle cx="50" cy="36" r="22" fill="#2e7d32"/>
+           <circle cx="38" cy="28" r="12" fill="#388e3c"/>
+           <circle cx="62" cy="28" r="12" fill="#388e3c"/>
+           <circle cx="50" cy="20" r="10" fill="#43a047"/>`,
+    eyes: `<circle cx="42" cy="38" r="4" fill="#76ff03"/>
+           <circle cx="58" cy="38" r="4" fill="#76ff03"/>
+           <circle cx="42" cy="38" r="2" fill="#222"/>
+           <circle cx="58" cy="38" r="2" fill="#222"/>`,
+  },
+  harpy: {
+    body: `<ellipse cx="50" cy="60" rx="18" ry="16" fill="#5c6bc0"/>
+           <circle cx="50" cy="40" r="14" fill="#7986cb"/>
+           <polygon points="24,46 4,28 30,42" fill="#9fa8da"/>
+           <polygon points="76,46 96,28 70,42" fill="#9fa8da"/>
+           <polygon points="20,50 8,36 26,46" fill="#7986cb"/>
+           <polygon points="80,50 92,36 74,46" fill="#7986cb"/>
+           <polygon points="40,76 46,68 50,78 54,68 60,76" fill="#5c6bc0"/>`,
+    eyes: `<circle cx="44" cy="38" r="3" fill="#fff"/>
+           <circle cx="56" cy="38" r="3" fill="#fff"/>
+           <circle cx="44" cy="38" r="1.5" fill="#222"/>
+           <circle cx="56" cy="38" r="1.5" fill="#222"/>`,
+    extra: `<polygon points="50,32 47,26 53,26" fill="#ffab00"/>`,
+  },
 };
 
 const NAME_TO_TYPE: Record<string, string> = {
@@ -110,6 +149,9 @@ const NAME_TO_TYPE: Record<string, string> = {
   'Ancient Dragon': 'boss_dragon',
   'Demon Lord': 'boss_demon',
   'Stone Golem': 'boss_golem',
+  'Dungeon Dragon': 'dungeon_dragon',
+  'World Tree': 'world_tree',
+  'Harpy': 'harpy',
 };
 
 export function getCharacterType(name: string): string {

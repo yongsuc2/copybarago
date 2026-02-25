@@ -37,7 +37,7 @@ const PAPER_DOLL_LAYOUT: ({ slot: SlotType; idx: number } | 'character' | null)[
 export function EquipmentScreen() {
   const { game, refresh } = useGame();
   const [tab, setTab] = useState<Tab>('equip');
-  const [inventoryFilter, setInventoryFilter] = useState<InvFilter>(null);
+  const [inventoryFilter, setInventoryFilter] = useState<InvFilter>('all');
   const [selectedSlotKey, setSelectedSlotKey] = useState<string | null>(null);
   const [selectedInventoryId, setSelectedInventoryId] = useState<string | null>(null);
   const [selectedForgeGroupIndex, setSelectedForgeGroupIndex] = useState<number | null>(null);
@@ -219,8 +219,7 @@ export function EquipmentScreen() {
   }
 
   function getFilteredInventory(): Equipment[] {
-    if (inventoryFilter === null) return [];
-    const items = inventoryFilter === 'all'
+    const items = (inventoryFilter === null || inventoryFilter === 'all')
       ? [...game.player.inventory]
       : game.player.inventory.filter(e => e.slot === inventoryFilter);
     items.sort((a, b) => {

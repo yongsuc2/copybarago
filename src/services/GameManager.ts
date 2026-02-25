@@ -22,7 +22,10 @@ import { ChapterTreasureTable } from '../domain/data/ChapterTreasureTable';
 import { Result } from '../domain/value-objects/Result';
 import { EventBus } from '../infrastructure/EventBus';
 import { SeededRandom } from '../infrastructure/SeededRandom';
-import { ChapterType, ChestType, DungeonType, ResourceType } from '../domain/enums';
+import { ChapterType, ChestType, DungeonType, BattleState, ResourceType } from '../domain/enums';
+import { BattleUnit } from '../domain/battle/BattleUnit';
+import type { PassiveSkill } from '../domain/entities/PassiveSkill';
+import type { Reward } from '../domain/value-objects/Reward';
 import { AttendanceSystem } from '../domain/meta/AttendanceSystem';
 import { AttendanceDataTable } from '../domain/data/AttendanceDataTable';
 import { Pet } from '../domain/entities/Pet';
@@ -95,6 +98,7 @@ export class GameManager {
 
     if (this.saveManager.hasSave()) {
       this.loadGame();
+      this.checkDailyReset();
     } else {
       this.initNewGame();
     }
@@ -116,15 +120,48 @@ export class GameManager {
     this.currentChapter = new Chapter(chapterId, type, this.rng.nextInt(0, 999999));
   }
 
-  enterDungeon(type: DungeonType) {
+  challengeDungeon(type: DungeonType) {
+    if (!this.dungeonManager.isAvailable()) {
+      return Result.fail('Daily limit reached');
+    }
     const dungeon = this.dungeonManager.getDungeon(type);
-    const result = dungeon.enter();
-    if (result.isOk() && result.data) {
-      for (const r of result.data.reward.resources) {
-        this.player.resources.add(r.type, r.amount);
-      }
+    const stats = this.player.computeStats();
+    const petAbility = this.battleManager.getPetAbilitySkill(this.player);
+    const passives: PassiveSkill[] = [];
+    if (petAbility) passives.push(petAbility);
+    const playerUnit = new BattleUnit('Capybara', stats, [], passives, true);
+
+    const result = dungeon.createBattle(playerUnit);
+    if (result.isOk()) {
+      this.dungeonManager.consumeEntry();
     }
     return result;
+  }
+
+  onDungeonBattleResult(type: DungeonType, state: BattleState): Reward | null {
+    if (state !== BattleState.VICTORY) return null;
+    const dungeon = this.dungeonManager.getDungeon(type);
+    const reward = dungeon.onBattleVictory();
+    for (const r of reward.resources) {
+      this.player.resources.add(r.type, r.amount);
+    }
+    return reward;
+  }
+
+  sweepDungeon(type: DungeonType) {
+    if (!this.dungeonManager.isAvailable()) {
+      return Result.fail('Daily limit reached');
+    }
+    const dungeon = this.dungeonManager.getDungeon(type);
+    if (dungeon.clearedStage <= 0) {
+      return Result.fail('No cleared stages');
+    }
+    this.dungeonManager.consumeEntry();
+    const reward = dungeon.getSweepReward();
+    for (const r of reward.resources) {
+      this.player.resources.add(r.type, r.amount);
+    }
+    return Result.ok({ reward });
   }
 
   pullGacha() {

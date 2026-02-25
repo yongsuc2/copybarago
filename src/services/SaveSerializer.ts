@@ -79,7 +79,7 @@ export interface SaveState {
   };
   tower: { currentFloor: number; currentStage: number };
   catacomb: { highestFloor: number };
-  dungeons: Record<string, number>;
+  dungeons: { todayCount: number; clearedStages: Record<string, number> } | Record<string, number>;
   arena: { tier: ArenaTier; points: number; todayEntries: number };
   travel: { maxClearedChapter: number; multiplier: number };
   goblinMiner: { oreCount: number };
@@ -214,10 +214,11 @@ export class SaveSerializer {
       slotPromoteCounts[slotType] = [...slot.slotPromoteCounts];
     }
 
-    const dungeons: Record<string, number> = {};
+    const clearedStages: Record<string, number> = {};
     for (const [type, dungeon] of game.dungeonManager.dungeons.entries()) {
-      dungeons[type] = dungeon.todayCount;
+      clearedStages[type] = dungeon.clearedStage;
     }
+    const dungeons = { todayCount: game.dungeonManager.todayCount, clearedStages };
 
     const collectionIds: string[] = [];
     for (const entry of game.collection.entries.values()) {
@@ -354,9 +355,19 @@ export class SaveSerializer {
 
     game.catacomb.highestFloor = data.catacomb.highestFloor;
 
-    for (const [typeStr, count] of Object.entries(data.dungeons)) {
-      const dungeon = game.dungeonManager.dungeons.get(typeStr as DungeonType);
-      if (dungeon) dungeon.todayCount = count;
+    if (data.dungeons && 'todayCount' in data.dungeons) {
+      const d = data.dungeons as { todayCount: number; clearedStages: Record<string, number> };
+      game.dungeonManager.todayCount = d.todayCount;
+      for (const [typeStr, stage] of Object.entries(d.clearedStages)) {
+        const dungeon = game.dungeonManager.dungeons.get(typeStr as DungeonType);
+        if (dungeon) dungeon.clearedStage = stage;
+      }
+    } else if (data.dungeons) {
+      const old = data.dungeons as Record<string, number>;
+      game.dungeonManager.todayCount = Math.min(
+        Object.values(old).reduce((s, v) => s + v, 0),
+        game.dungeonManager.dailyLimit,
+      );
     }
 
     game.arena.tier = data.arena.tier;

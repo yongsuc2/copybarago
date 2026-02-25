@@ -2,6 +2,23 @@
 
 ---
 
+## 2026-02-25
+
+### 일일 던전 전투 시스템 전면 재설계 (K-17)
+- 즉시 클리어 방식 → 실시간 전투 애니메이션으로 변경
+- 3종 던전별 고유 몬스터 추가: Dungeon Dragon(에메랄드 용), World Tree(나무 몬스터), Harpy(하피)
+- `dungeon.data.json` + `DungeonDataTable.ts` 데이터 테이블 신규 생성
+- `enemy.data.json`에 3종 적 템플릿 추가
+- `DailyDungeon.ts` 전면 재설계: 스테이지 기반 난이도(clearedStage 영구 누적), createBattle/onBattleVictory/getSweepReward
+- `DailyDungeonManager`: 개별 던전 3회 → 전체 공유 3회 일일 제한으로 변경
+- `GameManager`: enterDungeon 삭제 → challengeDungeon/onDungeonBattleResult/sweepDungeon 신규
+- `SaveSerializer`: 던전 세이브 구조 변경 + 기존 세이브 역호환 마이그레이션
+- `CharacterSprite.tsx`: 3종 SVG 스프라이트 + NAME_TO_TYPE 매핑 추가
+- `ContentScreen.tsx`: 던전 탭 전면 재설계 — DungeonPhase 상태 머신(select/battling/result/sweep-result), BattleArena 기반 1:1 전투 애니메이션 루프, 도전/소탕 버튼
+- `DailyDungeon.test.ts`: 새 API에 맞게 테스트 전면 재작성 (10개 테스트 통과)
+
+---
+
 ## 2026-02-23
 
 ### 장비 패시브 시스템 전체 삭제 (K-15)

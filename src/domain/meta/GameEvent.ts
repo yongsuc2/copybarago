@@ -1,5 +1,6 @@
 import { ResourceType } from '../enums';
 import { Reward } from '../value-objects/Reward';
+import questData from '../data/json/quest.data.json';
 
 export enum EventType {
   COLLECTION = 'COLLECTION',
@@ -114,19 +115,13 @@ export class EventManager {
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999);
 
+    const missions = questData.daily.map(q =>
+      makeMission(q.id, q.description, q.target, ResourceType[q.rewardType as keyof typeof ResourceType], q.rewardAmount),
+    );
+
     const event = new GameEvent(
-      `daily_${now}`,
-      '일일 퀘스트',
-      EventType.MISSION,
-      now,
-      endOfDay.getTime(),
-      [
-        makeMission('daily_chapter', '챕터 3회 클리어', 3, ResourceType.GEMS, 30),
-        makeMission('daily_dungeon', '던전 3회 완료', 3, ResourceType.GOLD, 500),
-        makeMission('daily_tower', '탑 2회 도전', 2, ResourceType.EQUIPMENT_STONE, 3),
-        makeMission('daily_arena', '아레나 1회 전투', 1, ResourceType.GEMS, 20),
-        makeMission('daily_travel', '여행 5회', 5, ResourceType.GOLD, 300),
-      ],
+      `daily_${now}`, '일일 퀘스트', EventType.MISSION,
+      now, endOfDay.getTime(), missions,
     );
 
     this.addEvent(event);
@@ -140,18 +135,13 @@ export class EventManager {
     endOfWeek.setDate(endOfWeek.getDate() + (daysUntilSunday === 0 ? 7 : daysUntilSunday));
     endOfWeek.setHours(23, 59, 59, 999);
 
+    const missions = questData.weekly.map(q =>
+      makeMission(q.id, q.description, q.target, ResourceType[q.rewardType as keyof typeof ResourceType], q.rewardAmount),
+    );
+
     const event = new GameEvent(
-      `weekly_${now}`,
-      '주간 퀘스트',
-      EventType.MISSION,
-      now,
-      endOfWeek.getTime(),
-      [
-        makeMission('weekly_chapter', '챕터 15회 클리어', 15, ResourceType.GEMS, 150),
-        makeMission('weekly_gacha', '장비 뽑기 20회', 20, ResourceType.EQUIPMENT_STONE, 10),
-        makeMission('weekly_sell', '장비 판매 10회', 10, ResourceType.GOLD, 2000),
-        makeMission('weekly_tower', '탑 10회 도전', 10, ResourceType.POWER_STONE, 3),
-      ],
+      `weekly_${now}`, '주간 퀘스트', EventType.MISSION,
+      now, endOfWeek.getTime(), missions,
     );
 
     this.addEvent(event);

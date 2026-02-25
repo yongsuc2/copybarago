@@ -27,6 +27,7 @@
 | K-14 | 뽑기 용어 변경 | 하 | 완료 | "천장" → "신화 확정" 용어 통일 (GachaScreen + 기획서) | GachaScreen 참고 |
 | K-15 | 장비 패시브 삭제 | 중 | 완료 | EquipmentPassiveTable + equipment-passive.data.json 삭제, 전투/UI/상세스탯에서 패시브 제거 | — |
 | K-16 | 챕터 결과 개선 | 하 | 완료 | 패배 시 실패 일차 표시, 딜그래프 아래 적 남은 HP 별도 표시 | ChapterScreen 참고 |
+| K-17 | 일일 던전 전투 시스템 재설계 | 상 | 완료 | 즉시 클리어→전투 애니메이션, 스테이지 기반 난이도, 도전/소탕, 3종 몬스터 | DailyDungeon, ContentScreen 참고 |
 
 ---
 
