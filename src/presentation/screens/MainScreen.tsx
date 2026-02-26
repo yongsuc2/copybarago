@@ -6,6 +6,7 @@ import type { Player } from '../../domain/entities/Player';
 import type { StatsBreakdown } from '../../domain/entities/Player';
 import type { Stats } from '../../domain/value-objects/Stats';
 import { formatNumber } from '../components/PlayerStatsBar';
+import { TalentTable } from '../../domain/data/TalentTable';
 
 const SOURCE_LABELS: { key: Exclude<keyof StatsBreakdown, 'total'>; label: string }[] = [
   { key: 'base', label: '기본' },
@@ -90,6 +91,7 @@ export function MainScreen() {
   const { game, setScreen } = useGame();
   const stats = game.player.computeStats();
   const [showDetail, setShowDetail] = useState(false);
+  const subGradeLabel = TalentTable.getSubGradeLabel(game.player.talent.getTotalLevel());
 
   return (
     <div className="screen">
@@ -102,7 +104,7 @@ export function MainScreen() {
       <div className="card">
         <div className="stat-row">
           <span>재능 등급</span>
-          <span>{game.player.talent.grade}</span>
+          <span>{subGradeLabel}</span>
         </div>
         <div className="stat-row">
           <span>클리어 챕터</span>

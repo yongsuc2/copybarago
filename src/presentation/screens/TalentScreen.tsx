@@ -1,17 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useGame } from '../GameContext';
-import { StatType, ResourceType, TalentGrade } from '../../domain/enums';
-import { TalentTable } from '../../domain/data/TalentTable';
-import type { TalentMilestone, MilestoneRewardType } from '../../domain/data/TalentTable';
-
-const GRADE_LABELS: Record<TalentGrade, string> = {
-  [TalentGrade.DISCIPLE]: '수련생',
-  [TalentGrade.ADVENTURER]: '모험가',
-  [TalentGrade.ELITE]: '정예',
-  [TalentGrade.MASTER]: '달인',
-  [TalentGrade.WARRIOR]: '전사',
-  [TalentGrade.HERO]: '영웅',
-};
+import { StatType, ResourceType } from '../../domain/enums';
+import { TalentTable, GRADE_LABELS } from '../../domain/data/TalentTable';
+import type { TalentMilestone, MilestoneRewardType, TransitionInfo } from '../../domain/data/TalentTable';
 
 const REWARD_ICONS: Partial<Record<MilestoneRewardType, string>> = {
   [ResourceType.GOLD]: '🪙',
@@ -30,80 +21,74 @@ const STAT_ICONS: Record<StatType, string> = {
   [StatType.CRIT]: '🎯',
 };
 
-const STAT_LABELS: Record<string, string> = {
+const BONUS_STAT_LABELS: Record<string, string> = {
   ATK: '공격력',
   DEF: '방어력',
-  HP: '체력',
-  CRIT: '치명타',
 };
+
+const VIEW_RANGE = 15;
+const MAX_LEVEL = TalentTable.getMaxLevel();
 
 function formatRewardAmount(type: MilestoneRewardType, amount: number): string {
   if (type === 'GOLD_BOOST') return `+${amount}%`;
-  if (amount >= 10000) return `x${(amount / 1000).toFixed(1)}K`;
-  if (amount >= 1000) return `x${amount.toLocaleString()}`;
-  return `x${amount}`;
+  if (amount >= 1_000_000_000) return `${(amount / 1_000_000_000).toFixed(1)}B`;
+  if (amount >= 1_000_000) return `${(amount / 1_000_000).toFixed(1)}M`;
+  if (amount >= 10_000) return `${(amount / 1_000).toFixed(1)}K`;
+  return `${amount.toLocaleString()}`;
 }
 
 type TrackNode =
   | { type: 'reward'; level: number; milestone: TalentMilestone }
-  | { type: 'grade_up'; level: number; grade: TalentGrade; bonus: { stat: string; amount: number } | null };
+  | { type: 'transition'; level: number; transition: TransitionInfo };
 
 function buildAllNodes(): TrackNode[] {
   const nodes: TrackNode[] = [];
-
   for (const m of TalentTable.getAllMilestones()) {
     nodes.push({ type: 'reward', level: m.level, milestone: m });
   }
-
-  for (const g of TalentTable.getGradeOrder()) {
-    const level = TalentTable.getGradeStartLevel(g);
-    if (level === 0) continue;
-    nodes.push({
-      type: 'grade_up',
-      level,
-      grade: g,
-      bonus: TalentTable.getIndividualGradeBonus(g),
-    });
+  for (const t of TalentTable.getAllTransitions()) {
+    nodes.push({ type: 'transition', level: t.level, transition: t });
   }
-
   nodes.sort((a, b) => a.level - b.level);
   return nodes;
 }
 
 const ALL_NODES = buildAllNodes();
-const MAX_LEVEL = TalentTable.getGradeStartLevel(
-  TalentTable.getGradeOrder()[TalentTable.getGradeOrder().length - 1],
-);
 
 export function TalentScreen() {
   const { game, refresh } = useGame();
   const talent = game.player.talent;
   const [claimedReward, setClaimedReward] = useState<TalentMilestone | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   const totalLevel = talent.getTotalLevel();
+  const subGradeInfo = TalentTable.getSubGradeInfo(totalLevel);
   const nextThreshold = talent.getNextGradeThreshold();
   const goldBoostPct = Math.round((game.player.getGoldMultiplier() - 1) * 100);
+  const levelsPerStat = TalentTable.getLevelsPerStat();
 
-  const firstUnclaimed = ALL_NODES.find(n =>
-    n.type === 'reward' &&
-    totalLevel >= n.level &&
-    !game.player.claimedMilestones.has(`LV_${n.level}`),
+  const subGradeProgress = subGradeInfo.tierLevels > 0
+    ? Math.min(subGradeInfo.levelInTier / subGradeInfo.tierLevels, 1) * 100
+    : 100;
+
+  let viewStart = Math.max(0, totalLevel - Math.floor(VIEW_RANGE / 2));
+  let viewEnd = viewStart + VIEW_RANGE;
+  if (viewEnd > MAX_LEVEL) {
+    viewEnd = MAX_LEVEL;
+    viewStart = Math.max(0, viewEnd - VIEW_RANGE);
+  }
+  const viewSize = viewEnd - viewStart;
+
+  const visibleNodes = useMemo(() =>
+    ALL_NODES.filter(n => n.level >= viewStart && n.level <= viewEnd),
+    [viewStart, viewEnd],
   );
-  const scrollTargetLevel = firstUnclaimed ? firstUnclaimed.level : Math.min(totalLevel, MAX_LEVEL);
 
-  useEffect(() => {
-    if (!scrollRef.current) return;
-    const el = scrollRef.current;
-    const targetPct = Math.min(scrollTargetLevel / MAX_LEVEL, 1);
-    const targetPx = targetPct * el.scrollWidth;
-    el.scrollLeft = Math.max(0, targetPx - el.clientWidth / 2);
-  }, [scrollTargetLevel]);
+  const allClaimable = talent.getClaimableMilestones(game.player.claimedMilestones);
 
   function upgradeStat(stat: StatType) {
+    if (!talent.canUpgradeStat(stat)) return;
     const cost = talent.getUpgradeCost(stat);
     if (!game.player.resources.canAfford(ResourceType.GOLD, cost)) return;
-
     const result = talent.upgrade(stat, game.player.resources.gold);
     if (result.isOk() && result.data) {
       game.player.resources.spend(ResourceType.GOLD, result.data.cost);
@@ -124,13 +109,28 @@ export function TalentScreen() {
     refresh();
   }
 
+  function claimAll() {
+    const claimable = talent.getClaimableMilestones(game.player.claimedMilestones);
+    if (claimable.length === 0) return;
+    for (const m of claimable) {
+      game.player.claimedMilestones.add(talent.getMilestoneKey(m.level));
+      if (m.rewardType !== 'GOLD_BOOST') {
+        game.player.resources.add(m.rewardType, m.rewardAmount);
+      }
+    }
+    game.saveGame();
+    refresh();
+  }
+
   const rows = [
-    { stat: StatType.ATK, label: '공격력', level: talent.atkLevel },
-    { stat: StatType.HP, label: '체력', level: talent.hpLevel },
-    { stat: StatType.DEF, label: '방어력', level: talent.defLevel },
+    { stat: StatType.ATK, label: '공격력' },
+    { stat: StatType.HP, label: '체력' },
+    { stat: StatType.DEF, label: '방어력' },
   ];
 
-  const progress = Math.min(totalLevel / MAX_LEVEL, 1) * 100;
+  const fillPct = viewSize > 0
+    ? Math.min(Math.max((totalLevel - viewStart) / viewSize, 0), 1) * 100
+    : 0;
 
   return (
     <div className="screen">
@@ -139,7 +139,11 @@ export function TalentScreen() {
       <div className="card">
         <div className="stat-row">
           <span>등급</span>
-          <span>{GRADE_LABELS[talent.grade] ?? talent.grade}</span>
+          <span>{TalentTable.getSubGradeLabel(totalLevel)}</span>
+        </div>
+        <div className="stat-row">
+          <span>서브 등급 진행</span>
+          <span>{subGradeInfo.levelInTier} / {subGradeInfo.tierLevels > 0 ? subGradeInfo.tierLevels : '-'}</span>
         </div>
         <div className="stat-row">
           <span>총 레벨</span>
@@ -151,64 +155,85 @@ export function TalentScreen() {
             <span style={{ color: 'var(--color-gold)' }}>+{goldBoostPct}%</span>
           </div>
         )}
-      </div>
-
-      <div className="card" style={{ marginTop: 8 }}>
-        <h3>등급 보상</h3>
-        <div className="ms-scroll" ref={scrollRef}>
-          <div className="ms-track" style={{ minWidth: ALL_NODES.length * 48 }}>
-            <div className="ms-markers">
-              {ALL_NODES.map(node => {
-                const pct = (node.level / MAX_LEVEL) * 100;
-                const reached = totalLevel >= node.level;
-
-                if (node.type === 'grade_up') {
-                  return (
-                    <div key={`g_${node.level}`} className="ms-marker" style={{ left: `${pct}%` }}>
-                      <div className={`ms-icon grade-up ${reached ? 'reached' : 'locked'}`}>
-                        ⬆
-                      </div>
-                      <div className={`ms-amount ${reached ? '' : 'locked'}`}>
-                        {GRADE_LABELS[node.grade]}
-                      </div>
-                    </div>
-                  );
-                }
-
-                const m = node.milestone;
-                const key = talent.getMilestoneKey(m.level);
-                const claimed = game.player.claimedMilestones.has(key);
-                const state = claimed ? 'claimed' : reached ? 'claimable' : 'locked';
-
-                return (
-                  <div key={`m_${node.level}`} className="ms-marker" style={{ left: `${pct}%` }}>
-                    <div
-                      className={`ms-icon ${state}`}
-                      onClick={() => state === 'claimable' && claimMilestone(m)}
-                    >
-                      {REWARD_ICONS[m.rewardType] ?? '?'}
-                      {claimed && <span className="ms-check">✓</span>}
-                    </div>
-                    <div className={`ms-amount ${state}`}>
-                      {formatRewardAmount(m.rewardType, m.rewardAmount)}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="ms-bar">
-              <div className="ms-fill" style={{ width: `${progress}%` }} />
-            </div>
-            <div className="ms-labels">
-              <span>Lv.0</span>
-              <span>Lv.{MAX_LEVEL}</span>
-            </div>
+        <div style={{ marginTop: 6 }}>
+          <div className="ms-bar" style={{ height: 6, borderRadius: 3 }}>
+            <div className="ms-fill" style={{ width: `${subGradeProgress}%`, borderRadius: 3 }} />
           </div>
         </div>
       </div>
 
+      <div className="card" style={{ marginTop: 8 }}>
+        <h3>등급 보상</h3>
+        <div className="ms-track" style={{ position: 'relative', paddingTop: 32, paddingBottom: 16 }}>
+          <div className="ms-markers">
+            {visibleNodes.map(node => {
+              const pct = viewSize > 0 ? ((node.level - viewStart) / viewSize) * 100 : 0;
+              const reached = totalLevel >= node.level;
+
+              if (node.type === 'transition') {
+                const t = node.transition;
+                const iconClass = t.isMainGrade ? 'grade-up' : 'tier-up';
+                const label = t.isMainGrade
+                  ? GRADE_LABELS[t.grade]
+                  : `${BONUS_STAT_LABELS[t.bonus.stat] ?? t.bonus.stat}+${t.bonus.amount}`;
+
+                return (
+                  <div key={`t_${node.level}`} className="ms-marker" style={{ left: `${pct}%` }}>
+                    <div className={`ms-icon ${iconClass} ${reached ? 'reached' : 'locked'}`}>
+                      {t.isMainGrade ? '⭐' : '⬆'}
+                    </div>
+                    <div className={`ms-amount ${reached ? '' : 'locked'}`}>{label}</div>
+                  </div>
+                );
+              }
+
+              const m = node.milestone;
+              const key = talent.getMilestoneKey(m.level);
+              const claimed = game.player.claimedMilestones.has(key);
+              const state = claimed ? 'claimed' : reached ? 'claimable' : 'locked';
+
+              return (
+                <div key={`m_${node.level}`} className="ms-marker" style={{ left: `${pct}%` }}>
+                  <div
+                    className={`ms-icon ${state}`}
+                    onClick={() => state === 'claimable' && claimMilestone(m)}
+                  >
+                    {REWARD_ICONS[m.rewardType] ?? '?'}
+                    {claimed && <span className="ms-check">✓</span>}
+                  </div>
+                  <div className={`ms-amount ${state}`}>
+                    {formatRewardAmount(m.rewardType, m.rewardAmount)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="ms-bar">
+            <div className="ms-fill" style={{ width: `${fillPct}%` }} />
+          </div>
+          <div className="ms-labels">
+            <span>Lv.{viewStart}</span>
+            <span>Lv.{viewEnd}</span>
+          </div>
+        </div>
+        {allClaimable.length > 0 && (
+          <div className="stat-row" style={{ marginTop: 4 }}>
+            <span style={{ color: 'var(--color-gold)', fontSize: 12 }}>미수령 보상: {allClaimable.length}개</span>
+            <button
+              className="btn btn-primary"
+              style={{ fontSize: 11, padding: '2px 10px' }}
+              onClick={claimAll}
+            >
+              모두 수령
+            </button>
+          </div>
+        )}
+      </div>
+
       <div className="talent-upgrades">
         {rows.map(row => {
+          const tierLevel = talent.getStatLevelInTier(row.stat);
+          const atMax = !talent.canUpgradeStat(row.stat);
           const cost = talent.getUpgradeCost(row.stat);
           const canAfford = game.player.resources.canAfford(ResourceType.GOLD, cost);
           const perLevel = TalentTable.getStatPerLevel(row.stat);
@@ -217,14 +242,18 @@ export function TalentScreen() {
             <button
               key={row.stat}
               className="talent-btn"
-              disabled={!canAfford}
+              disabled={atMax || !canAfford}
               onClick={() => upgradeStat(row.stat)}
             >
               <span style={{ fontSize: 24 }}>{STAT_ICONS[row.stat]}</span>
               <span style={{ fontWeight: 'bold', fontSize: 13 }}>{row.label}</span>
-              <span style={{ fontSize: 11, color: '#888' }}>Lv.{row.level}</span>
+              <span style={{ fontSize: 11, color: atMax ? '#4a4' : '#888' }}>
+                Lv.{tierLevel} / {levelsPerStat}
+              </span>
               <span style={{ fontSize: 12, color: 'var(--color-green)', fontWeight: 'bold' }}>+{perLevel}</span>
-              <span style={{ fontSize: 11, color: 'var(--color-gold)', marginTop: 2 }}>{cost} 🪙</span>
+              <span style={{ fontSize: 11, color: 'var(--color-gold)', marginTop: 2 }}>
+                {atMax ? 'MAX' : `${cost.toLocaleString()} 🪙`}
+              </span>
             </button>
           );
         })}

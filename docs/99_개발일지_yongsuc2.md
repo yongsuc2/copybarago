@@ -353,4 +353,11 @@
 - **최대 HP 비례 물리 추가 데미지 패시브** (Y-38) — MAX_HP_DAMAGE 타입 신규 추가, 압도(max_hp_damage): 물리 공격 시 maxHP×coefficient만큼 ATK에 추가(방어 적용), T1 2%~T4 12%, KNIGHT 시너지
 - **적 HP 비례 물리 공격 + 기절 스킬** (Y-39) — 분쇄(hp_crush): 적 maxHP 비례 물리 데미지(isTargetHpBased), SKULL 시너지 / 기절(stun_apply): LOWEST SkillEffectType.STUN(chance+duration), 강타(stun_strike): UPPER TRIGGER_SKILL→stun_apply, KNIGHT 시너지, processEnemyTurn 기절 체크
 - **재능 등급 골드 보상** (Y-40) — gradeRewards에 goldPercent 추가(2%~12%, 누적30%), Player.getGoldMultiplier(), 챕터 내 전투/인카운터/클리어 골드에만 적용, 등급업 팝업 표시
-- **재능 등급 보상 마일스톤 재설계** (Y-41) — 기존 등급 스탯% 보너스 삭제 → 등급업 ATK/DEF 교대 보너스(10/15/30/60/120) + 레벨 10 간격 마일스톤(골드 일시/골드 획득량% 교대), 수직 타임라인 UI(등급 탭 선택+현재 위치 자동 스크롤), Player.getGoldMultiplier() 챕터 내 골드 적용
+- **재능 등급 보상 마일스톤 재설계** (Y-41) — 기존 등급 스탯% 보너스 삭제 → 등급업 ATK/DEF 교대 보너스(10/15/30/60/120) + 레벨 간격 마일스톤(골드 일시/골드 획득량% 교대), 통합 프로그레스 바 UI(미수령 보상/현재 레벨 자동 스크롤), Player.getGoldMultiplier() 챕터 내 골드 적용
+
+---
+
+## 2026-02-24 (Day 13)
+
+### 완료 작업
+- **재능 서브 등급(단) 시스템** (Y-42) — 200개 서브 등급(30레벨/단 = 공10+방10+체10), 스탯별 10레벨 캡 + 서브 등급 진급 시 리셋, 마일스톤 10레벨 간격(서브 등급당 2개), 총 레벨 max 2010, 등급 경계(60/210/510/1020/2010), gradeConfig 기반 비용 자동 생성, 서브/메인 등급 전환 시 ATK/DEF 교대 스탯 보너스, 골드 마일스톤 = 강화비용×3, TalentScreen UI 재설계(등급 진행 바 + 마일스톤 카드 + 서브 등급 레벨 표시)

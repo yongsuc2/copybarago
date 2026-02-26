@@ -1,6 +1,7 @@
 import { GameManager } from './GameManager';
 import { Equipment } from '../domain/entities/Equipment';
 import type { UniqueEffect } from '../domain/entities/Equipment';
+import { Talent } from '../domain/entities/Talent';
 import { Pet } from '../domain/entities/Pet';
 import { Resources } from '../domain/entities/Resources';
 import { Stats } from '../domain/value-objects/Stats';
@@ -294,9 +295,11 @@ export class SaveSerializer {
   static deserialize(data: SaveState, game: GameManager): void {
     const player = game.player;
 
-    player.talent.atkLevel = data.player.talent.atkLevel;
-    player.talent.hpLevel = data.player.talent.hpLevel;
-    player.talent.defLevel = data.player.talent.defLevel;
+    player.talent = new Talent(
+      data.player.talent.atkLevel,
+      data.player.talent.hpLevel,
+      data.player.talent.defLevel,
+    );
 
     player.heritage.route = data.player.heritage.route;
     player.heritage.level = data.player.heritage.level;

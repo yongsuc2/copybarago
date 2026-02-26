@@ -309,6 +309,16 @@ body {
   border-color: var(--color-gold);
   color: #000;
 }
+.ms-icon.tier-up {
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+}
+.ms-icon.tier-up.reached {
+  background: #6a5acd;
+  border-color: #6a5acd;
+  color: #fff;
+}
 .ms-check {
   position: absolute;
   top: -4px;

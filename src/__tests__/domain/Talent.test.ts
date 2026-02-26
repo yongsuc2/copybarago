@@ -30,7 +30,7 @@ describe('Talent', () => {
   });
 
   it('advances grade when total level reaches threshold', () => {
-    const talent = new Talent(10, 10, 10);
+    const talent = new Talent(20, 20, 20);
     expect(talent.grade).toBe(TalentGrade.ADVENTURER);
   });
 
@@ -46,16 +46,44 @@ describe('Talent', () => {
   it('reports next grade threshold', () => {
     const talent = new Talent();
     const threshold = talent.getNextGradeThreshold();
-    expect(threshold).toBe(30);
+    expect(threshold).toBe(60);
   });
 
   it('detects grade change on upgrade', () => {
-    const talent = new Talent(10, 10, 9);
+    const talent = new Talent(20, 20, 19);
     expect(talent.grade).toBe(TalentGrade.DISCIPLE);
 
     const cost = talent.getUpgradeCost(StatType.DEF);
     const result = talent.upgrade(StatType.DEF, cost + 10000);
     expect(result.data?.gradeChanged).toBe(true);
     expect(talent.grade).toBe(TalentGrade.ADVENTURER);
+  });
+
+  it('caps stat at levelsPerStat within sub-grade', () => {
+    const talent = new Talent();
+    for (let i = 0; i < 10; i++) {
+      const cost = talent.getUpgradeCost(StatType.ATK);
+      talent.upgrade(StatType.ATK, cost + 999999);
+    }
+    expect(talent.canUpgradeStat(StatType.ATK)).toBe(false);
+    expect(talent.getStatLevelInTier(StatType.ATK)).toBe(10);
+
+    const result = talent.upgrade(StatType.ATK, 999999);
+    expect(result.isFail()).toBe(true);
+  });
+
+  it('advances sub-grade when all stats reach cap', () => {
+    const talent = new Talent(10, 10, 9);
+    expect(talent.subGradeIndex).toBe(0);
+
+    const cost = talent.getUpgradeCost(StatType.DEF);
+    const result = talent.upgrade(StatType.DEF, cost + 999999);
+    expect(result.isOk()).toBe(true);
+    expect(result.data?.subGradeAdvanced).toBe(true);
+    expect(talent.subGradeIndex).toBe(1);
+    expect(talent.getStatLevelInTier(StatType.ATK)).toBe(0);
+    expect(talent.getStatLevelInTier(StatType.HP)).toBe(0);
+    expect(talent.getStatLevelInTier(StatType.DEF)).toBe(0);
+    expect(talent.getTotalLevel()).toBe(30);
   });
 });

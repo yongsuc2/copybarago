@@ -75,7 +75,7 @@ export class Player {
     let stats = BASE_STATS.clone();
 
     stats = stats.add(this.talent.getStats());
-    stats = stats.add(TalentTable.getGradeStatBonus(this.talent.grade));
+    stats = stats.add(TalentTable.getStatBonus(this.talent.getTotalLevel()));
 
     for (const slot of this.equipmentSlots.values()) {
       stats = stats.add(slot.getTotalStats());
@@ -107,7 +107,7 @@ export class Player {
   getStatsBreakdown(): StatsBreakdown {
     const base = BASE_STATS.clone();
     const talent = this.talent.getStats();
-    const grade = TalentTable.getGradeStatBonus(this.talent.grade);
+    const grade = TalentTable.getStatBonus(this.talent.getTotalLevel());
 
     let equipment = Stats.ZERO;
     for (const slot of this.equipmentSlots.values()) {

@@ -50,7 +50,22 @@
 | Y-38 | 최대 HP 비례 물리 추가 데미지 패시브 | 중 | 완료 | 압도(max_hp_damage) — MAX_HP_DAMAGE 타입, 물리 공격 시 maxHP×coefficient 추가 ATK, 방어 적용 |
 | Y-39 | 적 HP 비례 물리 공격 + 기절 스킬 | 중 | 완료 | 분쇄(hp_crush): 적 maxHP 비례 물리 데미지, 강타(stun_strike): TRIGGER_SKILL→stun_apply, 기절(stun_apply): LOWEST SkillEffectType.STUN, STUN 상태효과 신규 |
 | Y-40 | 재능 등급 골드 보상 | 하 | 완료 | gradeRewards에 goldPercent 추가, 챕터 내 전투/인카운터/클리어 골드에만 적용, 퀘스트/아레나/여행 등 미적용 |
-| Y-41 | 재능 등급 보상 마일스톤 재설계 | 중 | 완료 | 등급 스탯% 보너스 → 등급업 ATK/DEF 교대 보너스 + 레벨 10 간격 마일스톤(골드/골드획득량%), 수직 타임라인 UI, 등급 탭 선택, 수동 수령+소급 가능 |
+| Y-41 | 재능 등급 보상 마일스톤 재설계 | 중 | 완료 | 등급 스탯% 보너스 → 등급업 ATK/DEF 교대 보너스 + 레벨 간격 마일스톤(골드/골드획득량%), 통합 프로그레스 바 UI, 수동 수령+소급 가능 |
+| Y-42 | 재능 서브 등급(단) 시스템 | 중 | 완료 | 67개 서브 등급(30레벨/단 = 공10+방10+체10), 스탯 10 도달 시 서브 등급 진급+리셋, 마일스톤 10레벨 간격, 총 레벨 max 2010 |
+| Y-43 | [Unity] 도메인 로직 포팅 | 상 | 완료 | TS→C# 전체 포팅 (67파일+22테스트), 250개 테스트 통과, 크로스 검증 완료 |
+| Y-44 | [Unity] 전투 연출 시스템 | 상 | 대기 | BattleArena 연출: 접근→타격→후퇴 페이즈 시퀀스, 데미지 팝업, 투사체 애니메이션, 배속 조절, Coroutine/DOTween 기반 |
+| Y-45 | [Unity] 전투 UI | 중 | 대기 | HP/분노 바, 상태이상 아이콘, 스킬 사용 인디케이터, 캐릭터 스프라이트, 쉴드 표시 |
+| Y-46 | [Unity] 챕터 화면 | 상 | 대기 | ChapterScreen: 인카운터 선택, 전투 진입/결과, 스킬 획득 카드, 일차 진행, 리롤 |
+| Y-47 | [Unity] 메인/로비 화면 | 중 | 대기 | MainScreen: 플레이어 정보, 스탯, 챕터 진입, 컨텐츠 네비게이션 |
+| Y-48 | [Unity] 장비 화면 | 중 | 대기 | EquipmentScreen: 장비 목록, 착용/해제, 강화, 합성, 부스탯 표시 |
+| Y-49 | [Unity] 재능 화면 | 중 | 대기 | TalentScreen: 스탯 강화, 서브 등급 진행, 마일스톤 보상 |
+| Y-50 | [Unity] 펫 화면 | 중 | 대기 | PetScreen: 펫 목록, 먹이주기, 등급업, 장착 |
+| Y-51 | [Unity] 가챠/상자 화면 | 중 | 대기 | GachaScreen: 장비/펫/보석 상자, 뽑기 연출, 천장 표시 |
+| Y-52 | [Unity] 컨텐츠 화면 | 중 | 대기 | ContentScreen: 던전/탑/아레나/여행/고블린/카타콤 진입 UI |
+| Y-53 | [Unity] 퀘스트/이벤트 화면 | 중 | 대기 | QuestScreen + EventScreen: 일일/주간 퀘스트, 미션 진행도, 보상 수령 |
+| Y-54 | [Unity] 설정/디버그 화면 | 하 | 대기 | SettingsScreen: 저장/불러오기/삭제, DebugPanel: 치트 기능 |
+| Y-55 | [Unity] 공통 컴포넌트 | 중 | 대기 | NavBar, ResourceBar, PlayerStatsBar, StatsDisplay, EquipmentIcon, PetIcon, DamageGraph |
+| Y-56 | [Unity] 챕터 보물/출석 화면 | 하 | 대기 | ChapterTreasureScreen + 출석 보상 UI |
 
 ---
 
