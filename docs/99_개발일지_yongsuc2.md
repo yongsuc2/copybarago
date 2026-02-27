@@ -453,3 +453,9 @@
   - **영향받던 화면**: EquipmentScreen(탭 패널 null→양쪽 동시 표시), ChapterScreen(다수 패널), BattleView, ContentScreen, GachaScreen, PetScreen 등 전체 Presentation 레이어
   - **스킬 아이콘 자동 로드**: SpriteManager에 `Resources.LoadAll<Sprite>("Icons/skill")` 추가. `icon_skill_{id}.png` → skill ID로 매핑. `GetSkillIcon(skillId)` API 추가
   - **ChapterScreen 스킬 아이콘 스프라이트 전환**: 세션 스킬 아이콘(28x28), 엘리트 보상 스킬 카드(24x24), 설정 스킬 목록(22x22) 3곳에서 emoji 텍스트 → Image 스프라이트로 전환 (스프라이트 없으면 emoji 폴백)
+- **장비/재능 UI 개선** (Y-65)
+  - **EquipmentScreen 스프라이트 아이콘 적용**: 인벤토리 아이템, 페이퍼돌 장착 슬롯, 합성 탭 아이콘 3곳에서 SpriteManager.GetEquipmentIcon() 호출하여 실제 스프라이트 표시. 기존 텍스트 약어(무기/갑옷 등) 제거
+  - **EquipmentScreen 탭 축소**: 탭 바 높이 44→36, 폰트 24→20, 패딩 조정
+  - **EquipmentScreen 인벤토리 라벨 개선**: 강화 레벨이 있으면 "+N" 등급색 표시, 없으면 슬롯명. 합성 뱃지 폰트 22→14
+  - **TalentScreen 마일스톤 노드 축소**: nodeArea 80→52, 아이콘 36→22, 설명 폰트 18→13, 설명 높이 26→16
+  - **TalentScreen 스탯 카드 재배치**: 레퍼런스 이미지 기준 LV 상단→아이콘 40px→보너스(+값)→스탯명→비용 순서. 카드 배경 ButtonPrimary→CardLight
