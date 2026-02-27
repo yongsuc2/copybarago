@@ -73,6 +73,7 @@
 | Y-61 | UI 품질 수정 + 아이콘 자동 로드 | 중 | 완료 | SpriteManager Resources/Icons 자동 로드(Inspector 불필요), TalentScreen 아이콘 preferredWidth+null체크, ContentScreen 탭 아이콘 1글자 제한, EventScreen 출석부 셀 240x120+폰트 증가, StatsDetailPopup Mask 클리핑 |
 | Y-62 | 아이콘 임포트 수정 + 마일스톤 노드 렌더링 수정 | 중 | 완료 | spriteMode Multiple→Single 이름 불일치 해결(SpriteManager _0 접미사 정규화), Editor .asmdef 생성+IconImportSettings 수정, TalentScreen _nodeContainer null 버그 수정(AddComponent→GetComponent), 스킬 아이콘 목록 문서 추가 |
 | Y-63 | 장비 아이콘 자동 로드 | 하 | 완료 | SpriteManager에서 Resources/Icons/equip/ 자동 로드, equip_{slot}_{grade}→{SLOT}_{GRADE} 키 매핑, _256 변형 자동 무시, 아이콘 리소스 목록 문서 업데이트 |
+| Y-64 | RectTransform null 버그 전역 수정 + 스킬 아이콘 자동 로드 | 중 | 완료 | AddComponent<RectTransform>() null 반환 버그 23개 파일 전역 수정(GetComponent ?? AddComponent 패턴), SpriteManager 스킬 아이콘 자동 로드(Resources/Icons/skill/), ChapterScreen 3곳 emoji→스프라이트 아이콘 전환 |
 
 ---
 

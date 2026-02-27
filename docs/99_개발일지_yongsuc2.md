@@ -448,3 +448,8 @@
   - `_256` 변형 자동 무시, `StripSpriteModeSuffix` 공통 메서드로 spriteMode 접미사 제거 통합
   - `GetEquipmentIcon`에서 리소스 로드 스프라이트 우선 확인 → SpriteDatabase → 플레이스홀더 순서
   - 아이콘_리소스_목록.md §5 장비 아이콘 섹션 업데이트 (자동 로드 경로 + 교체 방법)
+- **RectTransform null 버그 전역 수정 + 스킬 아이콘 자동 로드** (Y-64)
+  - **AddComponent<RectTransform>() null 버그 전역 수정**: Unity 6에서 UI 컴포넌트(Image, LayoutElement 등)가 RectTransform을 자동 생성하여 이후 AddComponent<RectTransform>()이 null 반환. 23개 파일(170+ 인스턴스)에서 `GetComponent<RectTransform>() ?? AddComponent<RectTransform>()` 패턴으로 일괄 교체
+  - **영향받던 화면**: EquipmentScreen(탭 패널 null→양쪽 동시 표시), ChapterScreen(다수 패널), BattleView, ContentScreen, GachaScreen, PetScreen 등 전체 Presentation 레이어
+  - **스킬 아이콘 자동 로드**: SpriteManager에 `Resources.LoadAll<Sprite>("Icons/skill")` 추가. `icon_skill_{id}.png` → skill ID로 매핑. `GetSkillIcon(skillId)` API 추가
+  - **ChapterScreen 스킬 아이콘 스프라이트 전환**: 세션 스킬 아이콘(28x28), 엘리트 보상 스킬 카드(24x24), 설정 스킬 목록(22x22) 3곳에서 emoji 텍스트 → Image 스프라이트로 전환 (스프라이트 없으면 emoji 폴백)
