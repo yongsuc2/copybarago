@@ -74,7 +74,9 @@
 | Y-62 | 아이콘 임포트 수정 + 마일스톤 노드 렌더링 수정 | 중 | 완료 | spriteMode Multiple→Single 이름 불일치 해결(SpriteManager _0 접미사 정규화), Editor .asmdef 생성+IconImportSettings 수정, TalentScreen _nodeContainer null 버그 수정(AddComponent→GetComponent), 스킬 아이콘 목록 문서 추가 |
 | Y-63 | 장비 아이콘 자동 로드 | 하 | 완료 | SpriteManager에서 Resources/Icons/equip/ 자동 로드, equip_{slot}_{grade}→{SLOT}_{GRADE} 키 매핑, _256 변형 자동 무시, 아이콘 리소스 목록 문서 업데이트 |
 | Y-64 | RectTransform null 버그 전역 수정 + 스킬 아이콘 자동 로드 | 중 | 완료 | AddComponent<RectTransform>() null 반환 버그 23개 파일 전역 수정(GetComponent ?? AddComponent 패턴), SpriteManager 스킬 아이콘 자동 로드(Resources/Icons/skill/), ChapterScreen 3곳 emoji→스프라이트 아이콘 전환 |
-| Y-65 | 장비/재능 UI 개선 | 하 | 완료 | EquipmentScreen: 인벤토리/페이퍼돌/합성에 SpriteManager.GetEquipmentIcon() 적용, 탭 36px+폰트 20px. TalentScreen: 마일스톤 노드 축소(아이콘22/설명13), 스탯 카드 레이아웃 재배치(LV→아이콘→보너스→이름→비용) |
+| Y-65 | 장비/재능 UI 개선 | 하 | 완료 | EquipmentScreen: 인벤토리/페이퍼돌/합성에 SpriteManager.GetEquipmentIcon() 적용, 탭 축소. TalentScreen: 마일스톤 노드 축소, 스탯 카드 레이아웃 재배치(LV→아이콘→보너스→이름→비용) |
+| Y-66 | 장비 UI 대규모 확대 + 상세 패널 분리 | 중 | 완료 | 인벤토리 셀 2배 확대(4열), 페이퍼돌 셀 확대, 탭 바 최소화, 보관함 클릭→상세 패널(장착/판매/닫기) 분리, 기획서 동기화 |
+| Y-67 | 전투 스킬 아이콘 스프라이트 전환 | 중 | 완료 | BattleLogEntry/SkillDamageResult에 SkillId 추가, DamagePopup emoji→Image 스프라이트 전환, 아이콘 페이드 아웃 애니메이션 |
 
 ---
 

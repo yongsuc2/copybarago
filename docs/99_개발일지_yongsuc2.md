@@ -459,3 +459,14 @@
   - **EquipmentScreen 인벤토리 라벨 개선**: 강화 레벨이 있으면 "+N" 등급색 표시, 없으면 슬롯명. 합성 뱃지 폰트 22→14
   - **TalentScreen 마일스톤 노드 축소**: nodeArea 80→52, 아이콘 36→22, 설명 폰트 18→13, 설명 높이 26→16
   - **TalentScreen 스탯 카드 재배치**: 레퍼런스 이미지 기준 LV 상단→아이콘 40px→보너스(+값)→스탯명→비용 순서. 카드 배경 ButtonPrimary→CardLight
+- **장비 UI 대규모 확대 + 상세 패널 분리** (Y-66)
+  - 인벤토리 그리드 셀 2배 확대 (5열→4열, 120x160), 페이퍼돌 셀 96px, 높이 440px
+  - 탭 바 최소화 (높이 22px, flexibleHeight=0)
+  - 보관함 클릭 → 즉시 장착에서 상세 패널 경유로 변경
+  - 상세 패널 모드 분리: 장착 모드(강화/해제) vs 보관함 모드(장착/판매/닫기)
+  - 장비화면_기획서.md 동기화 (수치 제거, 개념만 기술)
+- **전투 스킬 아이콘 스프라이트 전환** (Y-67)
+  - BattleLogEntry/SkillDamageResult에 SkillId 필드 추가
+  - SkillExecutionEngine(5곳) + Battle.cs(6곳)에서 SkillId 전달
+  - DamagePopup: emoji 텍스트 → HorizontalLayoutGroup(Image+Text) 구조로 재작성
+  - SpriteManager.GetSkillIcon(skillId)로 스프라이트 표시, 아이콘 페이드 아웃 애니메이션
