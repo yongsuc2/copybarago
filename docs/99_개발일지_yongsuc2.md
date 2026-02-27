@@ -361,3 +361,90 @@
 
 ### 완료 작업
 - **재능 서브 등급(단) 시스템** (Y-42) — 200개 서브 등급(30레벨/단 = 공10+방10+체10), 스탯별 10레벨 캡 + 서브 등급 진급 시 리셋, 마일스톤 10레벨 간격(서브 등급당 2개), 총 레벨 max 2010, 등급 경계(60/210/510/1020/2010), gradeConfig 기반 비용 자동 생성, 서브/메인 등급 전환 시 ATK/DEF 교대 스탯 보너스, 골드 마일스톤 = 강화비용×3, TalentScreen UI 재설계(등급 진행 바 + 마일스톤 카드 + 서브 등급 레벨 표시)
+
+---
+
+## 2026-02-27 (Day 14~15)
+
+### 완료 작업
+- **[Unity] 도메인 로직 포팅** (Y-43) — TS→C# 전체 포팅 (67파일+22테스트), 250개 테스트 통과, 크로스 검증 완료
+- **[Unity] Presentation 레이어 전체 구현** (Y-44~Y-56)
+  - **Core 프레임워크**: UIManager(싱글톤 Screen 전환/Popup 스택), BaseScreen/BasePopup 추상 클래스, ScreenType enum(12개), SpriteManager/SpriteDatabase/PlaceholderGenerator(런타임 플레이스홀더 스프라이트), ColorPalette(등급/UI 색상), NumberFormatter(K/M/B), SafeAreaFitter
+  - **전투 연출 시스템** (Y-44, Y-45): BattleView(Coroutine 오케스트레이터), CharacterView(HP/분노/쉴드 바+상태이상 아이콘), DamagePopup/Pool(DOTween 부유+페이드), ProjectileView(스킬 투사체), StatusEffectIconView, 배속 1x/2x
+  - **ChapterScreen** (Y-46): 인카운터 선택, 전투 진입/결과, 스킬 획득 카드(3택+리롤), 일차 진행, 중박/대박 카운터, 설정 오버레이(세션 스킬 목록+모험 포기/계속), 데미지 그래프, ChapterResultPopup/EliteRewardPopup
+  - **MainScreen** (Y-47): 플레이어 스탯 요약 카드, 메뉴 카드 4개(모험/컨텐츠/재능/가챠), StatsDetailPopup(출처별 기본/전투/장비패시브 스탯 분해)
+  - **EquipmentScreen** (Y-48): 페이퍼 돌 7슬롯 그리드, 인벤토리 필터(전체/등급별), 장착/해제, 골드 강화, 합성(Forge) 탭, 부스탯 표시, 등급별 색상
+  - **TalentScreen** (Y-49): 3열 스탯 강화 버튼(ATK/HP/DEF), 슬라이딩 윈도우 마일스톤 프로그레스 바, 서브 등급(단) 진행 표시, 유산 카드
+  - **PetScreen** (Y-50): 리소스 카드, 펫 쇼케이스+스탯 카드, 5열 펫 그리드, 먹이주기/등급업/장착
+  - **GachaScreen** (Y-51): 장비/펫/보석 상자 탭, 1회/10회 뽑기, 천장 진행도 바, 결과 카드 연출
+  - **ContentScreen** (Y-52): 던전/탑/아레나/여행/고블린/카타콤 6개 메뉴 카드, 각 서브패널(전투/결과)
+  - **QuestScreen + EventScreen** (Y-53): 일일/주간 퀘스트 탭, 미션 진행도 바, 보상 수령, 출석 캘린더 그리드
+  - **SettingsScreen + DebugScreen** (Y-54): 저장/불러오기/삭제/내보내기/가져오기, 리소스 추가/챕터 설정/퀘스트 완료 치트
+  - **공통 컴포넌트** (Y-55): NavBarView(10탭), ResourceBarView(골드/젬/스태미나/토큰/티켓), PlayerStatsBarView, ProgressBarView, DamageGraphView, TabBarView
+  - **ChapterTreasureScreen** (Y-56): 챕터별 마일스톤 보상, 진행도 바
+  - 총 ~45개 C# 파일 (Core 7 + Utils 3 + Components 7 + Battle 7 + Screens 12 + Popups 6 + 기타 3)
+  - 모든 UI 프로그래매틱 빌드 (프리팹 없음), SpriteDatabase 슬롯에 이미지 드래그&드롭만으로 교체 가능
+- **죽은 코드 삭제** — StatsDisplayView.cs, EquipmentIconView.cs, PetIconView.cs (화면 재작성 후 미참조 컴포넌트 삭제)
+- **[Unity] UI 레이아웃 품질 수정** (Y-57)
+  - 12개 화면 스크롤 콘텐츠 RectTransform offset 초기화: anchor 변경 후 offsetMin/offsetMax = Vector2.zero 누락 수정 (TalentScreen, ChapterTreasureScreen, ContentScreen, GachaScreen, QuestScreen, EventScreen, SettingsScreen, DebugScreen, PetScreen, EquipmentScreen×2, ChapterScreen, MainScreen)
+  - 폰트 크기 증가: ChapterTreasureScreen(13→20, 11→18), ContentScreen(14→22), QuestScreen(13→20), GachaScreen(13→20), EventScreen(10→14), SettingsScreen(10→16)
+  - ResourceType 한글 라벨: NumberFormatter.FormatResourceType() 추가 (14종 리소스 매핑), ChapterTreasureScreen/ContentScreen/QuestScreen/GachaScreen 적용
+  - MainScreen: 그리드 cellSize 490→400 (좁은 화면 오버플로 방지), StatsDetailPopup에 VerticalLayoutGroup+LayoutElement 추가
+  - ProgressBarView: Initialize()에서 고정 sizeDelta 제거, LayoutGroup이 외부 크기 제어
+- **딜그래프 분류 버그 수정 + 테스트** (Y-58)
+  - BattleLogCategorizer 유틸 클래스 추출 (TS: `BattleLogCategorizer.ts`, C#: `BattleLogCategorizer.cs`) — 전투 로그 엔트리를 damageMap/healMap으로 분류하는 순수 함수
+  - **스킬 크리티컬 분류 버그**: CRIT 타입 엔트리에 SkillName이 있으면(스킬 크리티컬) 해당 스킬명으로 분류하도록 수정 (기존: "일반 공격"으로 잘못 분류)
+  - **HEAL 타입 누락 버그**: BattleLogType.HEAL(스킬 힐)이 healMap에 집계되지 않던 문제 수정, 스킬명으로 분류
+  - ChapterScreen(TS+C#) 분류 로직을 BattleLogCategorizer로 교체
+  - 14개 테스트 케이스 추가 (TS: `BattleLogCategorizer.test.ts`, C#: `BattleLogCategorizerTests.cs`)
+    - 유닛 테스트: 일반 공격/크릿/스킬 데미지/스킬 크릿/반격/분노/독/흡혈/재생/부활/스킬 힐 분류
+    - 통합 테스트: 실제 전투 실행 후 크릿 스킬명 분류 검증, 전체 딜 합산 일치 검증
+  - 전체 260개 테스트 통과
+- **딜그래프 연출 동기화 + UI 개선** (Y-58 연장)
+  - **BattleView 연출 동기화**: OnTurnEntries를 턴 시작 시 한번에 호출 → 애니메이션 그룹별 호출로 변경, 공격 연출이 발생할 때마다 그래프가 점진적으로 업데이트
+  - **DamageGraphView UI 개선**: 헤더에 총합 표시 ("총 12.5K"), 각 바에 비율% 표시, 라벨 폰트 크기 22→24 + Bold, 라벨 너비 140→160px + minWidth 100px, 값 영역 70→110px, 행 높이 28→32px
+- **재능 화면 아이콘 렌더링 수정** (Y-58 연장)
+  - TMP에서 emoji(🪙📈)가 렌더링 안 되는 문제: TMP 호환 유니코드/문자로 교체
+    - 골드 마일스톤: "G" (골드색), 골드 획득량: "%" (초록색), 서브 등급 전환: "▲", 메인 등급 전환: "★" (골드색), 수령 완료: "✓" (초록색)
+  - 노드별 IconColor 필드 추가, 상태(reached/locked)에 따라 색상+투명도 적용
+  - 아이콘 크기 22→26 Bold, 설명 크기 14→18, 노드 영역 높이 70→80
+  - 보상 팝업 아이콘도 emoji → TMP 호환 문자로 교체
+- **이미지 리소스 플레이스홀더 시스템** (Y-59)
+  - 14개 분홍색 64x64 PNG 플레이스홀더 생성 (`Assets/_Project/Art/UI/Icons/`)
+    - 재능 화면: icon_gold, icon_gold_boost, icon_upgrade, icon_star, icon_check
+    - 스탯: icon_atk, icon_hp, icon_def, icon_crit
+    - 재화: icon_gold_currency, icon_gem, icon_stamina, icon_token, icon_ticket
+  - SpriteDatabase에 `IconSpriteEntry[]` 배열 추가 — Inspector에서 id+sprite 매핑
+  - SpriteManager에 `GetIcon(iconId)` 메서드 추가 — SpriteDatabase에 있으면 사용, 없으면 PlaceholderGenerator 분홍 박스 폴백
+  - TalentScreen 아이콘: TextMeshProUGUI(emoji) → Image 컴포넌트 + SpriteManager.GetIcon() 전환
+    - 노드 아이콘, 스탯 강화 카드 아이콘, 보상 팝업 아이콘 모두 Image 기반
+  - `README_ICONS.txt` 매니페스트 생성 — 각 파일 용도 설명, 교체 방법 안내
+- **딜그래프 누적 방식 수정** (Y-60)
+  - BattleView의 OnTurnEntries 호출 방식 변경: 애니메이션 그룹별 분할 호출 → 턴 단위 `result.Entries` 일괄 호출 (TS 레퍼런스와 동일)
+  - 기존 문제: 적 HP≤0 또는 플레이어 HP≤0일 때 남은 그룹의 break로 일부 엔트리가 그래프에 반영 안 됨
+  - per-group `OnTurnEntries?.Invoke(group)` 3곳 삭제, `OnTurnEntries?.Invoke(result.Entries)` 턴 시작 시 1회 호출로 통합
+  - 모험화면_기획서.md에 딜 그래프 섹션(§6) 추가 — 누적 모델, 분류 규칙(BattleLogCategorizer), 표시 형태, 토글 동작, 패배 시 추가 정보
+- **리소스 아이콘 목록 문서** (Y-60)
+  - `ICON_LIST.md` 생성 — 전체 스프라이트/아이콘 리소스 인벤토리
+    - 재능 아이콘 5종, 스탯 아이콘 4종, 재화 아이콘 5종
+    - 캐릭터 스프라이트 14종(idle+hit), 장비 아이콘 42조합(7슬롯×6등급)
+    - 펫 아이콘 18종, 상태이상 아이콘 9종, UI 공통 스프라이트 8종
+    - 파일명, 용도, 권장 크기, 교체 방법 포함
+- **UI 품질 수정 + 아이콘 자동 로드** (Y-61)
+  - **SpriteManager 아이콘 자동 로드**: `Resources.LoadAll<Sprite>("Icons")`로 `Resources/Icons/` 폴더 내 모든 스프라이트를 자동 등록. Inspector에서 SpriteDatabase에 수동 할당 불필요. 파일명(확장자 제외)이 아이콘 ID
+  - 아이콘 파일을 `Art/UI/Icons/` → `Resources/Icons/`로 이동
+  - **TalentScreen 마일스톤 아이콘**: preferredWidth=36 추가, preserveAspect 제거, SpriteManager.Instance null 체크
+  - **ContentScreen 탭 아이콘**: 아이콘 텍스트 첫 글자만 표시(overflow 방지), wordWrap 해제
+  - **EventScreen 출석부**: 셀 110x80→240x120, 열 7→4, Day fontSize 20→26 Bold, 보상 fontSize 14→22
+  - **StatsDetailPopup**: RectMask2D→Image+Mask(클리핑 확실하게), ScrollRect Elastic 추가
+- **아이콘 임포트 수정 + 마일스톤 노드 렌더링 수정** (Y-62)
+  - **아이콘 spriteMode 불일치 수정**: PNG가 `spriteMode: 2`(Multiple)로 임포트되어 스프라이트 이름이 `icon_atk_0`으로 생성됨. SpriteManager에서 `_0` 접미사를 자동으로 벗겨서 원본 이름으로도 매핑
+  - **Editor .asmdef 생성**: `CatCatGo.Editor.asmdef` 생성 (Editor 전용 어셈블리). IconImportSettings.cs가 컴파일 안 되던 문제 해결
+  - **IconImportSettings 조건 수정**: textureType이 이미 Sprite여도 spriteMode가 Single이 아니면 수정하도록 변경. "Tools > Reimport All Icons" 메뉴로 기존 아이콘 일괄 수정
+  - **TalentScreen 마일스톤 노드 null 버그**: `_nodeContainer = AddComponent<RectTransform>()`이 null 반환 (LayoutElement가 이미 RectTransform 자동 추가). `GetComponent<RectTransform>() ?? AddComponent<RectTransform>()`로 변경. 노드가 씬 루트로 빠져서 Canvas 밖에서 보이지 않던 문제 해결
+  - **스킬 아이콘 목록**: 아이콘_리소스_목록.md에 §9 추가 — 액티브 스킬 29종 + 패시브 스킬 19종 현재 이모지 아이콘 + 스프라이트 교체 방법
+- **장비 아이콘 자동 로드** (Y-63)
+  - SpriteManager에 `Resources.LoadAll<Sprite>("Icons/equip")` 추가 — `equip_{slot}_{grade}.png` 파일을 `{SLOT}_{GRADE}` 키로 자동 매핑
+  - `_256` 변형 자동 무시, `StripSpriteModeSuffix` 공통 메서드로 spriteMode 접미사 제거 통합
+  - `GetEquipmentIcon`에서 리소스 로드 스프라이트 우선 확인 → SpriteDatabase → 플레이스홀더 순서
+  - 아이콘_리소스_목록.md §5 장비 아이콘 섹션 업데이트 (자동 로드 경로 + 교체 방법)

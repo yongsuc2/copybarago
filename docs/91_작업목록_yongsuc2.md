@@ -53,19 +53,26 @@
 | Y-41 | 재능 등급 보상 마일스톤 재설계 | 중 | 완료 | 등급 스탯% 보너스 → 등급업 ATK/DEF 교대 보너스 + 레벨 간격 마일스톤(골드/골드획득량%), 통합 프로그레스 바 UI, 수동 수령+소급 가능 |
 | Y-42 | 재능 서브 등급(단) 시스템 | 중 | 완료 | 67개 서브 등급(30레벨/단 = 공10+방10+체10), 스탯 10 도달 시 서브 등급 진급+리셋, 마일스톤 10레벨 간격, 총 레벨 max 2010 |
 | Y-43 | [Unity] 도메인 로직 포팅 | 상 | 완료 | TS→C# 전체 포팅 (67파일+22테스트), 250개 테스트 통과, 크로스 검증 완료 |
-| Y-44 | [Unity] 전투 연출 시스템 | 상 | 대기 | BattleArena 연출: 접근→타격→후퇴 페이즈 시퀀스, 데미지 팝업, 투사체 애니메이션, 배속 조절, Coroutine/DOTween 기반 |
-| Y-45 | [Unity] 전투 UI | 중 | 대기 | HP/분노 바, 상태이상 아이콘, 스킬 사용 인디케이터, 캐릭터 스프라이트, 쉴드 표시 |
-| Y-46 | [Unity] 챕터 화면 | 상 | 대기 | ChapterScreen: 인카운터 선택, 전투 진입/결과, 스킬 획득 카드, 일차 진행, 리롤 |
-| Y-47 | [Unity] 메인/로비 화면 | 중 | 대기 | MainScreen: 플레이어 정보, 스탯, 챕터 진입, 컨텐츠 네비게이션 |
-| Y-48 | [Unity] 장비 화면 | 중 | 대기 | EquipmentScreen: 장비 목록, 착용/해제, 강화, 합성, 부스탯 표시 |
-| Y-49 | [Unity] 재능 화면 | 중 | 대기 | TalentScreen: 스탯 강화, 서브 등급 진행, 마일스톤 보상 |
-| Y-50 | [Unity] 펫 화면 | 중 | 대기 | PetScreen: 펫 목록, 먹이주기, 등급업, 장착 |
-| Y-51 | [Unity] 가챠/상자 화면 | 중 | 대기 | GachaScreen: 장비/펫/보석 상자, 뽑기 연출, 천장 표시 |
-| Y-52 | [Unity] 컨텐츠 화면 | 중 | 대기 | ContentScreen: 던전/탑/아레나/여행/고블린/카타콤 진입 UI |
-| Y-53 | [Unity] 퀘스트/이벤트 화면 | 중 | 대기 | QuestScreen + EventScreen: 일일/주간 퀘스트, 미션 진행도, 보상 수령 |
-| Y-54 | [Unity] 설정/디버그 화면 | 하 | 대기 | SettingsScreen: 저장/불러오기/삭제, DebugPanel: 치트 기능 |
-| Y-55 | [Unity] 공통 컴포넌트 | 중 | 대기 | NavBar, ResourceBar, PlayerStatsBar, StatsDisplay, EquipmentIcon, PetIcon, DamageGraph |
-| Y-56 | [Unity] 챕터 보물/출석 화면 | 하 | 대기 | ChapterTreasureScreen + 출석 보상 UI |
+| Y-44 | [Unity] 전투 연출 시스템 | 상 | 완료 | BattleView: 접근→타격→후퇴 Coroutine/DOTween 페이즈 시퀀스, CharacterView, DamagePopup 풀, ProjectileView, 배속 1x/2x |
+| Y-45 | [Unity] 전투 UI | 중 | 완료 | HP/분노/쉴드 바, 상태이상 아이콘(StatusEffectIconView), 캐릭터 스프라이트, 복수 적 렌더링 |
+| Y-46 | [Unity] 챕터 화면 | 상 | 완료 | ChapterScreen: 인카운터 선택, 전투 진입/결과, 스킬 획득 카드(3택+리롤), 일차 진행, 중박/대박 카운터, 설정 오버레이(세션 스킬 목록+포기), 데미지 그래프 |
+| Y-47 | [Unity] 메인/로비 화면 | 중 | 완료 | MainScreen: 플레이어 스탯 요약, 메뉴 카드 4개(모험/컨텐츠/재능/가챠), StatsDetailPopup(출처별 스탯 분해) |
+| Y-48 | [Unity] 장비 화면 | 중 | 완료 | EquipmentScreen: 페이퍼 돌(7슬롯) + 인벤토리 그리드, 장착/해제, 강화(골드), 합성(Forge) 탭, 부스탯 표시, 등급별 색상 |
+| Y-49 | [Unity] 재능 화면 | 중 | 완료 | TalentScreen: 3열 스탯 강화 버튼, 슬라이딩 윈도우 마일스톤 프로그레스 바, 서브 등급(단) 진행, 유산 카드 |
+| Y-50 | [Unity] 펫 화면 | 중 | 완료 | PetScreen: 리소스 카드, 쇼케이스+스탯, 5열 그리드, 먹이주기/등급업/장착 |
+| Y-51 | [Unity] 가챠/상자 화면 | 중 | 완료 | GachaScreen: 장비/펫/보석 상자 탭, 1회/10회 뽑기, 천장 진행도, 결과 카드 |
+| Y-52 | [Unity] 컨텐츠 화면 | 중 | 완료 | ContentScreen: 던전/탑/아레나/여행/고블린/카타콤 6개 메뉴 카드, 각 서브패널 |
+| Y-53 | [Unity] 퀘스트/이벤트 화면 | 중 | 완료 | QuestScreen(일일/주간 탭, 미션 진행도 바, 보상 수령) + EventScreen(출석 캘린더 그리드) |
+| Y-54 | [Unity] 설정/디버그 화면 | 하 | 완료 | SettingsScreen(저장/불러오기/삭제/내보내기/가져오기) + DebugScreen(리소스/챕터/퀘스트 치트) |
+| Y-55 | [Unity] 공통 컴포넌트 | 중 | 완료 | NavBar, ResourceBar, PlayerStatsBar, ProgressBar, DamageGraph, TabBar + Core(UIManager, BaseScreen/Popup, SpriteManager, PlaceholderGenerator, ColorPalette) |
+| Y-56 | [Unity] 챕터 보물/출석 화면 | 하 | 완료 | ChapterTreasureScreen(챕터별 마일스톤 보상, 진행도 바) |
+| Y-57 | [Unity] UI 레이아웃 품질 수정 | 중 | 완료 | 12개 화면 스크롤 콘텐츠 offset 초기화, 폰트 크기 증가(6개 화면), ResourceType 한글 라벨(NumberFormatter.FormatResourceType), MainScreen 그리드/팝업 레이아웃 수정, ProgressBarView sizeDelta 제거 |
+| Y-58 | 딜그래프 분류 버그 수정 + 테스트 | 중 | 완료 | BattleLogCategorizer 유틸 추출(TS+C#), 스킬 크리티컬 분류 버그 수정(CRIT+SkillName→스킬명), HEAL 타입 힐맵 누락 수정, 14개 유닛+통합 테스트(260개 전체 통과), 딜그래프 연출 동기화(그룹별 OnTurnEntries), DamageGraphView UI(총합/비율%/라벨Bold) |
+| Y-59 | 이미지 리소스 플레이스홀더 시스템 | 중 | 완료 | 14개 분홍 PNG 플레이스홀더, SpriteDatabase IconSpriteEntry 추가, SpriteManager.GetIcon() 폴백 시스템, TalentScreen emoji→Image 컴포넌트 전환, README_ICONS.txt 매니페스트 |
+| Y-60 | 딜그래프 누적 수정 + 아이콘 리소스 문서 | 중 | 완료 | BattleView OnTurnEntries 턴 단위 일괄 누적으로 변경(그룹별→턴별), 모험화면_기획서.md 딜그래프 섹션 추가(6장), ICON_LIST.md 전체 리소스 아이콘 목록 문서 |
+| Y-61 | UI 품질 수정 + 아이콘 자동 로드 | 중 | 완료 | SpriteManager Resources/Icons 자동 로드(Inspector 불필요), TalentScreen 아이콘 preferredWidth+null체크, ContentScreen 탭 아이콘 1글자 제한, EventScreen 출석부 셀 240x120+폰트 증가, StatsDetailPopup Mask 클리핑 |
+| Y-62 | 아이콘 임포트 수정 + 마일스톤 노드 렌더링 수정 | 중 | 완료 | spriteMode Multiple→Single 이름 불일치 해결(SpriteManager _0 접미사 정규화), Editor .asmdef 생성+IconImportSettings 수정, TalentScreen _nodeContainer null 버그 수정(AddComponent→GetComponent), 스킬 아이콘 목록 문서 추가 |
+| Y-63 | 장비 아이콘 자동 로드 | 하 | 완료 | SpriteManager에서 Resources/Icons/equip/ 자동 로드, equip_{slot}_{grade}→{SLOT}_{GRADE} 키 매핑, _256 변형 자동 무시, 아이콘 리소스 목록 문서 업데이트 |
 
 ---
 

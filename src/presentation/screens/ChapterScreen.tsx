@@ -6,6 +6,7 @@ import { BattleUnit } from '../../domain/battle/BattleUnit';
 import { Battle } from '../../domain/battle/Battle';
 import type { BattleLogEntry } from '../../domain/battle/BattleLog';
 import { BattleLogType } from '../../domain/battle/BattleLog';
+import { categorizeBattleEntries } from '../../domain/battle/BattleLogCategorizer';
 import type { AttackPhase } from '../components/BattleArena';
 import { AdventureStage } from '../components/AdventureStage';
 import { PlayerStatsBar, formatNumber } from '../components/PlayerStatsBar';
@@ -62,7 +63,8 @@ function isDamageOrHeal(type: BattleLogType): boolean {
     || type === BattleLogType.RAGE_ATTACK
     || type === BattleLogType.LIFESTEAL
     || type === BattleLogType.HOT_HEAL
-    || type === BattleLogType.REVIVE;
+    || type === BattleLogType.REVIVE
+    || type === BattleLogType.HEAL;
 }
 
 function reorderBySkillType(entries: BattleLogEntry[]): BattleLogEntry[] {
@@ -172,73 +174,30 @@ export function ChapterScreen() {
 
   function accumulateDamage(entries: BattleLogEntry[], playerName: string) {
     const map = damageMapRef.current;
-    for (const entry of entries) {
-      const isDmgType = entry.type === BattleLogType.ATTACK
-        || entry.type === BattleLogType.CRIT
-        || entry.type === BattleLogType.SKILL_DAMAGE
-        || entry.type === BattleLogType.COUNTER
-        || entry.type === BattleLogType.RAGE_ATTACK;
-      const isDot = entry.type === BattleLogType.DOT_DAMAGE;
+    const hMap = healMapRef.current;
+    const result = categorizeBattleEntries(entries, playerName);
 
-      if (isDmgType && entry.source === playerName && entry.target !== playerName) {
-        let key: string;
-        let icon: string;
-        if (entry.type === BattleLogType.RAGE_ATTACK) {
-          key = '분노 공격';
-          icon = '💢';
-        } else if (entry.type === BattleLogType.SKILL_DAMAGE && entry.skillName) {
-          key = entry.skillName;
-          icon = entry.skillIcon ?? '✨';
-        } else if (entry.type === BattleLogType.COUNTER) {
-          key = '반격';
-          icon = '🛡️';
-        } else {
-          key = '일반 공격';
-          icon = '⚔️';
-        }
-        const existing = map.get(key);
-        if (existing) {
-          existing.total += entry.value;
-        } else {
-          map.set(key, { label: key, icon, total: entry.value });
-        }
-      } else if (isDot && entry.target !== playerName) {
-        const key = '독 피해';
-        const icon = '☠️';
-        const existing = map.get(key);
-        if (existing) {
-          existing.total += entry.value;
-        } else {
-          map.set(key, { label: key, icon, total: entry.value });
-        }
+    const DAMAGE_ICONS: Record<string, string> = { '분노 공격': '💢', '반격': '🛡️', '일반 공격': '⚔️', '독 피해': '☠️' };
+    const HEAL_ICONS: Record<string, string> = { '흡혈': '🩸', '재생': '💚', '부활': '✨' };
+
+    for (const [key, value] of result.damageMap) {
+      const existing = map.get(key);
+      const icon = DAMAGE_ICONS[key] ?? '✨';
+      if (existing) {
+        existing.total += value;
+      } else {
+        map.set(key, { label: key, icon, total: value });
       }
     }
     setDamageSourcesSnapshot([...map.values()]);
 
-    const hMap = healMapRef.current;
-    for (const entry of entries) {
-      const isHealType = entry.type === BattleLogType.LIFESTEAL
-        || entry.type === BattleLogType.HOT_HEAL
-        || entry.type === BattleLogType.REVIVE;
-      if (!isHealType || entry.target !== playerName) continue;
-
-      let key: string;
-      let icon: string;
-      if (entry.type === BattleLogType.LIFESTEAL) {
-        key = '흡혈';
-        icon = '🩸';
-      } else if (entry.type === BattleLogType.HOT_HEAL) {
-        key = '재생';
-        icon = '💚';
-      } else {
-        key = '부활';
-        icon = '✨';
-      }
+    for (const [key, value] of result.healMap) {
       const existing = hMap.get(key);
+      const icon = HEAL_ICONS[key] ?? '💖';
       if (existing) {
-        existing.total += entry.value;
+        existing.total += value;
       } else {
-        hMap.set(key, { label: key, icon, total: entry.value });
+        hMap.set(key, { label: key, icon, total: value });
       }
     }
     setHealSourcesSnapshot([...hMap.values()]);
@@ -464,7 +423,8 @@ export function ChapterScreen() {
     for (const entry of entries) {
       const isHeal = entry.type === BattleLogType.LIFESTEAL
         || entry.type === BattleLogType.HOT_HEAL
-        || entry.type === BattleLogType.REVIVE;
+        || entry.type === BattleLogType.REVIVE
+        || entry.type === BattleLogType.HEAL;
       if (isHeal) {
         if (entry.target === playerName) playerHp += entry.value;
         else {
@@ -596,7 +556,7 @@ export function ChapterScreen() {
         let hp = result.enemyHps[i];
         for (const entry of result.entries) {
           if (!isDamageOrHeal(entry.type)) continue;
-          const isHeal = entry.type === BattleLogType.LIFESTEAL || entry.type === BattleLogType.HOT_HEAL || entry.type === BattleLogType.REVIVE;
+          const isHeal = entry.type === BattleLogType.LIFESTEAL || entry.type === BattleLogType.HOT_HEAL || entry.type === BattleLogType.REVIVE || entry.type === BattleLogType.HEAL;
           if (entry.target === e.name) {
             hp += isHeal ? -entry.value : entry.value;
           }
@@ -609,7 +569,7 @@ export function ChapterScreen() {
       let delta = 0;
       for (const entry of entries) {
         if (!isDamageOrHeal(entry.type)) continue;
-        const isHeal = entry.type === BattleLogType.LIFESTEAL || entry.type === BattleLogType.HOT_HEAL || entry.type === BattleLogType.REVIVE;
+        const isHeal = entry.type === BattleLogType.LIFESTEAL || entry.type === BattleLogType.HOT_HEAL || entry.type === BattleLogType.REVIVE || entry.type === BattleLogType.HEAL;
         if (entry.target === pName) {
           delta += isHeal ? -entry.value : entry.value;
         }
