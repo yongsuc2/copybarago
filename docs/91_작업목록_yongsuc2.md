@@ -77,6 +77,7 @@
 | Y-65 | 장비/재능 UI 개선 | 하 | 완료 | EquipmentScreen: 인벤토리/페이퍼돌/합성에 SpriteManager.GetEquipmentIcon() 적용, 탭 축소. TalentScreen: 마일스톤 노드 축소, 스탯 카드 레이아웃 재배치(LV→아이콘→보너스→이름→비용) |
 | Y-66 | 장비 UI 대규모 확대 + 상세 패널 분리 | 중 | 완료 | 인벤토리 셀 2배 확대(4열), 페이퍼돌 셀 확대, 탭 바 최소화, 보관함 클릭→상세 패널(장착/판매/닫기) 분리, 기획서 동기화 |
 | Y-67 | 전투 스킬 아이콘 스프라이트 전환 | 중 | 완료 | BattleLogEntry/SkillDamageResult에 SkillId 추가, DamagePopup emoji→Image 스프라이트 전환, 아이콘 페이드 아웃 애니메이션 |
+| Y-68 | 플레이어 캐릭터 스프라이트 애니메이션 | 중 | 완료 | player.png 스프라이트 시트(4×2, 걷기+공격) 런타임 슬라이싱, CharacterView 프레임 애니메이션(걷기/공격 모션 전환), BattleView 플레이어에 자동 적용 |
 
 ---
 

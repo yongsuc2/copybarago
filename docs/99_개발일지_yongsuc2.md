@@ -470,3 +470,19 @@
   - SkillExecutionEngine(5곳) + Battle.cs(6곳)에서 SkillId 전달
   - DamagePopup: emoji 텍스트 → HorizontalLayoutGroup(Image+Text) 구조로 재작성
   - SpriteManager.GetSkillIcon(skillId)로 스프라이트 표시, 아이콘 페이드 아웃 애니메이션
+
+---
+
+## 2026-02-28 (Day 16)
+
+### 완료 작업
+- **GachaScreen 레이아웃 재설계** — 쇼케이스 영역(flexibleHeight=1) 추가, 탭/정보카드/버튼 고정 높이(flexibleHeight=0), 상자 아이콘+이름 중앙 배치
+- **UI 테스트 에디터 윈도우** — UITestWindow (Ctrl+Shift+U): 12개 화면 전환, 팝업 테스트, 리소스 추가 버튼
+- **ChapterScreen 헤더 2배 확대** — titleRow/설정/일차 표시 높이 및 폰트 2배 확대
+- **ChapterTreasureScreen 2배 확대** — 전체 UI 요소 높이/폰트 2배, ContentSizeFitter 자동 높이
+- **플레이어 캐릭터 스프라이트 애니메이션** (Y-68)
+  - player.png 스프라이트 시트(1024×1536, 4열×2행) 런타임 슬라이싱: Sprite.Create()로 걷기 4프레임 + 공격 4프레임
+  - SpriteManager: GetPlayerWalkFrames()/GetPlayerAttackFrames() 캐시 로딩
+  - CharacterView: SetFrames() + 프레임 애니메이션 코루틴, SetPhase()에서 걷기↔공격 모션 자동 전환
+  - BattleView: 전투 시작 시 플레이어에 스프라이트 프레임 자동 적용
+  - player.png.meta: isReadable=1 설정 (런타임 Sprite.Create 필수)
