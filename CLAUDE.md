@@ -126,7 +126,6 @@
 
 ```
 리포: https://github.com/yongsuc2/CatCatGo.git
-로컬: C:\Users\yongs\CatCatGo\
 ```
 
 ### 클론 방법
