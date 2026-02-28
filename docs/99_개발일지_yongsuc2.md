@@ -494,3 +494,11 @@
   - 던전명 변경: 용의 둥지→거대 벌집, 세계수→수천년 고목, 하늘섬→호랑이 절벽
   - 변경 파일: enemy.data.json, encounter.data.json, dungeon.data.json, resource-labels.data.json, ContentScreen.cs, 05_스테이지던전시스템.md
   - 스탯/스킬/밸런스 수치 동일 유지, 260개 TS 테스트 통과
+- **챕터 테마 시스템** (Y-70)
+  - 10챕터 단위 5개 스테이지 테마: 미생물→곤충→소형동물→중형동물→대형동물
+  - 50종 적 템플릿 추가 (테마당 일반 5 + 엘리트 2 + 보스 3)
+  - `enemy.data.json`에 `chapterThemes` 배열 추가: 챕터 범위별 enemy/elite/boss 풀 + bossRotation
+  - `EnemyTable.ts`에 `getEnemyPoolForChapter(id)`, `getBossAssignmentForChapter(id)` 추가
+  - `Chapter.ts` createCombatBattle/createEliteBattle/createMidBossBattle/createBossBattle가 테마 인식 풀 사용
+  - C# `EnemyTable.cs`, `Chapter.cs` 동일하게 반영, JSON 양쪽 복사
+  - 260개 TS 테스트 통과

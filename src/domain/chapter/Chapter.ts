@@ -238,7 +238,7 @@ export class Chapter {
     }
 
     const dayProgress = this.getProgress();
-    const pool = EnemyTable.getChapterEnemyPool();
+    const pool = EnemyTable.getEnemyPoolForChapter(this.id);
     const idx1 = this.rng.nextInt(0, pool.length - 1);
     const id1 = pool[idx1];
     const template1 = EnemyTemplate.fromId(id1);
@@ -263,7 +263,7 @@ export class Chapter {
   }
 
   createEliteBattle(playerUnit: BattleUnit): Battle | null {
-    const assignment = EncounterDataTable.getChapterBossAssignment(this.id);
+    const assignment = EnemyTable.getBossAssignmentForChapter(this.id);
     const template = EnemyTemplate.fromId(assignment.elite);
     if (!template) return null;
 
@@ -273,7 +273,7 @@ export class Chapter {
   }
 
   createMidBossBattle(playerUnit: BattleUnit): Battle | null {
-    const assignment = EncounterDataTable.getChapterBossAssignment(this.id);
+    const assignment = EnemyTable.getBossAssignmentForChapter(this.id);
     const template = EnemyTemplate.fromId(assignment.midBoss);
     if (!template) return null;
 
@@ -283,7 +283,7 @@ export class Chapter {
   }
 
   createBossBattle(playerUnit: BattleUnit): Battle | null {
-    const assignment = EncounterDataTable.getChapterBossAssignment(this.id);
+    const assignment = EnemyTable.getBossAssignmentForChapter(this.id);
     const template = EnemyTemplate.fromId(assignment.boss);
     if (!template) return null;
 
