@@ -486,3 +486,11 @@
   - CharacterView: SetFrames() + 프레임 애니메이션 코루틴, SetPhase()에서 걷기↔공격 모션 자동 전환
   - BattleView: 전투 시작 시 플레이어에 스프라이트 프레임 자동 적용
   - player.png.meta: isReadable=1 설정 (런타임 Sprite.Create 필수)
+- **적/스테이지 테마 변경: 판타지→실존 생명체** (Y-69)
+  - 일반몹 5종: slime→일개미, goblin→참새, skeleton→거미, orc→다람쥐, dark_knight→고슴도치
+  - 엘리트 2종: elite_wolf→왕사마귀, elite_mage→독수리
+  - 챕터 보스 3종: boss_dragon→큰곰, boss_demon→왕뱀, boss_golem→코끼리
+  - 던전 보스 3종: dungeon_dragon→여왕벌, world_tree→고목나무 정령, harpy→백호
+  - 던전명 변경: 용의 둥지→거대 벌집, 세계수→수천년 고목, 하늘섬→호랑이 절벽
+  - 변경 파일: enemy.data.json, encounter.data.json, dungeon.data.json, resource-labels.data.json, ContentScreen.cs, 05_스테이지던전시스템.md
+  - 스탯/스킬/밸런스 수치 동일 유지, 260개 TS 테스트 통과
