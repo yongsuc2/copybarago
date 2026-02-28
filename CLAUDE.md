@@ -120,6 +120,23 @@
 
 ---
 
+## Unity 프로젝트
+
+게임 클라이언트는 별도 Unity 프로젝트로 관리한다:
+
+```
+리포: https://github.com/yongsuc2/CatCatGo.git
+로컬: C:\Users\yongs\CatCatGo\
+```
+
+### 클론 방법
+
+```bash
+git clone https://github.com/yongsuc2/CatCatGo.git
+```
+
+---
+
 ## 병렬 작업 환경
 
 같은 repo를 2개 디렉토리에서 동시에 작업한다:
