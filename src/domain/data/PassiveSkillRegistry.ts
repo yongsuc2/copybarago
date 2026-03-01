@@ -92,7 +92,9 @@ const PASSIVE_SKILL_FAMILIES: PassiveSkillFamilyDef[] = [
     tags: [SkillTag.RAGE], heritageSynergy: [HeritageRoute.SKULL, HeritageRoute.KNIGHT],
     traits: ['분노 공격 강화 전용', '분노 빌드 핵심'],
     buildEffect: (t) => ({
-      type: PassiveType.STAT_MODIFIER, stat: 'RAGE_POWER' as const, value: td('rage_mastery', t).value, isPercentage: true,
+      type: PassiveType.SKILL_MODIFIER,
+      targetTag: SkillTag.RAGE,
+      modifier: { damageMultiplier: td('rage_mastery', t).value },
     }),
     buildDescription: (t) => `분노 공격 데미지 +${pct(td('rage_mastery', t).value)}`,
   },

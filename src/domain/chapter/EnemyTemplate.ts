@@ -38,6 +38,15 @@ export class EnemyTemplate {
     return EnemyTemplate.fromData(data);
   }
 
+  private buildEnemySkills(): ActiveSkill[] {
+    const builtins = ActiveSkillRegistry.getBuiltinSkills();
+    const rageAccum = ActiveSkillRegistry.getById('rage_accumulate', 1);
+    const skills = [...builtins];
+    if (rageAccum) skills.push(rageAccum);
+    skills.push(...this.activeSkills);
+    return skills;
+  }
+
   createInstance(chapterLevel: number, statMultiplier: number = 1.0, dayProgress: number = 0): BattleUnit {
     let scaledStats = EnemyTable.getScaledStats(this.baseStats, chapterLevel);
     if (dayProgress > 0) {
@@ -47,23 +56,27 @@ export class EnemyTemplate {
     if (statMultiplier !== 1.0) {
       scaledStats = scaledStats.multiply(statMultiplier);
     }
-    return new BattleUnit(
+    const unit = new BattleUnit(
       this.name,
       scaledStats,
-      [...this.activeSkills],
+      this.buildEnemySkills(),
       [...this.passiveSkills],
       false,
     );
+    unit.ragePerAttack = this.ragePerAttack;
+    return unit;
   }
 
   createTowerInstance(floor: number): BattleUnit {
     const scaledStats = EnemyTable.getTowerScaledStats(this.baseStats, floor);
-    return new BattleUnit(
+    const unit = new BattleUnit(
       this.name,
       scaledStats,
-      [...this.activeSkills],
+      this.buildEnemySkills(),
       [...this.passiveSkills],
       false,
     );
+    unit.ragePerAttack = this.ragePerAttack;
+    return unit;
   }
 }

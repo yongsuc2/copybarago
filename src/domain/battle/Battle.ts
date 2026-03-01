@@ -59,13 +59,13 @@ export class Battle {
 
     const target = this.getFirstAliveEnemy();
     if (target && this.player.isAlive()) {
-      this.processPlayerTurn(this.player, target);
+      this.processUnitTurn(this.player, target, this.enemies);
       if (this.checkDeath()) return this.buildTurnResult();
     }
 
     for (const enemy of this.enemies) {
       if (!enemy.isAlive() || !this.player.isAlive()) continue;
-      this.processEnemyTurn(enemy, this.player);
+      this.processUnitTurn(enemy, this.player, [this.player]);
       if (this.checkDeath()) return this.buildTurnResult();
     }
 
@@ -80,15 +80,27 @@ export class Battle {
     return this.buildTurnResult();
   }
 
-  private processPlayerTurn(player: BattleUnit, target: BattleUnit): void {
-    const builtins = player.getBuiltinSkills();
+  private processUnitTurn(unit: BattleUnit, target: BattleUnit, allTargets: BattleUnit[]): void {
+    if (!target.isAlive()) return;
+
+    const stunEffect = unit.statusEffects.find(e => e.isStun());
+    if (stunEffect) {
+      this.log.add({
+        turn: this.turnCount, type: BattleLogType.STUN,
+        source: unit.name, target: unit.name, value: 0,
+        message: `${unit.name} is stunned`,
+      });
+      return;
+    }
+
+    const builtins = unit.getBuiltinSkills();
     const ilban = builtins.find(s => s.id === 'ilban_attack');
     const bunno = builtins.find(s => s.id === 'bunno_attack');
 
     let mainSkill: ActiveSkill | undefined;
     let isBunno = false;
 
-    if (bunno && this.engine.evaluateTrigger(bunno.trigger, this.turnCount, player)) {
+    if (bunno && this.engine.evaluateTrigger(bunno.trigger, this.turnCount, unit)) {
       mainSkill = bunno;
       isBunno = true;
     } else {
@@ -98,67 +110,54 @@ export class Battle {
     if (!target.isAlive()) return;
 
     if (!mainSkill) {
-      this.processBasicAttack(player, target);
+      this.processBasicAttack(unit, target);
       return;
     }
 
-    const allSkills = player.getAllSkillsForEngine();
-    const allTargets = this.enemies;
-    const mainResults = this.engine.executeSkillEffects(mainSkill, player, target, allSkills, 0, allTargets);
+    const allSkills = unit.getAllSkillsForEngine();
+    const mainResults = this.engine.executeSkillEffects(mainSkill, unit, target, allSkills, 0, allTargets);
 
-    if (isBunno) {
-      for (const r of mainResults) {
-        if (r.damage > 0) {
-          r.damage = Math.floor(r.damage * player.ragePowerMultiplier);
-        }
-      }
+    this.logSkillResults(mainResults, unit, target, isBunno);
+    this.applyLifesteal(unit, mainResults);
+
+    this.executeUpperSkills(unit, target, allSkills, mainSkill.id, allTargets);
+
+    if (!isBunno && target.isAlive() && unit.multiHitChance > 0 && this.rng.chance(unit.multiHitChance)) {
+      const multiResults = this.engine.executeSkillEffects(mainSkill, unit, target, allSkills, 0, allTargets);
+      this.logSkillResults(multiResults, unit, target, false);
+      this.applyLifesteal(unit, multiResults);
+
+      this.executeUpperSkills(unit, target, allSkills, mainSkill.id, allTargets);
     }
 
-    this.logSkillResults(mainResults, player, target, isBunno);
-    this.applyLifesteal(player, mainResults);
+    if (!isBunno && bunno && target.isAlive() && unit.rage >= unit.maxRage) {
+      const bunnoResults = this.engine.executeSkillEffects(bunno, unit, target, allSkills, 0, allTargets);
+      this.logSkillResults(bunnoResults, unit, target, true);
+      this.applyLifesteal(unit, bunnoResults);
 
-    this.executeUpperSkills(player, target, allSkills, mainSkill.id);
-
-    if (!isBunno && target.isAlive() && player.multiHitChance > 0 && this.rng.chance(player.multiHitChance)) {
-      const multiResults = this.engine.executeSkillEffects(mainSkill, player, target, allSkills, 0, allTargets);
-      this.logSkillResults(multiResults, player, target, false);
-      this.applyLifesteal(player, multiResults);
-
-      this.executeUpperSkills(player, target, allSkills, mainSkill.id);
-    }
-
-    if (!isBunno && bunno && target.isAlive() && player.rage >= player.maxRage) {
-      const bunnoResults = this.engine.executeSkillEffects(bunno, player, target, allSkills, 0, allTargets);
-      for (const r of bunnoResults) {
-        if (r.damage > 0) {
-          r.damage = Math.floor(r.damage * player.ragePowerMultiplier);
-        }
-      }
-      this.logSkillResults(bunnoResults, player, target, true);
-      this.applyLifesteal(player, bunnoResults);
-
-      this.executeUpperSkills(player, target, allSkills, bunno.id);
+      this.executeUpperSkills(unit, target, allSkills, bunno.id, allTargets);
     }
 
     if (target.isAlive() && target.counterTriggerChance > 0 && this.rng.chance(target.counterTriggerChance)) {
-      this.processCounter(target, player);
+      this.processCounter(target, unit);
     }
   }
 
   private executeUpperSkills(
-    player: BattleUnit, target: BattleUnit,
+    unit: BattleUnit, target: BattleUnit,
     allSkills: ActiveSkill[], triggerSkillId: string,
+    allTargets: BattleUnit[],
   ): void {
-    const anyAlive = this.enemies.some(e => e.isAlive());
+    const anyAlive = allTargets.some(e => e.isAlive());
     if (!anyAlive) return;
-    for (const skill of player.activeSkills) {
-      if (!this.enemies.some(e => e.isAlive())) break;
+    for (const skill of unit.activeSkills) {
+      if (!allTargets.some(e => e.isAlive())) break;
       if (skill.hierarchy === SkillHierarchy.BUILTIN) continue;
-      if (skill.hierarchy !== SkillHierarchy.UPPER) continue;
-      if (this.engine.evaluateTrigger(skill.trigger, this.turnCount, player, triggerSkillId)) {
-        const results = this.engine.executeSkillEffects(skill, player, target, allSkills, 0, this.enemies);
-        this.logSkillResults(results, player, target, false);
-        this.applyLifesteal(player, results);
+      if (skill.hierarchy === SkillHierarchy.LOWEST) continue;
+      if (this.engine.evaluateTrigger(skill.trigger, this.turnCount, unit, triggerSkillId)) {
+        const results = this.engine.executeSkillEffects(skill, unit, target, allSkills, 0, allTargets);
+        this.logSkillResults(results, unit, target, false);
+        this.applyLifesteal(unit, results);
       }
     }
   }
@@ -197,88 +196,6 @@ export class Battle {
         source: attacker.name, target: target.name, value: extraDealt,
         message: `${attacker.name} multi-hit ${target.name} for ${extraDealt}`,
       });
-    }
-  }
-
-  private processEnemyTurn(enemy: BattleUnit, target: BattleUnit): void {
-    if (!target.isAlive()) return;
-
-    const stunEffect = enemy.statusEffects.find(e => e.isStun());
-    if (stunEffect) {
-      this.log.add({
-        turn: this.turnCount, type: BattleLogType.STUN,
-        source: enemy.name, target: enemy.name, value: 0,
-        message: `${enemy.name} is stunned`,
-      });
-      return;
-    }
-
-    const baseDamage = this.calculateBaseDamage(enemy, target);
-    const isCrit = this.rng.chance(enemy.getEffectiveCrit());
-    const finalDamage = isCrit ? Math.floor(baseDamage * BattleDataTable.damage.critMultiplier) : baseDamage;
-
-    const dealt = target.takeDamage(finalDamage);
-
-    this.log.add({
-      turn: this.turnCount,
-      type: isCrit ? BattleLogType.CRIT : BattleLogType.ATTACK,
-      source: enemy.name, target: target.name, value: dealt,
-      message: `${enemy.name} ${isCrit ? 'CRIT' : 'attacks'} ${target.name} for ${dealt}`,
-    });
-
-    if (enemy.lifestealRate > 0 && dealt > 0) {
-      const healAmount = Math.floor(dealt * enemy.lifestealRate);
-      const healed = enemy.heal(healAmount);
-      if (healed > 0) {
-        this.log.add({
-          turn: this.turnCount, type: BattleLogType.LIFESTEAL,
-          source: enemy.name, target: enemy.name, value: healed,
-          message: `${enemy.name} heals ${healed} from lifesteal`,
-        });
-      }
-    }
-
-    if (!target.isAlive()) return;
-
-    if (enemy.multiHitChance > 0 && this.rng.chance(enemy.multiHitChance)) {
-      const extraDamage = this.calculateBaseDamage(enemy, target);
-      const extraDealt = target.takeDamage(extraDamage);
-      this.log.add({
-        turn: this.turnCount, type: BattleLogType.ATTACK,
-        source: enemy.name, target: target.name, value: extraDealt,
-        message: `${enemy.name} multi-hit ${target.name} for ${extraDealt}`,
-      });
-      if (!target.isAlive()) return;
-    }
-
-    for (const skill of enemy.activeSkills) {
-      if (!target.isAlive()) break;
-      if (this.engine.evaluateTrigger(skill.trigger, this.turnCount, enemy)) {
-        const results = this.engine.executeSkillEffects(skill, enemy, target, enemy.activeSkills);
-        this.logSkillResults(results, enemy, target, false);
-      }
-    }
-
-    if (!target.isAlive()) return;
-    if (enemy.isPlayer) return;
-
-    if (enemy.rage < enemy.maxRage) {
-      enemy.rage = Math.min(enemy.rage + BattleDataTable.rage.playerRagePerAttack, enemy.maxRage);
-      if (enemy.rage >= enemy.maxRage) {
-        enemy.rage = 0;
-        const rageDamage = Math.floor(enemy.getEffectiveAtk() * BattleDataTable.rage.attackMultiplier);
-        const rageDealt = target.takeDamage(rageDamage);
-        this.log.add({
-          turn: this.turnCount, type: BattleLogType.RAGE_ATTACK,
-          source: enemy.name, target: target.name, value: rageDealt,
-          skillName: '분노 공격', skillIcon: '💢',
-          message: `${enemy.name} RAGE ATTACK ${target.name} for ${rageDealt}`,
-        });
-      }
-    }
-
-    if (target.isAlive() && target.counterTriggerChance > 0 && this.rng.chance(target.counterTriggerChance)) {
-      this.processCounter(target, enemy);
     }
   }
 

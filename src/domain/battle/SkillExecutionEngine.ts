@@ -15,6 +15,7 @@ export interface SkillExecutionUnit {
   getEffectiveCrit(): number;
   rage: number;
   maxRage: number;
+  ragePerAttack: number;
   magicCoefficient: number;
   takeDamage(amount: number): number;
   heal(amount: number): number;
@@ -192,10 +193,11 @@ export class SkillExecutionEngine {
         }
 
         case SkillEffectType.ADD_RAGE: {
-          source.rage = source.rage + effect.amount;
+          const rageAmount = effect.useSourceStat ? source.ragePerAttack : effect.amount;
+          source.rage = source.rage + rageAmount;
           results.push({
             skillName: skill.name, skillIcon: skill.icon,
-            damage: 0, isCrit: false, healAmount: 0, rageChange: effect.amount, debuffApplied: false,
+            damage: 0, isCrit: false, healAmount: 0, rageChange: rageAmount, debuffApplied: false,
           });
           break;
         }

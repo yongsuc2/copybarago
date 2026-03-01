@@ -91,6 +91,7 @@ export interface HealHpEffect {
 export interface AddRageEffect {
   type: SkillEffectType.ADD_RAGE;
   amount: number;
+  useSourceStat?: boolean;
 }
 
 export interface ConsumeRageEffect {

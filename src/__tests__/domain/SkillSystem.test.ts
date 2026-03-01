@@ -243,12 +243,15 @@ describe('PassiveSkillRegistry', () => {
   });
 
   it('all stat modifier passives have correct types', () => {
-    const statMods = ['crit_mastery', 'rage_mastery'];
-    for (const id of statMods) {
-      const skill = PassiveSkillRegistry.getById(id, 1);
-      expect(skill).toBeDefined();
-      expect(skill!.effect.type).toBe(PassiveType.STAT_MODIFIER);
-    }
+    const critMastery = PassiveSkillRegistry.getById('crit_mastery', 1);
+    expect(critMastery).toBeDefined();
+    expect(critMastery!.effect.type).toBe(PassiveType.STAT_MODIFIER);
+  });
+
+  it('rage_mastery uses SKILL_MODIFIER for RAGE tag', () => {
+    const rageMastery = PassiveSkillRegistry.getById('rage_mastery', 1);
+    expect(rageMastery).toBeDefined();
+    expect(rageMastery!.effect.type).toBe(PassiveType.SKILL_MODIFIER);
   });
 });
 

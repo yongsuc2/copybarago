@@ -2,7 +2,7 @@ import { Stats } from '../value-objects/Stats';
 import { ActiveSkill } from '../entities/ActiveSkill';
 import { PassiveSkill } from '../entities/PassiveSkill';
 import { StatusEffect } from './StatusEffect';
-import { StatusEffectType, PassiveType, StatType, SkillHierarchy, SkillTag } from '../enums';
+import { StatusEffectType, PassiveType, StatType, SkillEffectType, SkillHierarchy, SkillTag } from '../enums';
 import { BattleDataTable } from '../data/BattleDataTable';
 import type { SkillExecutionUnit } from './SkillExecutionEngine';
 
@@ -34,8 +34,8 @@ export class BattleUnit implements SkillExecutionUnit {
   counterTriggerChance: number;
   rage: number;
   maxRage: number;
+  ragePerAttack: number;
   magicCoefficient: number;
-  ragePowerMultiplier: number;
   shield: number;
   usedOnceConditions: Set<string>;
   skillTagBonuses: Map<SkillTag, number>;
@@ -66,8 +66,8 @@ export class BattleUnit implements SkillExecutionUnit {
     this.counterTriggerChance = 0;
     this.rage = 0;
     this.maxRage = BattleDataTable.rage.maxRage;
+    this.ragePerAttack = this.extractRagePerAttack();
     this.magicCoefficient = BattleDataTable.damage.baseMagicCoefficient;
-    this.ragePowerMultiplier = 1.0;
     this.shield = 0;
     this.usedOnceConditions = new Set();
     this.skillTagBonuses = new Map();
@@ -75,6 +75,19 @@ export class BattleUnit implements SkillExecutionUnit {
     this.hpDamageCoefficient = 0;
 
     this.applyPassiveSkills();
+  }
+
+  private extractRagePerAttack(): number {
+    for (const skill of this.activeSkills) {
+      if (skill.id === 'rage_accumulate') {
+        for (const eff of skill.effects) {
+          if (eff.type === SkillEffectType.ADD_RAGE) {
+            return eff.amount;
+          }
+        }
+      }
+    }
+    return 0;
   }
 
   private applyPassiveSkills(): void {
@@ -98,8 +111,6 @@ export class BattleUnit implements SkillExecutionUnit {
           const oldMax = this.maxHp;
           this.maxHp = isPercentage ? Math.floor(this.maxHp * (1 + value)) : this.maxHp + value;
           this.currentHp += (this.maxHp - oldMax);
-        } else if (stat === 'RAGE_POWER') {
-          this.ragePowerMultiplier += value;
         } else if (stat === 'MAGIC_COEFFICIENT') {
           this.magicCoefficient += value;
         }
