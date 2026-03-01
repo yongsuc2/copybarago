@@ -517,3 +517,13 @@
   - 적 분노 하드코딩 로직 제거 (ATK×1.2 고정 데미지 → 스킬 계수 기반 물리 공격)
   - battle.data.json에서 `playerRagePerAttack`, `attackMultiplier`, `skill` 섹션 삭제
   - 261개 테스트 통과
+- **Unity C# 프로젝트 동기화** — 동일한 분노 시스템 리팩토링을 Unity(CatCatGo) 프로젝트에 적용
+  - ActiveSkillEffect에 UseSourceStat 플래그 추가
+  - BattleUnit: RagePerAttack 프로퍼티 추가, RagePowerMultiplier 제거, ExtractRagePerAttack() 메서드 추가
+  - ISkillExecutionUnit에 RagePerAttack 추가
+  - SkillExecutionEngine: ADD_RAGE에서 UseSourceStat 지원
+  - EnemyTemplate: BuildEnemySkills()로 적에게 빌트인 스킬 부여 + RagePerAttack 설정
+  - Battle.cs: ProcessPlayerTurn/ProcessEnemyTurn → ProcessUnitTurn 통합
+  - rage_mastery: STAT_MODIFIER → SKILL_MODIFIER(RAGE 태그)
+  - BattleDataTable: SkillConfig 클래스 제거, RageConfig에서 불필요 필드 제거
+  - battle.data.json 동기화 (maxRage만 유지)
