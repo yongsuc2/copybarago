@@ -502,3 +502,18 @@
   - `Chapter.ts` createCombatBattle/createEliteBattle/createMidBossBattle/createBossBattle가 테마 인식 풀 사용
   - C# `EnemyTable.cs`, `Chapter.cs` 동일하게 반영, JSON 양쪽 복사
   - 260개 TS 테스트 통과
+
+---
+
+## 2026-03-01 (Day 17)
+
+### 완료 작업
+- **분노 시스템 리팩토링** — 플레이어/적 분노 시스템을 스킬 시스템으로 통합
+  - `ragePerAttack`를 BattleUnit 캐릭터 스탯으로 추가 (rage_accumulate 티어 데이터에서 추출)
+  - `ragePowerMultiplier` 제거 → rage_mastery를 SKILL_MODIFIER(RAGE 태그)로 전환, 기존 스킬 태그 보너스 시스템 활용
+  - `AddRageEffect`에 `useSourceStat` 플래그 추가, rage_accumulate가 캐릭터의 ragePerAttack 스탯 사용
+  - 적에게 빌트인 스킬(ilban_attack, bunno_attack, rage_accumulate) 자동 부여 (EnemyTemplate.buildEnemySkills)
+  - Battle.ts: processPlayerTurn/processEnemyTurn → processUnitTurn으로 통합 (플레이어/적 동일 로직)
+  - 적 분노 하드코딩 로직 제거 (ATK×1.2 고정 데미지 → 스킬 계수 기반 물리 공격)
+  - battle.data.json에서 `playerRagePerAttack`, `attackMultiplier`, `skill` 섹션 삭제
+  - 261개 테스트 통과

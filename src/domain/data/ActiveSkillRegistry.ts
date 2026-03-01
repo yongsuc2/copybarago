@@ -79,7 +79,7 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     traits: [],
     buildTrigger: () => trigger(onSkillActivation('ilban_attack')),
     buildEffects: (t) => [
-      { type: SkillEffectType.ADD_RAGE, amount: td('rage_accumulate', t).amount },
+      { type: SkillEffectType.ADD_RAGE, amount: td('rage_accumulate', t).amount, useSourceStat: true },
     ],
     buildDescription: (t) => `분노 게이지 ${td('rage_accumulate', t).amount} 추가`,
   },
