@@ -38,6 +38,18 @@ export class EnemyTemplate {
     return EnemyTemplate.fromData(data);
   }
 
+  private buildEnemySkills(): ActiveSkill[] {
+    const skills = [...this.activeSkills];
+    const enemyBunno = ActiveSkillRegistry.getById('enemy_bunno_attack', 1);
+    if (enemyBunno) skills.push(enemyBunno);
+    return skills;
+  }
+
+  private applyEnemyFields(unit: BattleUnit): BattleUnit {
+    unit.ragePerAttack = this.ragePerAttack;
+    return unit;
+  }
+
   createInstance(chapterLevel: number, statMultiplier: number = 1.0, dayProgress: number = 0): BattleUnit {
     let scaledStats = EnemyTable.getScaledStats(this.baseStats, chapterLevel);
     if (dayProgress > 0) {
@@ -47,23 +59,23 @@ export class EnemyTemplate {
     if (statMultiplier !== 1.0) {
       scaledStats = scaledStats.multiply(statMultiplier);
     }
-    return new BattleUnit(
+    return this.applyEnemyFields(new BattleUnit(
       this.name,
       scaledStats,
-      [...this.activeSkills],
+      this.buildEnemySkills(),
       [...this.passiveSkills],
       false,
-    );
+    ));
   }
 
   createTowerInstance(floor: number): BattleUnit {
     const scaledStats = EnemyTable.getTowerScaledStats(this.baseStats, floor);
-    return new BattleUnit(
+    return this.applyEnemyFields(new BattleUnit(
       this.name,
       scaledStats,
-      [...this.activeSkills],
+      this.buildEnemySkills(),
       [...this.passiveSkills],
       false,
-    );
+    ));
   }
 }

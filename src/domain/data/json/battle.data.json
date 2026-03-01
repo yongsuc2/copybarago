@@ -7,14 +7,8 @@
     "varianceMax": 1.1,
     "critMultiplier": 1.5
   },
-  "rage": {
-    "maxRage": 100,
-    "playerRagePerAttack": 20,
-    "attackMultiplier": 1.2
-  },
   "skill": {
     "onAttackAtkRatio": 0.3,
-    "onRageAtkRatio": 0.3,
     "turnStartAtkRatio": 0.2
   },
   "enemy": {

@@ -139,5 +139,7 @@
   { "skill": "stun_strike", "tier": 1, "count": 1 },
   { "skill": "stun_strike", "tier": 2, "count": 1 },
   { "skill": "stun_strike", "tier": 3, "count": 1 },
-  { "skill": "stun_strike", "tier": 4, "count": 1 }
+  { "skill": "stun_strike", "tier": 4, "count": 1 },
+
+  { "skill": "enemy_bunno_attack", "tier": 1, "coefficient": 1.2 }
 ]

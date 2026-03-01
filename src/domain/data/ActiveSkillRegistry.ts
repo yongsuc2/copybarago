@@ -419,6 +419,19 @@ const ACTIVE_SKILL_FAMILIES: ActiveSkillFamilyDef[] = [
     buildDescription: (t) => `일반 공격 시 적 최대 체력의 ${pct(td('hp_crush', t).coefficient)} 물리 데미지`,
   },
   {
+    id: 'enemy_bunno_attack', name: '분노 공격', icon: '💢',
+    hierarchy: SkillHierarchy.LOWEST,
+    tags: [SkillTag.RAGE, SkillTag.PHYSICAL],
+    heritageSynergy: [],
+    traits: [],
+    buildTrigger: () => trigger(everyNTurns(1), prob(1.0), rageFull()),
+    buildEffects: (t) => [
+      { type: SkillEffectType.CONSUME_RAGE, amount: 100 },
+      { type: SkillEffectType.ATTACK, attackType: AttackType.PHYSICAL, coefficient: td('enemy_bunno_attack', t).coefficient },
+    ],
+    buildDescription: (t) => `분노 게이지 100 소모, 물리 공격 (계수 ${td('enemy_bunno_attack', t).coefficient})`,
+  },
+  {
     id: 'stun_apply', name: '기절', icon: '💫',
     hierarchy: SkillHierarchy.LOWEST,
     tags: [SkillTag.DEBUFF],

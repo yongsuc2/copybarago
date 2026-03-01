@@ -251,29 +251,16 @@ export class Battle {
       if (!target.isAlive()) return;
     }
 
+    if (!enemy.isPlayer && enemy.ragePerAttack > 0) {
+      enemy.rage = Math.min(enemy.rage + enemy.ragePerAttack, enemy.maxRage);
+    }
+
     for (const skill of enemy.activeSkills) {
       if (!target.isAlive()) break;
       if (this.engine.evaluateTrigger(skill.trigger, this.turnCount, enemy)) {
         const results = this.engine.executeSkillEffects(skill, enemy, target, enemy.activeSkills);
-        this.logSkillResults(results, enemy, target, false);
-      }
-    }
-
-    if (!target.isAlive()) return;
-    if (enemy.isPlayer) return;
-
-    if (enemy.rage < enemy.maxRage) {
-      enemy.rage = Math.min(enemy.rage + BattleDataTable.rage.playerRagePerAttack, enemy.maxRage);
-      if (enemy.rage >= enemy.maxRage) {
-        enemy.rage = 0;
-        const rageDamage = Math.floor(enemy.getEffectiveAtk() * BattleDataTable.rage.attackMultiplier);
-        const rageDealt = target.takeDamage(rageDamage);
-        this.log.add({
-          turn: this.turnCount, type: BattleLogType.RAGE_ATTACK,
-          source: enemy.name, target: target.name, value: rageDealt,
-          skillName: '분노 공격', skillIcon: '💢',
-          message: `${enemy.name} RAGE ATTACK ${target.name} for ${rageDealt}`,
-        });
+        const isRage = skill.id === 'enemy_bunno_attack';
+        this.logSkillResults(results, enemy, target, isRage);
       }
     }
 

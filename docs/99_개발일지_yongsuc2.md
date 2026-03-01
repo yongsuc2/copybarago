@@ -502,3 +502,18 @@
   - `Chapter.ts` createCombatBattle/createEliteBattle/createMidBossBattle/createBossBattle가 테마 인식 풀 사용
   - C# `EnemyTable.cs`, `Chapter.cs` 동일하게 반영, JSON 양쪽 복사
   - 260개 TS 테스트 통과
+
+---
+
+## 2026-03-01 (Day 17)
+
+### 완료 작업
+- **적 분노 공격 스킬 시스템화** (Y-71)
+  - `enemy_bunno_attack` 스킬 추가 (LOWEST 계층, coefficient 1.2, rageFull 트리거)
+  - `battle.data.json`에서 `rage` 섹션 완전 삭제 (maxRage/playerRagePerAttack/attackMultiplier)
+  - `battle.data.json`에서 `skill.onRageAtkRatio` 죽은 데이터 삭제
+  - `Battle.ts processEnemyTurn` 리팩토링: 하드와이어 분노 공격 → 스킬 시스템 경유
+  - 적 분노 축적을 `enemy.ragePerAttack` (enemy.data.json) 사용으로 통일
+  - `BattleUnit.ragePerAttack` 필드 추가, `maxRage` 상수 100 고정
+  - `EnemyTemplate.createInstance/createTowerInstance`에서 `enemy_bunno_attack` 자동 부여 + `ragePerAttack` 전달
+  - 260개 테스트 통과

@@ -34,6 +34,7 @@ export class BattleUnit implements SkillExecutionUnit {
   counterTriggerChance: number;
   rage: number;
   maxRage: number;
+  ragePerAttack: number;
   magicCoefficient: number;
   ragePowerMultiplier: number;
   shield: number;
@@ -65,7 +66,8 @@ export class BattleUnit implements SkillExecutionUnit {
     this.lifestealRate = 0;
     this.counterTriggerChance = 0;
     this.rage = 0;
-    this.maxRage = BattleDataTable.rage.maxRage;
+    this.maxRage = 100;
+    this.ragePerAttack = 0;
     this.magicCoefficient = BattleDataTable.damage.baseMagicCoefficient;
     this.ragePowerMultiplier = 1.0;
     this.shield = 0;
